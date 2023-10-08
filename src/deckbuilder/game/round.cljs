@@ -1,12 +1,14 @@
 (ns deckbuilder.game.round
-  (:require [deckbuilder.game.cards :as cards]))
+  (:require [deckbuilder.game.cards :as cards]
+            [re-frame.core :as re-frame]))
 
 (def resources {:energy {:display "Energy" :value 0}
                 :credits {:display "Credits" :value 0}})
 
-(defn discard-hand [deck]
+(defn play-hand [deck]
   (if (:hand deck)
-    (assoc deck :discard-pile (cons (:hand deck) (:discard-pile deck)) :hand nil)
+    (do (re-frame.core/dispatch (:event (:hand deck)))
+        (assoc deck :discard-pile (cons (:hand deck) (:discard-pile deck)) :hand nil))
     deck))
 
 (defn draw-card [deck]
@@ -17,7 +19,7 @@
            :hand (first (:draw-pile deck)))))
 
 (defn advance-deck [deck]
-  (draw-card (discard-hand deck)))
+  (draw-card (play-hand deck)))
 
 (defn play-deck
   ([term deck]

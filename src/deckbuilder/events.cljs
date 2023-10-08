@@ -13,3 +13,9 @@
  :advance-game
  (fn [db _]
    (update db :round round/advance-deck)))
+
+(re-frame/reg-event-db
+ :add-energy
+ (fn [db _]
+   (update-in db [:resources :energy :value] inc)))
+
