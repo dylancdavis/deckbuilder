@@ -1,10 +1,10 @@
 h1.game-title {
-	background-color: rgb(12, 14, 87);
+	background-color: rgb(95, 100, 255);
 	color: white;
 	font-weight: bold;
 	padding: 0.75em;
 	font-size: 32px;
-	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+	border-bottom: 4px solid rgb(165, 168, 255);
 }
 
 #app {
@@ -24,14 +24,29 @@ h1.game-title {
 }
 
 .card-container {
-	--card-grey: #b2b2b2;
+	--card-grey: #dfdfdf;
 	width: 250px;
 	height: 350px;
 	border: 1px solid var(--card-grey);
 	display: flex;
 	flex-direction: column;
 	border-radius: 8px;
-	box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.card-back {
+		--s: 8px; /* control the size */
+	
+		--c:#0000,#ededed .5deg 119.5deg,#0000 120deg;
+		--g1:conic-gradient(from  60deg at 56.25% calc(425%/6),var(--c));
+		--g2:conic-gradient(from 180deg at 43.75% calc(425%/6),var(--c));
+		--g3:conic-gradient(from -60deg at 50%   calc(175%/12),var(--c));
+		background:
+			var(--g1),var(--g1) var(--s) calc(1.73*var(--s)),
+			var(--g2),var(--g2) var(--s) calc(1.73*var(--s)),
+			var(--g3) var(--s) 0,var(--g3) 0 calc(1.73*var(--s)) 
+			#dfdfdf;
+		background-size: calc(2*var(--s)) calc(3.46*var(--s));
 }
 
 .card-name {
@@ -49,8 +64,6 @@ opacity: 0.8;
 background-image: radial-gradient(circle at center center, #ffffff, #ffffff), repeating-radial-gradient(circle at center center, #f2f2f2, #dadada, 10px, transparent 20px, transparent 10px);
 background-blend-mode: multiply;
 }
-
-
 
 .card-description {
 	display: grid;

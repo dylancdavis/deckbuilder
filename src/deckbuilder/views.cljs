@@ -9,8 +9,10 @@
    [:div.card-image]
    [:div.card-description (:description card)]])
 
+(defn card-back [card] [:div.card-container.card-back])
+
 (defn card-pile [cards name]
-  [:div.draw-pile (map card-item cards)])
+  [:div.draw-pile (map card-back cards)])
 
 (defn round-panel [round-data]
   (let [draw-pile (:draw-pile round-data)
