@@ -14,14 +14,23 @@
   (let [draw-pile (:draw-pile round-data)
         hand (:hand round-data)
         discard-pile (:discard-pile round-data)]
-    [:div.pile-container
-     (card-pile draw-pile "Draw Pile")
-     (card-pile (if hand [hand] []) "Hand")
-     (card-pile discard-pile "Discard Pile")]))
+    [:div.round-panel [:div.pile-container
+                       (card-pile draw-pile "Draw Pile")
+                       (card-pile (if hand [hand] []) "Hand")
+                       (card-pile discard-pile "Discard Pile")]
+     [:button {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]]))
+
+(defn resource-panel [resources]
+  (let [energy (:energy resources)
+        credits (:credits resources)]
+    [:div.resource-panel
+     [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
+     [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
 
 (defn main-panel []
-  (let [round-data (re-frame/subscribe [::subs/round])]
+  (let [round-data (re-frame/subscribe [::subs/round])
+        resource-data (re-frame/subscribe [::subs/resources])]
     [:div.main-panel
      [:h1 "Deckbuilder"]
      (round-panel @round-data)
-     [:button {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]]))
+     (resource-panel @resource-data)]))

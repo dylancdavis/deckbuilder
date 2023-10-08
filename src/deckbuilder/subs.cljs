@@ -6,3 +6,8 @@
  ::round
  (fn [db]
    (:round db)))
+
+(re-frame/reg-sub
+ ::resources
+ (fn [db]
+   (:resources db)))
