@@ -12,4 +12,4 @@
 (re-frame/reg-event-db
  :advance-game
  (fn [db _]
-   (update db :round (round/advance-deck {:round db}))))
+   (update db :round round/advance-deck)))
