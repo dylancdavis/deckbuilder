@@ -4,9 +4,7 @@
    [re-frame.core :as re-frame]
    [deckbuilder.events :as events]
    [deckbuilder.views :as views]
-   [deckbuilder.config :as config]
-   ))
-
+   [deckbuilder.config :as config]))
 
 (defn dev-setup []
   (when config/debug?

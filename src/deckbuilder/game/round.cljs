@@ -1,5 +1,4 @@
 (ns deckbuilder.game.round
-  (:gen-class)
   (:require [deckbuilder.game.cards :as cards]))
 
 (def resources {:energy {:display "Energy" :value 0}
@@ -25,4 +24,4 @@
    (if (and (empty? (:draw-pile deck)) (nil? (:hand deck)))
      deck
      (play-deck term (advance-deck deck))))
-  ([term] (play-deck term cards/starting-deck)))
+  ([term] (play-deck term cards/starting-round)))

@@ -1,4 +1,6 @@
-(ns deckbuilder.db)
+(ns deckbuilder.db
+  (:require [deckbuilder.game.cards :as cards]))
+
 
 (def default-db
-  {:name "re-frame"})
+  {:round cards/starting-round})
