@@ -4,7 +4,7 @@
    [deckbuilder.subs :as subs]))
 
 (defn card-item [card]
-  [:li {:key (:name card)} (str (:name card) ": " (:description card))])
+  [:li (str (:name card) ": " (:description card))])
 
 (defn card-pile [cards name]
   [:div.draw-pile [:h2 name]
