@@ -4,11 +4,13 @@
    [deckbuilder.subs :as subs]))
 
 (defn card-item [card]
-  [:li (str (:name card) ": " (:description card))])
+  [:div.card-container
+   [:div.card-name (:name card)]
+   [:div.card-image]
+   [:div.card-description (:description card)]])
 
 (defn card-pile [cards name]
-  [:div.draw-pile [:h2 name]
-   [:ul (map card-item cards)]])
+  [:div.draw-pile (map card-item cards)])
 
 (defn round-panel [round-data]
   (let [draw-pile (:draw-pile round-data)
@@ -31,6 +33,7 @@
   (let [round-data (re-frame/subscribe [::subs/round])
         resource-data (re-frame/subscribe [::subs/resources])]
     [:div.main-panel
-     [:h1 "Deckbuilder"]
-     (round-panel @round-data)
-     (resource-panel @resource-data)]))
+     [:h1.game-title "Deckbuilder"]
+     [:div.main-content
+      (round-panel @round-data)
+      (resource-panel @resource-data)]]))
