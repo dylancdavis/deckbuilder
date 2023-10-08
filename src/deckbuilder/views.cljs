@@ -27,8 +27,15 @@
       (= size 2) [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile))]
       :else [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile)) (card-item (second (rest discard-pile)))])))
 
+(defn flippable-card [card]
+  [:div.flip-card
+   [:div.flip-card-inner
+    [:div.flip-card-front (card-item card)]
+    [:div.flip-card-back
+     (card-back)]]])
+
 (defn hand-display [hand]
-  (if (nil? hand) [:div.empty-pile "hand"] (card-item hand)))
+  (if (nil? hand) [:div.empty-pile "hand"] (flippable-card hand)))
 
 (defn round-panel [round-data]
   [:div.round-panel [:div.pile-container
