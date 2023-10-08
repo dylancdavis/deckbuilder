@@ -42,7 +42,8 @@
                      (draw-pile (:draw-pile round-data))
                      (hand-display (:hand round-data))
                      (discard-pile (:discard-pile round-data))]
-   [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
+   [:div.button-wrapper
+    [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]]])
 
 (defn resource-panel [resources]
   (let [energy (:energy resources)
