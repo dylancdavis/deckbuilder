@@ -9,20 +9,30 @@
    [:div.card-image]
    [:div.card-description (:description card)]])
 
-(defn card-back [card] [:div.card-container.card-back])
+(defn card-back [] [:div.card-container.card-back])
 
-(defn card-pile [cards name]
-  [:div.draw-pile (map card-back cards)])
+(defn draw-pile [draw-pile]
+  (let [size (count draw-pile)]
+    (cond
+      (= size 0) [:div.empty-pile "draw"]
+      (= size 1) [:div.draw-pile (card-back)]
+      (= size 2) [:div.draw-pile (card-back) (card-back)]
+      :else [:div.draw-pile (card-back) (card-back) (card-back)])))
+
+(defn discard-pile [discard-pile]
+  (let [size (count discard-pile)]
+    (cond
+      (= size 0) [:div.empty-pile "discard"]
+      (= size 1) [:div.draw-pile (card-item (first discard-pile))]
+      (= size 2) [:div.draw-pile (card-item (first discard-pile)) (card-item (second discard-pile))]
+      :else [:div.draw-pile (card-item (first discard-pile)) (card-item (second discard-pile)) (card-item (second (rest discard-pile)))])))
 
 (defn round-panel [round-data]
-  (let [draw-pile (:draw-pile round-data)
-        hand (:hand round-data)
-        discard-pile (:discard-pile round-data)]
-    [:div.round-panel [:div.pile-container
-                       (card-pile draw-pile "Draw Pile")
-                       (card-pile (if hand [hand] []) "Hand")
-                       (card-pile discard-pile "Discard Pile")]
-     [:button {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]]))
+  [:div.round-panel [:div.pile-container
+                     (draw-pile (:draw-pile round-data))
+                     (card-item (:hand round-data))
+                     (discard-pile (:discard-pile round-data))]
+   [:button {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
 
 (defn resource-panel [resources]
   (let [energy (:energy resources)
