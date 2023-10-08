@@ -15,5 +15,6 @@
 /.shadow-cljs/
 
 # Calva/Kondo
+/.calva/
 /.clj-kondo/
 /.lsp/
