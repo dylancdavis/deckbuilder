@@ -19,3 +19,11 @@
  (fn [db _]
    (update-in db [:resources :energy :value] inc)))
 
+(re-frame/reg-event-db
+ :generate-credit
+ (fn [db _]
+   (if
+    (>= (get-in db [:resources :energy :value]) 3)
+     (-> db (update-in [:resources :energy :value] #(- % 3))
+         (update-in [:resources :credits :value] inc)) db)))
+
