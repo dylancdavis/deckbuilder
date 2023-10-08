@@ -23,16 +23,19 @@
   (let [size (count discard-pile)]
     (cond
       (= size 0) [:div.empty-pile "discard"]
-      (= size 1) [:div.draw-pile (card-item (first discard-pile))]
-      (= size 2) [:div.draw-pile (card-item (first discard-pile)) (card-item (second discard-pile))]
-      :else [:div.draw-pile (card-item (first discard-pile)) (card-item (second discard-pile)) (card-item (second (rest discard-pile)))])))
+      (= size 1) [:div.discard-pile (card-item (first discard-pile))]
+      (= size 2) [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile))]
+      :else [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile)) (card-item (second (rest discard-pile)))])))
+
+(defn hand-display [hand]
+  (if (nil? hand) [:div.empty-pile "hand"] (card-item hand)))
 
 (defn round-panel [round-data]
   [:div.round-panel [:div.pile-container
                      (draw-pile (:draw-pile round-data))
-                     (card-item (:hand round-data))
+                     (hand-display (:hand round-data))
                      (discard-pile (:discard-pile round-data))]
-   [:button {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
+   [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
 
 (defn resource-panel [resources]
   (let [energy (:energy resources)
