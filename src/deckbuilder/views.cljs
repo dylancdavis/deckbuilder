@@ -16,7 +16,7 @@
         discard-pile (:discard-pile round-data)]
     [:div.pile-container
      (card-pile draw-pile "Draw Pile")
-     (card-pile hand "Hand")
+     (card-pile (if hand [hand] []) "Hand")
      (card-pile discard-pile "Discard Pile")]))
 
 (defn main-panel []
