@@ -8,5 +8,10 @@
              :description "+1 Energy"
              :event [:add-energy]})
 
-(def starting-round {:draw-pile (concat (take 7 (repeat energy)) (take 2 (repeat credit-generator))) :hand nil
+(def starting-deck-list (concat (take 7 (repeat energy)) (take 3 (repeat credit-generator))))
+
+(defn with-keys [coll]
+  (map-indexed (fn [idx item] (assoc item :key idx)) coll))
+
+(def starting-round {:draw-pile (with-keys starting-deck-list) :hand nil
                      :discard-pile []})

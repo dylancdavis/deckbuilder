@@ -4,7 +4,7 @@
    [deckbuilder.subs :as subs]))
 
 (defn card-item [card]
-  [:div.card-container
+  [:div.card-container {:key (:key card)}
    [:div.card-name (:name card)]
    [:div.card-image]
    [:div.card-description (:description card)]])
