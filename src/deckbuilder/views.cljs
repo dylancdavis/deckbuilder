@@ -35,7 +35,7 @@
      (card-back)]]])
 
 (defn hand-display [hand]
-  (if (nil? hand) [:div.empty-pile "hand"] (flippable-card hand)))
+  [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
 
 (defn round-panel [round-data]
   [:div.round-panel [:div.pile-container

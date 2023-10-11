@@ -159,6 +159,19 @@ button.advance:active {
 	color: #9a9a9a;
 }
 
+.hand-group {
+	position: relative;
+}
+
+.hand-group .empty-pile {
+	position: relative;
+}
+
+.hand-group .flip-card {
+	position: absolute;
+	top: 0
+}
+
 .round-panel {
 	display: flex;
 	flex-direction: column;
