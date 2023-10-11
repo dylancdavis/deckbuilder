@@ -104,8 +104,10 @@ h1.game-title {
 }
 
 .discard-pile .card-container:nth-child(1) {
+	animation: card-sliding 0.5s ease 0s forwards;
 	position: relative;
 	z-index: 2;
+
 }
 
 .discard-pile .card-container:not(:nth-child(1)) {
