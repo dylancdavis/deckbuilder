@@ -37,6 +37,7 @@ h1.game-title {
 	border-radius: 8px;
 	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 	background-color: white;
+	text-align: center;
 }
 
 .card-back {
@@ -226,7 +227,6 @@ button.advance:active {
   position: relative;
   width: 100%;
   height: 100%;
-  text-align: center;
   transition: transform 0.2s;
   transform-style: preserve-3d;
 	border-radius: 8px;
