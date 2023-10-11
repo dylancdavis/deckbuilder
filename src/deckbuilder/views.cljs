@@ -4,12 +4,12 @@
    [deckbuilder.subs :as subs]))
 
 (defn card-item [card]
-  [:div.card-container {:key (:key card)}
+  [:div.card-container {:key (js/Math.random)}
    [:div.card-name (:name card)]
    [:div.card-image]
    [:div.card-description (:description card)]])
 
-(defn card-back [] [:div.card-container.card-back])
+(defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
 
 (defn draw-pile [draw-pile]
   (let [size (count draw-pile)]
