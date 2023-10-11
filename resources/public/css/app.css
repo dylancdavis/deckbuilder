@@ -7,6 +7,10 @@ h1.game-title {
 	border-bottom: 4px solid rgb(60, 142, 158);
 }
 
+* {
+	--animation-time: 0.5s
+}
+
 #app {
 	font-family: 'Courier New', Courier, monospace;
 	width: 100vw;
@@ -48,6 +52,11 @@ h1.game-title {
 			var(--g3) var(--s) 0,var(--g3) 0 calc(1.73*var(--s)) 
 			#dfdfdf;
 		background-size: calc(2*var(--s)) calc(3.46*var(--s));
+		animation: card-shifting var(--animation-time) ease 0s forwards;
+}
+
+.card-back:last-child {
+	animation: none;
 }
 
 .card-name {
@@ -96,7 +105,7 @@ h1.game-title {
 }
 
 .draw-pile .card-back:nth-child(3) {
-	right: 1em
+	right: 1em;
 }
 
 .discard-pile {
@@ -104,13 +113,14 @@ h1.game-title {
 }
 
 .discard-pile .card-container:nth-child(1) {
-	animation: card-sliding 0.5s ease 0s forwards;
+	animation: card-sliding var(--animation-time) ease 0s forwards;
 	position: relative;
 	z-index: 2;
 
 }
 
 .discard-pile .card-container:not(:nth-child(1)) {
+	animation: card-shifting var(--animation-time) ease 0s forwards;
 	position: absolute;
 	top: 0;
 }
@@ -123,6 +133,7 @@ h1.game-title {
 .discard-pile .card-container:nth-child(3) {
 	left: 1em;
 	z-index: 0;
+	animation: none;
 }
 
 .button-wrapper {
@@ -191,12 +202,17 @@ button.advance:active {
   perspective: 3000px;
 	border-radius: 8px;
 	transform: translateX(calc(-100% - 2em));
-	animation: card-sliding 0.5s ease 0s forwards;
+	animation: card-sliding var(--animation-time) ease 0s forwards;
 	z-index: 3;
 }
 
 @keyframes card-sliding {
-	from { transform: translateX(calc(-100% - 1em)); }
+	from { transform: translateX(calc(-100% - 2em)); }
+	to { transform: translateX(0%);}
+}
+
+@keyframes card-shifting {
+	from { transform: translateX(calc(-0.5em)); }
 	to { transform: translateX(0%);}
 }
 
@@ -214,7 +230,7 @@ button.advance:active {
   transition: transform 0.2s;
   transform-style: preserve-3d;
 	border-radius: 8px;
-	animation: card-flipping 0.5s ease 0s forwards;
+	animation: card-flipping var(--animation-time) ease 0s forwards;
 }
 
 .flip-card-front, .flip-card-back {
