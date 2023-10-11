@@ -8,7 +8,9 @@ h1.game-title {
 }
 
 * {
-	--animation-time: 0.5s
+	--card-grey: #dfdfdf;
+	--animation-time: 0.5s;
+	--card-border: 1px solid var(--card-grey);
 }
 
 #app {
@@ -28,10 +30,9 @@ h1.game-title {
 }
 
 .card-container {
-	--card-grey: #dfdfdf;
 	width: 250px;
 	height: 350px;
-	border: 1px solid var(--card-grey);
+	border: var(--card-border);
 	display: flex;
 	flex-direction: column;
 	border-radius: 8px;
@@ -63,13 +64,13 @@ h1.game-title {
 .card-name {
 	font-weight: bold;
 	padding: 8px;
-	border-bottom: 1px solid var(--card-grey);
+	border-bottom: var(--card-border);
 	text-align: center;
 }
 
 .card-image {
 	flex: 1;
-	border-bottom: 1px solid var(--card-grey);
+	border-bottom: var(--card-border);
 	background-color: #ffffff;
 }
 
@@ -161,7 +162,6 @@ button.advance:active {
 }
 
 .empty-pile {
-	--card-grey: #dfdfdf;
 	width: 250px;
 	height: 350px;
 	border: 1px dashed var(--card-grey);
