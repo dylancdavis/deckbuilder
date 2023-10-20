@@ -11,3 +11,8 @@
  ::resources
  (fn [db]
    (:resources db)))
+
+(re-frame/reg-sub
+ ::view
+ (fn [db]
+   (:view db)))

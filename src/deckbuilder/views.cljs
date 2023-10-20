@@ -52,11 +52,13 @@
      [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
      [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
 
+(defn collection-view [] [:div "This is the collection view"])
+
+(defn get-view [name] (name {:collection collection-view :round round-panel}))
+
 (defn main-panel []
-  (let [round-data (re-frame/subscribe [::subs/round])
-        resource-data (re-frame/subscribe [::subs/resources])]
+  (let [view (re-frame/subscribe [::subs/view])]
     [:div.main-panel
      [:h1.game-title "Deckbuilder"]
      [:div.main-content
-      (round-panel @round-data)
-      (resource-panel @resource-data)]]))
+      ((get-view @view))]]))
