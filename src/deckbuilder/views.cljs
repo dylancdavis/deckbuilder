@@ -61,7 +61,12 @@
       [:div.panel-header "Decks"]
       (map (fn [decklist] (let [name (:name decklist)]
                             [:div.decklist-item {:key name} name]))
-           (:decklists @collection))]]))
+           (:decklists @collection))]
+     [:div.cards-panel
+      [:div.panel-header "Cards"]
+      [:div.card-grid
+       (map (fn [card] (card-item card))
+            (:cards @collection))]]]))
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
