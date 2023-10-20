@@ -16,3 +16,8 @@
  ::view
  (fn [db]
    (:view db)))
+
+(re-frame/reg-sub
+ ::collection
+ (fn [db]
+   (:collection db)))

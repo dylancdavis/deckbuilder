@@ -52,7 +52,13 @@
      [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
      [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
 
-(defn collection-view [] [:div "This is the collection view"])
+(defn collection-view []
+  (let
+   [collection (re-frame/subscribe [::subs/collection])]
+    [:div
+     "This is the collection view."
+     [:br]
+     (map #(:name %) (:decklists @collection))]))
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
