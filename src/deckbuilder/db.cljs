@@ -1,8 +1,6 @@
 (ns deckbuilder.db
-  (:require [deckbuilder.constants :as constants]
-            [deckbuilder.game.cards :as cards]))
+  (:require [deckbuilder.constants :as constants]))
 
 (def default-db
-  {:round cards/starting-round
-   :resources {:energy {:display "Energy" :value 0} :credits {:display "Credits" :value 0}}
+  {:view :collection
    :collection {:cards {} :card-backs {} :decklists [constants/starting-deck-list]}})
