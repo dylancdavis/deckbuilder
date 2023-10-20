@@ -55,10 +55,13 @@
 (defn collection-view []
   (let
    [collection (re-frame/subscribe [::subs/collection])]
-    [:div
+    [:div.collection-view
      "This is the collection view."
-     [:br]
-     (map #(:name %) (:decklists @collection))]))
+     [:div.decklist-panel
+      [:div.panel-header "Decks"]
+      (map (fn [decklist] (let [name (:name decklist)]
+                            [:div.decklist-item {:key name} name]))
+           (:decklists @collection))]]))
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
