@@ -1,7 +1,8 @@
 (ns deckbuilder.views
   (:require
    [re-frame.core :as re-frame]
-   [deckbuilder.subs :as subs]))
+   [deckbuilder.subs :as subs]
+   [deckbuilder.game.cards :as cards]))
 
 (defn card-item [card]
   [:div.card-container {:key (js/Math.random)}
@@ -52,21 +53,29 @@
      [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
      [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
 
+(defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card)}
+                                            (card-item card)
+                                            [:div.amount (str amount)]])
+
+(collection-card-item [cards/energy 2])
+
 (defn collection-view []
   (let
    [collection (re-frame/subscribe [::subs/collection])]
     [:div.collection-view
+
      "This is the collection view."
+
      [:div.decklist-panel
       [:div.panel-header "Decks"]
       (map (fn [decklist] (let [name (:name decklist)]
                             [:div.decklist-item {:key name} name]))
            (:decklists @collection))]
+
      [:div.cards-panel
       [:div.panel-header "Cards"]
       [:div.card-grid
-       (map (fn [card] (card-item card))
-            (:cards @collection))]]]))
+       (map collection-card-item (:cards @collection))]]]))
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
