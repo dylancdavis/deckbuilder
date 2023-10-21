@@ -64,8 +64,6 @@
    [collection (re-frame/subscribe [::subs/collection])]
     [:div.collection-view
 
-     "This is the collection view."
-
      [:div.decklist-panel
       [:div.panel-header "Decks"]
       (map (fn [decklist] (let [name (:name decklist)]

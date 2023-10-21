@@ -263,3 +263,35 @@ button.advance:active {
   color: white;
   transform: rotateY(180deg);
 }
+
+/* Styles for collection view */
+
+.collection-view {
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.decklist-panel {
+	border: 1px solid black;
+	padding: 2em;
+	width: 300px;
+	height: 100%;
+}
+
+.cards-panel {
+	flex: 1
+}
+
+.cards-panel .panel-header {
+	padding: 0.5em;
+	border: 1px solid black;
+	font-size: 40px;
+}
+
+.card-grid {
+	display: grid;
+	padding: 1em;
+	grid-gap: 1em;
+	overflow-x: scroll;
+}
