@@ -66,9 +66,9 @@
     (if
      (nil? selected-deck)
       (map (fn [decklist] (let [name (:name decklist)]
-                            [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} name]))
+                            [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} "Deck Item: " name]))
            (:decklists collection))
-      (:h2 "Selected deck:" selected-deck))))
+      [:h2 "Selected Deck: " selected-deck])))
 
 (defn collection-view []
   (let

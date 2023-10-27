@@ -30,6 +30,5 @@
 (re-frame/reg-event-db
  :select-deck
  (fn [db [_ deck-name]]
-   (js/console.log "deck-name" deck-name)
    (assoc-in db [:view-data :selected-deck] deck-name)))
 
