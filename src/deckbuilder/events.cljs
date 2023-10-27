@@ -2,7 +2,8 @@
   (:require
    [re-frame.core :as re-frame]
    [deckbuilder.db :as db]
-   [deckbuilder.game.round :as round]))
+   [deckbuilder.game.round :as round]
+   [deckbuilder.game.cards :as cards]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -32,3 +33,9 @@
  (fn [db [_ deck-name]]
    (assoc-in db [:view-data :selected-deck] deck-name)))
 
+(re-frame/reg-event-db
+ :start-run
+ (fn [db [_ deck-name]]
+   (assoc db
+          :view :round
+          :round cards/starting-round)))
