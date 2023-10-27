@@ -180,7 +180,9 @@ button.advance:active {
 .empty-pile {
 	width: 250px;
 	height: 350px;
-	border: 1px dashed var(--card-grey);
+	border: 4px solid var(--card-grey);
+	background-color: #eee;
+	box-shadow: inset 0px 1px 0px 1px grey;
 	border-radius: 8px;
 	display: grid;
 	place-items: center;
