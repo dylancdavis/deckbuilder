@@ -61,14 +61,14 @@
 
 (defn selected-deck-view []
   (let
-   [selected-deck (re-frame/subscribe [::subs/selected-deck])
-    collection (re-frame/subscribe [::subs/collection])]
+   [selected-deck @(re-frame/subscribe [::subs/selected-deck])
+    collection @(re-frame/subscribe [::subs/collection])]
     (if
-     (nil? @selected-deck)
+     (nil? selected-deck)
       (map (fn [decklist] (let [name (:name decklist)]
                             [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} name]))
-           (:decklists @collection))
-      (:h2 "Selected deck:" @selected-deck))))
+           (:decklists collection))
+      (:h2 "Selected deck:" selected-deck))))
 
 (defn collection-view []
   (let
