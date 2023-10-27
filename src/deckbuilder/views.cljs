@@ -68,7 +68,7 @@
       (map (fn [decklist] (let [name (:name decklist)]
                             [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} name]))
            (:decklists @collection))
-      (:h2 "Selected deck:" (:name @selected-deck)))))
+      (:h2 "Selected deck:" @selected-deck))))
 
 (defn collection-view []
   (let
