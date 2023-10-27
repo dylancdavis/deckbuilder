@@ -21,3 +21,8 @@
  ::collection
  (fn [db]
    (:collection db)))
+
+(re-frame/reg-sub
+ ::selected-deck
+ (fn [db]
+   (get-in db [:view-data :selected-deck])))

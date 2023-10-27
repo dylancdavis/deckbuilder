@@ -27,3 +27,8 @@
      (-> db (update-in [:resources :energy :value] #(- % 3))
          (update-in [:resources :credits :value] inc)) db)))
 
+(re-frame/reg-event-db
+ :select-deck
+ (fn [db [deck-name]]
+   (assoc-in db [:view-data :selected-deck] deck-name)))
+

@@ -59,6 +59,17 @@
 
 (collection-card-item [cards/energy 2])
 
+(defn selected-deck-view []
+  (let
+   [selected-deck (re-frame/subscribe [::subs/selected-deck])
+    collection (re-frame/subscribe [::subs/collection])]
+    (if
+     (nil? @selected-deck)
+      (map (fn [decklist] (let [name (:name decklist)]
+                            [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} name]))
+           (:decklists @collection))
+      (:h2 "Selected deck:" (:name @selected-deck)))))
+
 (defn collection-view []
   (let
    [collection (re-frame/subscribe [::subs/collection])]
@@ -66,9 +77,7 @@
 
      [:div.decklist-panel
       [:div.panel-header "Decks"]
-      (map (fn [decklist] (let [name (:name decklist)]
-                            [:div.decklist-item {:key name} name]))
-           (:decklists @collection))]
+      (selected-deck-view)]
 
      [:div.cards-panel
       [:div.panel-header "Cards"]
