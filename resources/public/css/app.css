@@ -10,7 +10,8 @@ h1.game-title {
 * {
 	--card-grey: #dfdfdf;
 	--animation-time: 0.5s;
-	--card-border: 4px solid rgb(88, 88, 88);
+	--card-border-color: rgb(88, 88, 88);
+	--card-border: 4px solid var(--card-border-color);
 }
 
 #app {
@@ -37,7 +38,7 @@ h1.game-title {
 	flex-direction: column;
 	border-radius: 8px;
 	/* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
-	background-color: white;
+	background-color: var(--card-border-color);
 	text-align: center;
 }
 
@@ -64,14 +65,19 @@ h1.game-title {
 .card-name {
 	font-weight: bold;
 	padding: 8px;
+	border-radius: 4px 4px 0 0;
 	border-bottom: var(--card-border);
 	text-align: center;
+	font-size: 24px;
+}
+
+.card-description {
+	border-radius: 0 0 4px 4px;
 }
 
 .card-name,.card-description {
 	text-shadow: 1px 1px white;
 	background-color: #ebebeb;
-	opacity: 0.8;
 	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
 	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
 	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
@@ -81,7 +87,6 @@ h1.game-title {
 	flex: 1;
 	border-bottom: var(--card-border);
 	background-color: #ffffff;
-	
 }
 
 .card-description {
