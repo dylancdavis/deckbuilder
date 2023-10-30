@@ -39,12 +39,12 @@
   [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
 
 (defn round-panel [round-data]
-  [:div.round-panel [:div.pile-container
-                     (draw-pile (:draw-pile round-data))
-                     (hand-display (:hand round-data))
-                     (discard-pile (:discard-pile round-data))]
-   [:div.button-wrapper
-    [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]]])
+  (let [round-data @(re-frame/subscribe [::subs/round])] [:div.round-panel [:div.pile-container
+                                                                            (draw-pile (:draw-pile round-data))
+                                                                            (hand-display (:hand round-data))
+                                                                            (discard-pile (:discard-pile round-data))]
+                                                          [:div.button-wrapper
+                                                           [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]]]))
 
 (defn resource-panel [resources]
   (let [energy (:energy resources)
