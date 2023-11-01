@@ -39,3 +39,10 @@
    (assoc db
           :view :round
           :round cards/starting-round)))
+
+(re-frame/reg-event-db
+ :end-run
+ (fn [db _]
+   (assoc db
+          :view :collection
+          :round nil)))
