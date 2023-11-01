@@ -10,7 +10,7 @@
 (re-frame/reg-sub
  ::resources
  (fn [db]
-   (:resources db)))
+   (get-in db [:round :resources])))
 
 (re-frame/reg-sub
  ::view

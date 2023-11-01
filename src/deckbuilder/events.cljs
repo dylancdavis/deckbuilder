@@ -46,3 +46,8 @@
    (assoc db
           :view :collection
           :round nil)))
+
+(re-frame/reg-event-db
+ :gain-resource
+ (fn [db [_ resource-name amount]]
+   (update-in db [:resources resource-name :value] + amount)))
