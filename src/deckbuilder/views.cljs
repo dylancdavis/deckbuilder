@@ -38,24 +38,27 @@
 (defn hand-display [hand]
   [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
 
-(defn round-panel []
-  (let [round-data @(re-frame/subscribe [::subs/round])]
-    [:div.round-panel [:div.pile-container
-                       (draw-pile (:draw-pile round-data))
-                       (hand-display (:hand round-data))
-                       (discard-pile (:discard-pile round-data))]
-     (if (and (empty? (:draw-pile round-data)) (empty? (:hand round-data)))
-       [:div.button-wrapper
-        [:button.mavigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
-       [:div.button-wrapper
-        [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])]))
-
 (defn resource-panel [resources]
   (let [energy (:energy resources)
         credits (:credits resources)]
     [:div.resource-panel
      [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
      [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
+
+(defn round-panel []
+  (let [deck-data @(re-frame/subscribe [::subs/round-deck])
+        resource-data @(re-frame/subscribe [::subs/resources])]
+    [:div.round-panel
+     [:div.pile-container
+      (draw-pile (:draw-pile deck-data))
+      (hand-display (:hand deck-data))
+      (discard-pile (:discard-pile deck-data))]
+     (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
+       [:div.button-wrapper
+        [:button.mavigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
+       [:div.button-wrapper
+        [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
+     (resource-panel resource-data)]))
 
 (defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card)}
                                             (card-item card)

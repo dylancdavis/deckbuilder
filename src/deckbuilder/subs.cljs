@@ -3,9 +3,9 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
- ::round
+ ::round-deck
  (fn [db]
-   (:round db)))
+   (get-in db [:round :deck])))
 
 (re-frame/reg-sub
  ::resources

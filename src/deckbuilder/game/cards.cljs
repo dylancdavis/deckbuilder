@@ -2,11 +2,11 @@
 
 (def credit-generator {:name "Credit Generator"
                        :description "Convert 3 Energy to 1 Credit"
-                       :event [:generate-credit]})
+                       :event [:gain-resource :credit 1]})
 
 (def energy {:name "Energize"
              :description "+1 Energy"
-             :event [:add-energy]})
+             :event [:gain-resource :energy 1]})
 
 (def starting-deck-list (concat (take 7 (repeat energy)) (take 3 (repeat credit-generator))))
 

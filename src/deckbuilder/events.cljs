@@ -13,7 +13,7 @@
 (re-frame/reg-event-db
  :advance-game
  (fn [db _]
-   (update db :round round/advance-deck)))
+   (update-in db [:round :deck] round/advance-deck)))
 
 (re-frame/reg-event-db
  :add-energy
@@ -38,7 +38,7 @@
  (fn [db [_ deck-name]]
    (assoc db
           :view :round
-          :round cards/starting-round)))
+          :round {:deck cards/starting-round :resources round/starting-resources})))
 
 (re-frame/reg-event-db
  :end-run

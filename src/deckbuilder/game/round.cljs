@@ -2,8 +2,8 @@
   (:require [deckbuilder.game.cards :as cards]
             [re-frame.core :as re-frame]))
 
-(def resources {:energy {:display "Energy" :value 0}
-                :credits {:display "Credits" :value 0}})
+(def starting-resources {:energy {:display "Energy" :value 0}
+                         :credits {:display "Credits" :value 0}})
 
 (defn play-hand [deck]
   (if (:hand deck)
