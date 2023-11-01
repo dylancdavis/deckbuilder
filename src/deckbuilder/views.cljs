@@ -38,7 +38,7 @@
 (defn hand-display [hand]
   [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
 
-(defn round-panel [round-data]
+(defn round-panel []
   (let [round-data @(re-frame/subscribe [::subs/round])]
     [:div.round-panel [:div.pile-container
                        (draw-pile (:draw-pile round-data))
