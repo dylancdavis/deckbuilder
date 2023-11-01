@@ -50,4 +50,4 @@
 (re-frame/reg-event-db
  :gain-resource
  (fn [db [_ resource-name amount]]
-   (update-in db [:resources resource-name :value] + amount)))
+   (update-in db [:round :resources resource-name :value] + amount)))

@@ -2,7 +2,7 @@
 
 (def credit-generator {:name "Credit Generator"
                        :description "Convert 3 Energy to 1 Credit"
-                       :event [:gain-resource :credit 1]})
+                       :event [:gain-resource :credits 1]})
 
 (def energy {:name "Energize"
              :description "+1 Energy"
