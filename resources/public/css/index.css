@@ -49,6 +49,7 @@ h1.game-title {
 	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
 	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
 	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+	background: linear-gradient(#ddd, #999);
 	border-radius: 8px;
 }
 
@@ -59,6 +60,7 @@ h1.game-title {
 		--g1:conic-gradient(from  60deg at 56.25% calc(425%/6),var(--c));
 		--g2:conic-gradient(from 180deg at 43.75% calc(425%/6),var(--c));
 		--g3:conic-gradient(from -60deg at 50%   calc(175%/12),var(--c));
+		
 		background:
 			var(--g1),var(--g1) var(--s) calc(1.73*var(--s)),
 			var(--g2),var(--g2) var(--s) calc(1.73*var(--s)),
