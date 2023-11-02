@@ -6,9 +6,10 @@
 
 (defn card-item [card]
   [:div.card-container {:key (js/Math.random)}
-   [:div.card-name (:name card)]
-   [:div.card-image]
-   [:div.card-description (:description card)]])
+   [:div.card-background
+    [:div.card-name (:name card)]
+    [:div.card-image]
+    [:div.card-description [:div.inner (:description card)]]]])
 
 (defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
 
@@ -75,9 +76,9 @@
       (map (fn [decklist] (let [name (:name decklist)]
                             [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} "Deck Item: " name]))
            (:decklists collection))
-      [:h2 
-       [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"] 
-       "Selected Deck: " selected-deck 
+      [:h2
+       [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"]
+       "Selected Deck: " selected-deck
        [:ul [:li " - Card 1 (x3)"] [:li " - Card 2 (x1)"]]
        [:div {:on-click #(re-frame/dispatch [:start-run name])} "Run This Deck"]])))
 

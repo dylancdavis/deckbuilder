@@ -10,7 +10,7 @@ h1.game-title {
 * {
 	--card-grey: #dfdfdf;
 	--animation-time: 0.5s;
-	--card-border-color: rgb(88, 88, 88);
+	--card-border-color: rgb(20, 20, 20);
 	--card-border: 4px solid var(--card-border-color);
 }
 
@@ -34,12 +34,21 @@ h1.game-title {
 	width: 250px;
 	height: 350px;
 	border: var(--card-border);
-	display: flex;
-	flex-direction: column;
 	border-radius: 8px;
 	/* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
 	background-color: var(--card-border-color);
+}
+
+.card-background {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 	text-align: center;
+	background-color: #ebebeb;
+	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
+	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 }
 
 .card-back {
@@ -69,32 +78,34 @@ h1.game-title {
 	border-bottom: var(--card-border);
 	text-align: center;
 	font-size: 24px;
+	background: linear-gradient(#fff, #eee);
 }
+
+/* use d9 for background  */
 
 .card-description {
 	border-radius: 0 0 4px 4px;
+	text-shadow: 1px 1px white;
+	display: grid;
+	place-items: center;
+	flex: 1;
+	padding: 1em;
 }
 
-.card-name,.card-description {
-	text-shadow: 1px 1px white;
-	background-color: #ebebeb;
-	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
-	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
-	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+.card-description .inner {
+	border: 4px solid var(--card-border-color);
+	border-radius: 4px;
+	width: 100%;
+	height: 100%;
+	display: grid;
+	place-items: center;
+	background: white;
 }
 
 .card-image {
 	flex: 1;
 	border-bottom: var(--card-border);
 	background-color: #ffffff;
-}
-
-.card-description {
-	display: grid;
-	place-items: center;
-	flex: 1;
-	padding: 1em;
-
 }
 
 .pile-container {
