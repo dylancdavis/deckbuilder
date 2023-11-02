@@ -100,7 +100,7 @@ h1.game-title {
 	height: 100%;
 	display: grid;
 	place-items: center;
-	background: white;
+	background: linear-gradient(#fff, #e6e6e6)
 }
 
 .card-image {

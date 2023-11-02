@@ -8,7 +8,6 @@
   [:div.card-container {:key (js/Math.random)}
    [:div.card-background
     [:div.card-name (:name card)]
-    [:div.card-image]
     [:div.card-description [:div.inner (:description card)]]]])
 
 (defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
