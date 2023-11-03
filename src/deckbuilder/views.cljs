@@ -73,11 +73,11 @@
     (if
      (nil? selected-deck)
       (map (fn [decklist] (let [name (:name decklist)]
-                            [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck name])} "Deck Item: " name]))
+                            [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck decklist])} "Deck Item: " name]))
            (:decklists collection))
       [:h2
        [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"]
-       "Selected Deck: " selected-deck
+       "Selected Deck: " (:name selected-deck)
        [:ul [:li " - Card 1 (x3)"] [:li " - Card 2 (x1)"]]
        [:div {:on-click #(re-frame/dispatch [:start-run name])} "Run This Deck"]])))
 
