@@ -78,8 +78,9 @@
       [:h2
        [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"]
        "Selected Deck: " (:name selected-deck)
-       [:ul [:li " - Card 1 (x3)"] [:li " - Card 2 (x1)"]]
+       [:ul (map (fn [[card amount]] [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
        [:div {:on-click #(re-frame/dispatch [:start-run name])} "Run This Deck"]])))
+
 
 (defn collection-view []
   (let
