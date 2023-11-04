@@ -35,10 +35,10 @@
 
 (re-frame/reg-event-db
  :start-run
- (fn [db [_ deck-name]]
+ (fn [db [_ deck]]
    (assoc db
           :view :round
-          :round {:deck cards/starting-round :resources round/starting-resources})))
+          :round {:deck (round/starting-round-data-from-deck deck) :resources round/starting-resources})))
 
 (re-frame/reg-event-db
  :end-run

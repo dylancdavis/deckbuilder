@@ -5,6 +5,13 @@
 (def starting-resources {:energy {:display "Energy" :value 0}
                          :credits {:display "Credits" :value 0}})
 
+(defn cardlist-from-cardmap [cardmap]
+  (mapcat (fn [[card count]] (repeat count card)) cardmap))
+
+(defn starting-round-data-from-deck [deck] (let [cards (:cards deck)] {:draw-pile (shuffle (cardlist-from-cardmap cards))}))
+
+(cardlist-from-cardmap {:a 2 :b 3})
+
 (defn play-hand [deck]
   (if (:hand deck)
     (do (re-frame.core/dispatch (:event (:hand deck)))

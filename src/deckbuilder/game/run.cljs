@@ -6,5 +6,3 @@
   (if (>= (:energy game) 2)
     (update (update game :energy dec) :credits inc)
     game))
-
-(def deck-size 5)
