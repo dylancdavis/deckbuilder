@@ -5,7 +5,7 @@
                        :event [:gain-resource :credits 1]})
 
 (def energy {:name "Energize"
-             :description "+1 Energy"
+             :description "Gain 1 Energy."
              :event [:gain-resource :energy 1]})
 
 (def starting-deck-list (concat (take 7 (repeat energy)) (take 3 (repeat credit-generator))))
