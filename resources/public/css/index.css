@@ -49,7 +49,7 @@ h1.game-title {
 	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
 	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
 	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-	background: linear-gradient(#ddd, #999);
+	background: linear-gradient(#ccc, #919191);
 	border-radius: 8px;
 }
 
