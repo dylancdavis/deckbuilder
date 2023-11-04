@@ -29,7 +29,7 @@
       :else [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile)) (card-item (second (rest discard-pile)))])))
 
 (defn flippable-card [card]
-  [:div.flip-card {:key (:key card)}
+  [:div.flip-card {:key (js/Math.random)}
    [:div.flip-card-inner
     [:div.flip-card-front (card-item card)]
     [:div.flip-card-back
