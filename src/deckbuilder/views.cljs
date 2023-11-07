@@ -61,7 +61,7 @@
         [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
      (resource-panel resource-data)
      (if (= modal-view :buy-basic)
-       [:div.modal-view.buy-basic [:button {:on-click (re-frame/dispatch [:clear-modal-view])} "Continue"]])]))
+       [:div.modal-view.buy-basic [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])]))
 
 (defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card)}
                                             (card-item card)
