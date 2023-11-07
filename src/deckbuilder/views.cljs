@@ -58,7 +58,7 @@
        [:div.button-wrapper
         [:button.mavigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
        [:div.button-wrapper
-        [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
+        [:button.advance {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))} "Advance"]])
      (resource-panel resource-data)
      (if (= modal-view :buy-basic)
        [:div.modal-view.buy-basic [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])]))
