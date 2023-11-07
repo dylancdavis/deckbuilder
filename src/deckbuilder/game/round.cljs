@@ -10,8 +10,6 @@
 
 (defn starting-round-data-from-deck [deck] (let [cards (:cards deck)] {:draw-pile (shuffle (cardlist-from-cardmap cards))}))
 
-(cardlist-from-cardmap {:a 2 :b 3})
-
 (defn play-hand [deck]
   (if (:hand deck)
     (do (re-frame.core/dispatch (:event (:hand deck)))
