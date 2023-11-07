@@ -47,7 +47,8 @@
 
 (defn round-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
-        resource-data @(re-frame/subscribe [::subs/resources])]
+        resource-data @(re-frame/subscribe [::subs/resources])
+        modal-view @(re-frame/subscribe [::subs/modal-view])]
     [:div.round-panel
      [:div.pile-container
       (draw-pile (:draw-pile deck-data))
@@ -58,7 +59,9 @@
         [:button.mavigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
        [:div.button-wrapper
         [:button.advance {:on-click #(re-frame/dispatch [:advance-game])} "Advance"]])
-     (resource-panel resource-data)]))
+     (resource-panel resource-data)
+     (if (= modal-view :buy-basic)
+       [:div.modal-view.buy-basic [:button {:on-click (re-frame/dispatch [:clear-modal-view])} "Continue"]])]))
 
 (defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card)}
                                             (card-item card)

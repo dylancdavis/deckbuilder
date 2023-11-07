@@ -51,3 +51,13 @@
  :gain-resource
  (fn [db [_ resource-name amount]]
    (update-in db [:round :resources resource-name :value] + amount)))
+
+(re-frame/reg-event-db
+ :buy-basic
+ (fn [db _]
+   (assoc-in db [:view-data :modal-view] :buy-basic)))
+
+(re-frame/reg-event-db
+ :clear-modal-view
+ (fn [db _]
+   (update-in db [:view-data] #(dissoc % :modal-view))))
