@@ -1,16 +1,18 @@
 (ns deckbuilder.game.cards)
 
-(def credit-generator {:name "Credit Generator"
-                       :description "Convert 3 Energy to 1 Credit."
-                       :event [:gain-resource :credits 1]})
-
 (def energy {:name "Energize"
              :description "Gain 1 Energy."
              :event [:gain-resource :energy 1]})
 
+(def credit-generator {:name "Credit Generator"
+                       :description "Convert 3 Energy to 1 Credit."
+                       :event [:gain-resource :credits 1]})
+
 (def buy-basic {:name "Buy Basic"
                 :description "Buy a Basic Card."
                 :event [:buy-basic]})
+
+(def basic-cards #{energy credit-generator buy-basic})
 
 (def starting-deck-list (concat (take 7 (repeat energy)) (take 3 (repeat credit-generator))))
 
