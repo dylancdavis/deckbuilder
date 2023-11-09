@@ -64,4 +64,4 @@
 
 (re-frame/reg-event-db
  :add-to-collection
- (fn [db [_ card]] (update-in db [:collection :cards] #(conj [card 1] %))))
+ (fn [db [_ card]] (update-in db [:collection :cards] #(conj % [card 1]))))
