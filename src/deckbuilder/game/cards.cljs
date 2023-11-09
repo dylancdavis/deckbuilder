@@ -2,15 +2,18 @@
 
 (def energy {:name "Energize"
              :description "Gain 1 Energy."
-             :event [:gain-resource :energy 1]})
+             :event [:gain-resource :energy 1]
+             :cost nil})
 
 (def credit-generator {:name "Credit Generator"
                        :description "Convert 3 Energy to 1 Credit."
-                       :event [:gain-resource :credits 1]})
+                       :event [:gain-resource :credits 1]
+                       :cost 1})
 
 (def buy-basic {:name "Buy Basic"
                 :description "Buy a Basic Card."
-                :event [:buy-basic]})
+                :event [:buy-basic]
+                :cost 2})
 
 (def basic-cards #{energy credit-generator buy-basic})
 

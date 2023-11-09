@@ -45,6 +45,13 @@
      [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
      [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
 
+(defn buy-card [card] (let 
+                       [resources @(re-frame/subscribe [::subs/resources])
+                        credits (:credits resources)]
+                        (if (>= credits (:cost card)) 
+                          (re-frame/dispatch [:add-to-collection card]) 
+                          nil)))
+
 (defn round-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
         resource-data @(re-frame/subscribe [::subs/resources])
@@ -61,17 +68,18 @@
         [:button.advance {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))} "Advance"]])
      (resource-panel resource-data)
      (if (= modal-view :buy-basic)
-       (let [new-card (rand-nth (vec cards/basic-cards))]
+       (let [first-card (rand-nth (vec cards/basic-cards))
+             second-card (rand-nth (vec cards/basic-cards))]
          [:div.modal-view.buy-basic
-          [:span (str "Card is: " (:name new-card))]
+          [:ul
+           [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card)) [:button {:on-click #(buy-card first-card)}]]
+           [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card)) [:button {:on-click #(buy-card first-card)}]]]
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
        nil)]))
 
 (defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card)}
                                             (card-item card)
                                             [:div.amount (str amount)]])
-
-(collection-card-item [cards/energy 2])
 
 (defn selected-deck-view []
   (let

@@ -61,3 +61,7 @@
  :clear-modal-view
  (fn [db _]
    (update-in db [:view-data] #(dissoc % :modal-view))))
+
+(re-frame/reg-event-db
+ :add-to-collection
+ (fn [db [_ card]] (update-in db [:collection :cards] #(conj [card 1] %))))
