@@ -1,8 +1,7 @@
 (ns deckbuilder.db
-  (:require [deckbuilder.constants :as constants]
-            [deckbuilder.game.cards :as cards]))
+  (:require [deckbuilder.constants :as constants]))
 
 (def default-db
   {:view :collection
-   :collection {:cards {cards/energy 2 cards/credit-generator 3} :card-backs {} :decklists [constants/starting-deck-list]}
+   :collection {:cards {} :card-backs {} :decklists [constants/starting-deck-list]}
    :view-data {:selected-deck nil}})
