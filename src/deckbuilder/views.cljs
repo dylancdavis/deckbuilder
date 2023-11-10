@@ -72,8 +72,8 @@
              second-card (rand-nth (vec cards/basic-cards))]
          [:div.modal-view.buy-basic
           [:ul
-           [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card)) [:button {:on-click #(re-frame/dispatch [:add-to-collection cards/energy])} "Buy"]]
-           [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card)) [:button {:on-click (buy-card first-card)} "Buy"]]]
+           [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card)) [:button {:on-click #(re-frame/dispatch [:add-to-collection first-card])} "Buy"]]
+           [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card)) [:button {:on-click #(re-frame/dispatch [:add-to-collection second-card])} "Buy"]]]
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
        nil)]))
 
