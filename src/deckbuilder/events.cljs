@@ -62,10 +62,10 @@
 (re-frame/reg-event-db
  :clear-modal-view
  (fn [db _]
-   (update-in db [:view-data] #(dissoc % :modal-view))))
+   (remove-modal-view db)))
 
 (defn conj-to-cards [db card] (update-in db [:collection :cards] #(conj % [card 1])))
 
 (re-frame/reg-event-db
  :add-to-collection
- (fn [db [_ card]] (conj-to-cards db card)))
+ (fn [db [_ card]] (remove-modal-view (conj-to-cards db card))))
