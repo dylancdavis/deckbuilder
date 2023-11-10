@@ -69,11 +69,3 @@
 (re-frame/reg-event-db
  :add-to-collection
  (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(inc-in-map % card)))))
-
-(def db {:view :collection
-         :collection {:cards {cards/energy 1} :card-backs {} :decklists []}
-         :view-data {:selected-deck nil}})
-
-(update-in db [:collection :cards] #(inc-in-map % cards/energy))
-
-(get-in db [:collection :cards cards/energy])
