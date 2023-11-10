@@ -64,8 +64,16 @@
  (fn [db _]
    (remove-modal-view db)))
 
-(defn conj-to-cards [db card] (update-in db [:collection :cards] #(conj % [card 1])))
+(defn inc-in-map [map key] (if (nil? (get map key)) (assoc map key 1) (update-in map [key] inc)))
 
 (re-frame/reg-event-db
  :add-to-collection
- (fn [db [_ card]] (remove-modal-view (conj-to-cards db card))))
+ (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(inc-in-map % card)))))
+
+(def db {:view :collection
+         :collection {:cards {cards/energy 1} :card-backs {} :decklists []}
+         :view-data {:selected-deck nil}})
+
+(update-in db [:collection :cards] #(inc-in-map % cards/energy))
+
+(get-in db [:collection :cards cards/energy])
