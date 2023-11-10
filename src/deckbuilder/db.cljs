@@ -4,5 +4,5 @@
 
 (def default-db
   {:view :collection
-   :collection {:cards [[cards/energy 2] [cards/credit-generator 3]] :card-backs {} :decklists [constants/starting-deck-list]}
+   :collection {:cards {cards/energy 2 cards/credit-generator 3} :card-backs {} :decklists [constants/starting-deck-list]}
    :view-data {:selected-deck nil}})
