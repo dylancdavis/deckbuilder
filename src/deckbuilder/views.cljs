@@ -106,7 +106,7 @@
 
 (defn collection-view []
   (let
-   [collection (re-frame/subscribe [::subs/collection])]
+   [collection @(re-frame/subscribe [::subs/collection])]
     [:div.collection-view
 
      [:div.decklist-panel
@@ -116,13 +116,13 @@
      [:div.cards-panel
       [:div.panel-header "Cards"]
       [:div.card-grid
-       (map collection-card-item (:cards @collection))]]]))
+       (map collection-card-item (:cards collection))]]]))
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
 (defn main-panel []
-  (let [view (re-frame/subscribe [::subs/view])]
+  (let [view @(re-frame/subscribe [::subs/view])]
     [:div.main-panel
      [:h1.game-title "Deckbuilder"]
      [:div.main-content
-      ((get-view @view))]]))
+      ((get-view view))]]))
