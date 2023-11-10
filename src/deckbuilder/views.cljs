@@ -65,15 +65,19 @@
        [:div.button-wrapper
         [:button.mavigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
        [:div.button-wrapper
-        [:button.advance {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))} "Advance"]])
+        [:button.advance
+         {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))}
+         "Advance"]])
      (resource-panel resource-data)
      (if (= modal-view :buy-basic)
        (let [first-card (rand-nth (vec cards/basic-cards))
              second-card (rand-nth (vec cards/basic-cards))]
          [:div.modal-view.buy-basic
           [:ul
-           [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card)) [:button {:on-click #(re-frame/dispatch [:add-to-collection first-card])} "Buy"]]
-           [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card)) [:button {:on-click #(re-frame/dispatch [:add-to-collection second-card])} "Buy"]]]
+           [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card))
+            [:button {:on-click #(re-frame/dispatch [:add-to-collection first-card])} "Buy"]]
+           [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card))
+            [:button {:on-click #(re-frame/dispatch [:add-to-collection second-card])} "Buy"]]]
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
        nil)]))
 
@@ -88,12 +92,15 @@
     (if
      (nil? selected-deck)
       (map (fn [decklist] (let [name (:name decklist)]
-                            [:div.decklist-item {:key name :on-click #(re-frame/dispatch [:select-deck decklist])} "Deck Item: " name]))
+                            [:div.decklist-item
+                             {:key name :on-click #(re-frame/dispatch [:select-deck decklist])}
+                             "Deck Item: " name]))
            (:decklists collection))
       [:h2
        [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"]
        "Selected Deck: " (:name selected-deck)
-       [:ul (map (fn [[card amount]] [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
+       [:ul (map (fn [[card amount]]
+                   [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
        [:div {:on-click #(re-frame/dispatch [:start-run selected-deck])} "Run This Deck"]])))
 
 
