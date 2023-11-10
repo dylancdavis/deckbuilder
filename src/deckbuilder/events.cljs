@@ -57,11 +57,15 @@
  (fn [db _]
    (assoc-in db [:view-data :modal-view] :buy-basic)))
 
+(defn remove-modal-view [db] (update-in db [:view-data] #(dissoc % :modal-view)))
+
 (re-frame/reg-event-db
  :clear-modal-view
  (fn [db _]
    (update-in db [:view-data] #(dissoc % :modal-view))))
 
+(defn conj-to-cards [db card] (update-in db [:collection :cards] #(conj % [card 1])))
+
 (re-frame/reg-event-db
  :add-to-collection
- (fn [db [_ card]] (update-in db [:collection :cards] #(conj % [card 1]))))
+ (fn [db [_ card]] (conj-to-cards db card)))
