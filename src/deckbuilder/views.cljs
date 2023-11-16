@@ -71,13 +71,16 @@
      (resource-panel resource-data)
      (if (= modal-view :buy-basic)
        (let [first-card (rand-nth (vec cards/basic-cards))
-             second-card (rand-nth (vec cards/basic-cards))]
+             second-card (rand-nth (vec cards/basic-cards))
+             credits (:value (:credits resource-data))
+             afford-first? (>= credits (:cost first-card))
+             afford-second? (>= credits (:cost second-card))]
          [:div.modal-view.buy-basic
           [:ul
            [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card))
-            [:button {:on-click #(re-frame/dispatch [:add-to-collection first-card])} "Buy"]]
+            [:button {:disabled (not afford-first?) :on-click (if afford-first? #(re-frame/dispatch [:add-to-collection first-card]) nil)} "Buy"]]
            [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card))
-            [:button {:on-click #(re-frame/dispatch [:add-to-collection second-card])} "Buy"]]]
+            [:button {:disabled (not afford-second?) :on-click (if afford-second? #(re-frame/dispatch [:add-to-collection second-card]) nil)} "Buy"]]]
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
        nil)]))
 
