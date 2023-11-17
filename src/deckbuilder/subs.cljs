@@ -28,6 +28,11 @@
    (get-in db [:collection :decklists (get-in db [:view-data :selected-deck])])))
 
 (re-frame/reg-sub
+ ::selected-deck-key
+ (fn [db]
+   (get-in db [:view-data :selected-deck])))
+
+(re-frame/reg-sub
  ::modal-view
  (fn [db]
    (get-in db [:view-data :modal-view])))

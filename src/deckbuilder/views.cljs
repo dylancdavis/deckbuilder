@@ -90,14 +90,15 @@
 
 (defn selected-deck-view []
   (let
-   [selected-deck @(re-frame/subscribe [::subs/selected-deck])
+   [selected-deck-key @(re-frame/subscribe [::subs/selected-deck-key])
+    selected-deck @(re-frame/subscribe [::subs/selected-deck])
     collection @(re-frame/subscribe [::subs/collection])]
     (if
-     (nil? selected-deck)
-      [:div (map (fn [[key decklist]] (let [name (:name decklist)]
-                                        [:div.decklist-item
-                                         {:key name :on-click #(re-frame/dispatch [:select-deck key])}
-                                         "Deck Item: " name]))
+     (nil? selected-deck-key)
+      [:div (map (fn [[deck-key decklist]] (let [name (:name decklist)]
+                                             [:div.decklist-item
+                                              {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
+                                              "Deck Item: " name]))
                  (:decklists collection))
        [:button {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]]
       [:h2
@@ -105,7 +106,7 @@
        "Selected Deck: " (:name selected-deck)
        [:ul (map (fn [[card amount]]
                    [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
-       [:button {:on-click #(re-frame/dispatch [:add-card-to-deck cards/energy key])} "Add Energy to Deck"]
+       [:button {:on-click #(re-frame/dispatch [:add-card-to-deck cards/energy selected-deck-key])} "Add Energy to Deck"]
        [:div {:on-click #(re-frame/dispatch [:start-run selected-deck])} "Run This Deck"]])))
 
 

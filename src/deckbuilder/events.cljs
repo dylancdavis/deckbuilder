@@ -76,4 +76,4 @@
 
 (re-frame/reg-event-db
  :add-card-to-deck
- (fn [db [_ card key]] (assoc-in db [:collection :decklists key :cards] {})))
+ (fn [db [_ card key]] (js/console.log (= (get-in db [:view-data :selected-deck]) :starting-deck)) (update-in db [:collection :decklists key :cards] #(inc-in-map % card))))
