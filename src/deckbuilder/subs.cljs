@@ -25,7 +25,7 @@
 (re-frame/reg-sub
  ::selected-deck
  (fn [db]
-   (get-in db [:view-data :selected-deck])))
+   (get-in db [:collection :decklists (get-in db [:view-data :selected-deck])])))
 
 (re-frame/reg-sub
  ::modal-view

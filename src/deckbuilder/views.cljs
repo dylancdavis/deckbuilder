@@ -94,10 +94,10 @@
     collection @(re-frame/subscribe [::subs/collection])]
     (if
      (nil? selected-deck)
-      [:div (map (fn [decklist] (let [name (:name decklist)]
-                                  [:div.decklist-item
-                                   {:key name :on-click #(re-frame/dispatch [:select-deck decklist])}
-                                   "Deck Item: " name]))
+      [:div (map (fn [[key decklist]] (let [name (:name decklist)]
+                                        [:div.decklist-item
+                                         {:key name :on-click #(re-frame/dispatch [:select-deck key])}
+                                         "Deck Item: " name]))
                  (:decklists collection))
        [:button {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]]
       [:h2
@@ -105,7 +105,7 @@
        "Selected Deck: " (:name selected-deck)
        [:ul (map (fn [[card amount]]
                    [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
-       [:button {:on-click #(re-frame/dispatch [:add-card-to-deck cards/energy selected-deck])} "Add Energy to Deck"]
+       [:button {:on-click #(re-frame/dispatch [:add-card-to-deck cards/energy key])} "Add Energy to Deck"]
        [:div {:on-click #(re-frame/dispatch [:start-run selected-deck])} "Run This Deck"]])))
 
 
