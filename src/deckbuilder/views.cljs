@@ -84,7 +84,7 @@
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
        nil)]))
 
-(defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card)}
+(defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card) :on-click #(re-frame/dispatch [:add-card-to-selected-deck card])}
                                             (card-item card)
                                             [:div.amount (str amount)]])
 
