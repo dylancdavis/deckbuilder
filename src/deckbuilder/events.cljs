@@ -73,3 +73,7 @@
 (re-frame/reg-event-db
  :add-new-deck
  (fn [db _] (update-in db [:collection :decklists] #(conj % {:name (js/prompt "Deck Name") :cards {}}))))
+
+(re-frame/reg-event-db
+ :add-card-to-deck
+ (fn [db [_ deck card]] (assoc-in db [:collection :decklists deck :cards] {})))
