@@ -94,11 +94,12 @@
     collection @(re-frame/subscribe [::subs/collection])]
     (if
      (nil? selected-deck)
-      (map (fn [decklist] (let [name (:name decklist)]
-                            [:div.decklist-item
-                             {:key name :on-click #(re-frame/dispatch [:select-deck decklist])}
-                             "Deck Item: " name]))
-           (:decklists collection))
+      [:div (map (fn [decklist] (let [name (:name decklist)]
+                                  [:div.decklist-item
+                                   {:key name :on-click #(re-frame/dispatch [:select-deck decklist])}
+                                   "Deck Item: " name]))
+                 (:decklists collection))
+       [:button {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]]
       [:h2
        [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"]
        "Selected Deck: " (:name selected-deck)

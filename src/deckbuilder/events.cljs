@@ -69,3 +69,7 @@
 (re-frame/reg-event-db
  :add-to-collection
  (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(inc-in-map % card)))))
+
+(re-frame/reg-event-db
+ :add-new-deck
+ (fn [db _] (update-in db [:collection :decklists] #(conj % {:name (js/prompt "Deck Name") :cards {}}))))
