@@ -89,6 +89,8 @@
                                             (card-item card)
                                             [:div.amount (str amount)]])
 
+(defn deck-size [decklist] (reduce + (vals (:cards decklist))))
+
 (defn selected-deck-view []
   (let
    [selected-deck-key @(re-frame/subscribe [::subs/selected-deck-key])
@@ -107,7 +109,7 @@
        "Selected Deck: " (:name selected-deck)
        [:ul (map (fn [[card amount]]
                    [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
-       [:div {:on-click #(re-frame/dispatch [:start-run selected-deck])} "Run This Deck"]])))
+       [:div {:on-click (if (= (deck-size selected-deck) 10) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 
 (defn collection-view []
