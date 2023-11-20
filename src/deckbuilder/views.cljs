@@ -107,6 +107,9 @@
       [:h2
        [:span {:on-click #(re-frame/dispatch [:select-deck nil])} "<--"]
        "Selected Deck: " (:name selected-deck)
+       [:div "Rules Card:"
+        [:ul [:li "- " (get-in selected-deck [:rules-card :name])]]]
+       [:div "Cards in Deck:"]
        [:ul (map (fn [[card amount]]
                    [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
        [:div {:on-click (if (= (deck-size selected-deck) 10) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
