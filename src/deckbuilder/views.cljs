@@ -129,7 +129,7 @@
      [:div.cards-panel
       [:div.panel-header "Cards"]
       [:div.card-grid
-       (map collection-card-item (:cards collection))]]]))
+       (if (= (:cards collection) {}) "No Cards in Collection. Run the starter deck!" (map collection-card-item (:cards collection)))]]]))
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
