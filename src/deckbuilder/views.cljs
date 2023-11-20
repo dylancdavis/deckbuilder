@@ -95,7 +95,9 @@
   (let
    [selected-deck-key @(re-frame/subscribe [::subs/selected-deck-key])
     selected-deck @(re-frame/subscribe [::subs/selected-deck])
-    collection @(re-frame/subscribe [::subs/collection])]
+    collection @(re-frame/subscribe [::subs/collection])
+    current-deck-size (deck-size selected-deck)
+    required-deck-size (get-in selected-deck [:rules-card :deck-size])]
     (if
      (nil? selected-deck-key)
       [:div (map (fn [[deck-key decklist]] (let [name (:name decklist)]
@@ -109,10 +111,10 @@
        "Selected Deck: " (:name selected-deck)
        [:div "Rules Card:"
         [:ul [:li "- " (get-in selected-deck [:rules-card :name])]]]
-       [:div "Cards in Deck:"]
+       [:div "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
        [:ul (map (fn [[card amount]]
                    [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
-       [:div {:on-click (if (= (deck-size selected-deck) 10) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
+       [:div {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 
 (defn collection-view []
