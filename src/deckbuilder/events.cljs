@@ -66,6 +66,12 @@
 
 (defn inc-in-map [map key] (if (nil? (get map key)) (assoc map key 1) (update-in map [key] inc)))
 
+(defn dec-in-map [map key]
+  (cond
+    (nil? (get map key)) map
+    (= 1 (get map key)) (dissoc map key)
+    :else (update-in map [key] dec)))
+
 (re-frame/reg-event-db
  :add-to-collection
  (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(inc-in-map % card)))))
@@ -85,3 +91,11 @@
      (update-in db
                 [:collection :decklists current-deck-key :cards]
                 #(inc-in-map % card)))))
+
+(re-frame/reg-event-db
+ :remove-card-from-selected-deck
+ (fn [db [_ card]]
+   (let [current-deck-key (get-in db [:view-data :selected-deck])]
+     (update-in db
+                [:collection :decklists current-deck-key :cards]
+                #(dec-in-map % card)))))
