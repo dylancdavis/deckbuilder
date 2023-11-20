@@ -22,7 +22,7 @@
                   :turn {:draw-amount 1 :play-amount 1}
                   :cost 1})
 
-(def basic-cards #{energy credit-generator buy-basic})
+(def basic-cards #{energy credit-generator buy-basic basic-rules})
 
 (def starting-deck-list (concat (take 7 (repeat energy)) (take 3 (repeat credit-generator))))
 
