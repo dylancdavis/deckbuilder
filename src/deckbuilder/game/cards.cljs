@@ -16,6 +16,7 @@
                 :cost 2})
 
 (def basic-rules {:name "Basic Rules"
+                  :type :rules
                   :deck-size 10
                   :total-rounds 1
                   :turn {:draw-amount 1 :play-amount 1}
