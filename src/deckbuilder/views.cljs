@@ -106,7 +106,6 @@
        "Selected Deck: " (:name selected-deck)
        [:ul (map (fn [[card amount]]
                    [:li {:key (:name card)} " -" (:name card) " x" amount]) (:cards selected-deck))]
-       [:button {:on-click #(re-frame/dispatch [:add-card-to-deck cards/energy selected-deck-key])} "Add Energy to Deck"]
        [:div {:on-click #(re-frame/dispatch [:start-run selected-deck])} "Run This Deck"]])))
 
 
