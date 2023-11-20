@@ -63,7 +63,7 @@
       (discard-pile (:discard-pile deck-data))]
      (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
        [:div.button-wrapper
-        [:button.mavigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
+        [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
        [:div.button-wrapper
         [:button.advance
          {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))}
@@ -82,7 +82,8 @@
            [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card))
             [:button {:disabled (not afford-second?) :on-click (if afford-second? #(re-frame/dispatch [:add-to-collection second-card]) nil)} "Buy"]]]
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
-       nil)]))
+       nil)
+     [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
 
 (defn collection-card-item [[card amount]] [:div.card-collection-item {:key (:name card) :on-click #(re-frame/dispatch [:add-card-to-selected-deck card])}
                                             (card-item card)
