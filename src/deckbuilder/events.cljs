@@ -99,3 +99,15 @@
      (update-in db
                 [:collection :decklists current-deck-key :cards]
                 #(dec-in-map % card)))))
+
+(re-frame/reg-event-db
+ :set-selected-deck-rules-card
+ (fn [db [_ rules-card]]
+   (let [current-deck-key (get-in db [:view-data :selected-deck])]
+     (assoc-in db [:collection :decklists current-deck-key :rules-card] rules-card))))
+
+(re-frame/reg-event-db
+ :clear-selected-deck-rules-card
+ (fn [db [_ rules-card]]
+   (let [current-deck-key (get-in db [:view-data :selected-deck])]
+     (assoc-in db [:collection :decklists current-deck-key :rules-card] nil))))
