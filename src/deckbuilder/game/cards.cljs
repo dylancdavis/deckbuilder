@@ -20,7 +20,7 @@
                   :deck-size 10
                   :total-rounds 1
                   :turn {:draw-amount 1 :play-amount 1}
-                  :cost 1})
+                  :cost 2})
 
 (def basic-cards #{energy credit-generator buy-basic basic-rules})
 
