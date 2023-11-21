@@ -88,12 +88,19 @@
 (defn collection-card-item [[card amount-in-collection]]
   (let [selected-deck @(re-frame/subscribe [::subs/selected-deck])
         selected-cards (:cards selected-deck)
-        amount-in-decklist (get selected-cards card)]
-    [:div.card-collection-item
-     {:key (:name card) :on-click (if (< amount-in-decklist amount-in-collection) #(re-frame/dispatch [:add-card-to-selected-deck card]) nil)}
-     (card-item card)
-     [:div.amount (str amount-in-collection)]
-     (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)]))
+        amount-in-decklist (get selected-cards card)
+        card-type (:type card)]
+    (if (= card-type :rules)
+      [:div.card-collection-item
+       {:key (:name card) :on-click (if (nil? (:rules-card selected-deck)) #(re-frame/dispatch [:set-selected-deck-rules-card card]) nil)}
+       (card-item card)
+       [:div.amount (str amount-in-collection)]
+       (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)]
+      [:div.card-collection-item
+       {:key (:name card) :on-click (if (< amount-in-decklist amount-in-collection) #(re-frame/dispatch [:add-card-to-selected-deck card]) nil)}
+       (card-item card)
+       [:div.amount (str amount-in-collection)]
+       (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)])))
 
 (defn deck-size [decklist] (reduce + (vals (:cards decklist))))
 
