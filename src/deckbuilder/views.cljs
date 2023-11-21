@@ -95,7 +95,7 @@
        {:key (:name card) :on-click (if (nil? (:rules-card selected-deck)) #(re-frame/dispatch [:set-selected-deck-rules-card card]) nil)}
        (card-item card)
        [:div.amount (str amount-in-collection)]
-       (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)]
+       (if (nil? (:rules-card selected-deck)) nil "Rules Card Already Selected")]
       [:div.card-collection-item
        {:key (:name card) :on-click (if (< amount-in-decklist amount-in-collection) #(re-frame/dispatch [:add-card-to-selected-deck card]) nil)}
        (card-item card)
