@@ -126,10 +126,10 @@
         (let [current-rules-card (get-in selected-deck [:rules-card])]
           (if (nil? current-rules-card)
             "- none"
-            [:ul [:li "- " (get current-rules-card :name) [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]))]
+            [:ul [:li [:span (get current-rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]))]
        [:div "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
        [:ul (map (fn [[card amount]]
-                   [:li {:key (:name card)} " -" (:name card) " x" amount [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "x"]]) (:cards selected-deck))]
+                   [:li {:key (:name card) :class "deck-card-count-item"} [:span (:name card) " x" amount] [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "x"]]) (:cards selected-deck))]
        [:div {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 

@@ -322,3 +322,18 @@ button.advance:active {
 	grid-gap: 1em;
 	overflow-x: scroll;
 }
+
+/* Deck list detail styling */
+
+.deck-card-count-item {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.2em;
+	background: rgb(236, 236, 236)
+}
+
+.deck-card-count-item button {
+	background: rgb(199, 199, 199);
+	border: 1px solid black;
+	border-radius: 4px;
+}
