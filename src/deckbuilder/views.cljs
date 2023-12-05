@@ -133,9 +133,9 @@
         [:ul (map (fn [[card amount]]
                     [:li {:key (:name card) :class "deck-card-count-item"}
                      [:span (:name card) " x" amount]
-                     [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "x"]]) (:cards selected-deck))]]
+                     [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]]
 
-       [:div {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
+       [:button {:class "run-deck" :on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 
 (defn collection-view []
