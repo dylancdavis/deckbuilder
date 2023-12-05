@@ -119,9 +119,8 @@
                                               "Deck Item: " name]))
                  (:decklists collection))
        [:button {:on-click #(re-frame/dispatch [:add-new-deck]) :class "add-new-deck"} "Add New Deck"]]
-      [:h2
-       [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "<--"]
-       "Selected Deck: " (:name selected-deck)
+      [:div {:class "selected-deck-view"}
+       [:h2 [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "<--"] "Selected Deck: " (:name selected-deck)]
        [:div {:class "card-list-block"}
         [:div {:class "card-list-header"} "Rules Card:"]
         (let [current-rules-card (get-in selected-deck [:rules-card])]

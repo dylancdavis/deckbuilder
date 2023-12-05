@@ -325,6 +325,12 @@ button.advance:active {
 
 /* Deck list detail styling */
 
+.selected-deck-view {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
 .card-list-block {
 	border: 1px solid black;
 	border-radius: 4px;
