@@ -99,6 +99,13 @@ h1.game-title {
 	padding: 1em;
 }
 
+.card-image {
+	border: 4px solid var(--card-border-color);
+	border-radius: 4px;
+	background: rgb(54,55,177);
+	background: linear-gradient(0deg, rgba(54,55,177,1) 0%, rgba(102,156,207,1) 100%); 
+}
+
 .card-description {
 	border: 4px solid var(--card-border-color);
 	border-radius: 4px;
@@ -111,11 +118,6 @@ h1.game-title {
 	font-weight: bold;
 }
 
-.card-image {
-	flex: 1;
-	border-bottom: var(--card-border);
-	background-color: #ffffff;
-}
 
 .pile-container {
 	display: flex;
