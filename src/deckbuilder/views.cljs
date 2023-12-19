@@ -4,6 +4,22 @@
    [deckbuilder.subs :as subs]
    [deckbuilder.game.cards :as cards]))
 
+(def lightning-svg
+  [:svg [:path
+         {:style {:stroke "#000"
+                  :strokeWidth 2
+                  :strokeDasharray "none"
+                  :strokeLinecap "butt"
+                  :strokeDashoffset 0
+                  :strokeLinejoin "miter"
+                  :strokeMiterlimit 4
+                  :fill "#fff"
+                  :fillRule "nonzero"
+                  :opacity 1}
+          :transform "translate(-0.000005, 0)"
+          :d "M 32.90323 -86.12903 L -36.77419 -86.12903 L -61.290319999999994 4.193550000000002 L -12.258059999999993 4.193550000000002 L -27.741929999999993 86.12903 L 61.29033 -20.322580000000002 L 9.032269999999997 -20.322580000000002 z"
+          :stroke-linecap "round"}]])
+
 (defn card-item [card]
   [:div.card-container {:key (js/Math.random)}
    [:div.card-background
