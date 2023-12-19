@@ -90,7 +90,7 @@ h1.game-title {
 
 /* use d9 for background  */
 
-.card-description {
+.card-content {
 	border-radius: 0 0 4px 4px;
 	text-shadow: 1px 1px white;
 	display: grid;
@@ -99,7 +99,7 @@ h1.game-title {
 	padding: 1em;
 }
 
-.card-description .inner {
+.card-description {
 	border: 4px solid var(--card-border-color);
 	border-radius: 4px;
 	width: 100%;
