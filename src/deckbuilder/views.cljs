@@ -182,7 +182,7 @@
   (let [view @(re-frame/subscribe [::subs/view])]
     [:<>
      [:h1.game-title "Deckbuilder"]
-     [:div.main-panel
-      [:div.main-content
+     [:div.main-content
+      [:div.main-panel
        [:div.nav "Collection" nav-divider "Current Run" nav-divider "Shop"]
        ((get-view view))]]]))

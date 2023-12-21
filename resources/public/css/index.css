@@ -1,10 +1,10 @@
 h1.game-title {
-	background-color: rgb(83, 177, 196);
 	color: rgb(255, 255, 255);
+	background-color: #003a50;
 	font-weight: bold;
-	padding: 0.75em;
+	padding: 0.5em;
 	font-size: 32px;
-	border-bottom: 4px solid rgb(60, 142, 158);
+	border-bottom: 4px solid #004057;
 }
 
 * {
@@ -12,22 +12,53 @@ h1.game-title {
 	--animation-time: 0.5s;
 	--card-border-color: rgb(20, 20, 20);
 	--card-border: 4px solid var(--card-border-color);
+
+	--standard-blue: #004c67;
+	--standard-orange: orangered;
 }
 
 #app {
 	font-family: 'Lexend', sans-serif;
 	width: 100vw;
 	height: 100vh;
-}
-
-.main-panel {
+	background-color: var(--standard-blue);
 	display: flex;
 	flex-direction: column;
 }
 
 .main-content {
-	display: grid;
-	place-items: center;
+	display: flex;
+	flex-direction: column;
+	padding: 2em 4em;
+	flex: 1;
+}
+
+.main-panel {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border: 2px solid #272727;
+	background-color: #272727;
+	border-radius: 16px;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.main-panel .nav {
+	padding: 0.75em;
+	color: white;
+	font-size: 18px;
+	display: flex;
+	gap: 0.5em;
+}
+
+.main-panel .nav .nav-divider {
+	border-left: 1px solid var(--standard-orange);
+}
+
+
+
+.collection-view {
+	flex: 1;
 }
 
 .card-container {
@@ -324,26 +355,32 @@ button.advance:active {
 	display: flex;
 	width: 100%;
 	height: 100%;
+	padding: 2px;
 }
 
 .decklist-panel {
-	border: 1px solid black;
 	padding: 2em;
 	width: 300px;
 	height: 100%;
+	background-color: #c2c2c2;
+	border-bottom-left-radius: 14px;
+	border-right: 4px solid #272727;
 }
 
 .cards-panel {
-	flex: 1
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	background-color: #eee
 }
 
 .cards-panel .panel-header {
 	padding: 0.5em;
-	border: 1px solid black;
 	font-size: 40px;
 }
 
 .card-grid {
+	flex: 1;
 	display: grid;
 	padding: 1em;
 	grid-gap: 1em;
