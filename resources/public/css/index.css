@@ -92,7 +92,6 @@ h1.game-title {
 
 .card-content {
 	border-radius: 0 0 4px 4px;
-	text-shadow: 1px 1px white;
 	display: grid;
 	place-items: center;
 	grid-template-rows: 1fr 1fr;
@@ -123,6 +122,17 @@ h1.game-title {
 	background: linear-gradient(#e6e6e6, #fff);
 	font-weight: bold;
 	font-size: 12px;
+	position: relative;
+}
+
+.card-description .card-label {
+	position: absolute;
+	top: -1em;
+	color: white;
+	background: linear-gradient(#000, #434343);
+	padding: 0.5em 1.5em;
+	border: 2px solid black;
+	clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
 }
 
 
