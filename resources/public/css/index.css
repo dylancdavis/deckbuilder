@@ -108,8 +108,8 @@ h1.game-title {
 	height: 100%;
 	border: 4px solid var(--card-border-color);
 	border-radius: 4px;
-	background: rgb(54,55,177);
-	background: linear-gradient(0deg, rgba(54,55,177,1) 0%, rgba(102,156,207,1) 100%);
+	background: #093153ff;
+	background: linear-gradient(0deg, #093153ff 0%, 	#1077d2 100%);
 }
 
 .card-description {
