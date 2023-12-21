@@ -176,9 +176,13 @@
 
 (defn get-view [name] (name {:collection collection-view :round round-panel}))
 
+(def nav-divider [:div.nav-divider])
+
 (defn main-panel []
   (let [view @(re-frame/subscribe [::subs/view])]
-    [:div.main-panel
+    [:<>
      [:h1.game-title "Deckbuilder"]
-     [:div.main-content
-      ((get-view view))]]))
+     [:div.main-panel
+      [:div.main-content
+       [:div.nav "Collection" nav-divider "Current Run" nav-divider "Shop"]
+       ((get-view view))]]]))
