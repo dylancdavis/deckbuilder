@@ -127,11 +127,19 @@ h1.game-title {
 
 .card-description .card-label {
 	position: absolute;
-	top: -1em;
+	top: calc(-1em - 3px);
+	color: white;
+	background: #000;
+	clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+	padding: 2px;
+}
+
+.card-description .card-label-inner {
+	padding: 0.5em 1.5em;
+	width: 100%;
+	height: 100%;
 	color: white;
 	background: linear-gradient(#000, #434343);
-	padding: 0.5em 1.5em;
-	border: 2px solid black;
 	clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
 }
 
