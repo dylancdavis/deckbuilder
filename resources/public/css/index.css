@@ -98,6 +98,7 @@ h1.game-title {
 	grid-template-rows: 1fr 1fr;
 	flex: 1;
 	padding: 1em;
+	grid-gap: 1em;
 }
 
 .card-image {
