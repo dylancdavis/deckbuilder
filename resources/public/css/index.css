@@ -392,7 +392,7 @@ button.advance:active {
 	display: grid;
 	padding: 1em;
 	grid-gap: 1em;
-	overflow-x: scroll;
+	overflow-y: scroll;
 }
 
 /* Deck list detail styling */
