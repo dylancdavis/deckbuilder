@@ -389,7 +389,7 @@ button.advance:active {
 
 .card-grid {
 	flex: 1;
-	display: grid;
+	display: flex;
 	padding: 1em;
 	grid-gap: 1em;
 	overflow-y: scroll;
@@ -454,4 +454,27 @@ button.run-deck {
 	border: 0px;
 	border-radius: 4px;
 	font-weight: bold;
+}
+
+.card-collection-item .card-container {
+	position: relative;
+	z-index: 1;
+}
+
+.card-interaction-row {
+	display: flex;
+	justify-content: center;
+	gap: 0.5em;
+}
+
+.card-interaction-row .amount {
+	color: white;
+	background-color: #111;
+	padding: 0.5em;
+	padding-top: 1em;
+	position: relative;
+	bottom: 0.75em;
+	border: 2px solid black;
+	border-radius: 8px;
+	z-index: 0;
 }
