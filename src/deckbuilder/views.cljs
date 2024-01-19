@@ -117,12 +117,12 @@
       [:div.card-collection-item
        {:key (:name card) :on-click (if (nil? (:rules-card selected-deck)) #(re-frame/dispatch [:set-selected-deck-rules-card card]) nil)}
        (card-item card)
-       [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)]]
+       [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
        (if (nil? (:rules-card selected-deck)) nil "Rules Card Already Selected")]
       [:div.card-collection-item
        {:key (:name card) :on-click (if (< amount-in-decklist amount-in-collection) #(re-frame/dispatch [:add-card-to-selected-deck card]) nil)}
        (card-item card)
-       [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)]]
+       [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
        (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)])))
 
 (defn deck-size [decklist] (reduce + (vals (:cards decklist))))

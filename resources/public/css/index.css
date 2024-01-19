@@ -463,13 +463,26 @@ button.run-deck {
 
 .card-interaction-row {
 	display: flex;
-	justify-content: center;
+	justify-content: flex-start;
 	gap: 0.5em;
+	padding-left: 1em;
 }
 
 .card-interaction-row .amount {
 	color: white;
 	background-color: #111;
+	padding: 0.5em;
+	padding-top: 1em;
+	position: relative;
+	bottom: 0.75em;
+	border: 2px solid black;
+	border-radius: 8px;
+	z-index: 0;
+}
+
+.card-interaction-row .add-card {
+	color: white;
+	background-color: #0e460c;
 	padding: 0.5em;
 	padding-top: 1em;
 	position: relative;
