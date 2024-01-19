@@ -379,7 +379,8 @@ button.advance:active {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	background-color: #eee
+	background-color: #eee;
+	box-shadow: inset 0px 0px 4px black;
 }
 
 .cards-panel .panel-header {
