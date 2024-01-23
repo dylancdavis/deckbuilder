@@ -136,11 +136,11 @@
     required-deck-size (get-in selected-deck [:rules-card :deck-size])]
     (if
      (nil? selected-deck-key)
-      [:div (map (fn [[deck-key decklist]] (let [name (:name decklist)]
-                                             [:div.decklist-item
-                                              {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
-                                              "Deck Item: " name]))
-                 (:decklists collection))
+      [:div.decks-container (map (fn [[deck-key decklist]] (let [name (:name decklist)]
+                                                             [:div.decklist-item
+                                                              {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
+                                                              name]))
+                                 (:decklists collection))
        [:button {:on-click #(re-frame/dispatch [:add-new-deck]) :class "add-new-deck"} "Add New Deck"]]
       [:div {:class "selected-deck-view"}
        [:h2 [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "<--"] "Selected Deck: " (:name selected-deck)]

@@ -360,7 +360,7 @@ button.advance:active {
 
 .decklist-panel {
 	width: 300px;
-	background-color: #c2c2c2;
+	background-color: #666;
 	border-bottom-left-radius: 14px;
 	border-right: 4px solid #272727;
 }
@@ -491,4 +491,26 @@ button.run-deck {
 	border: 2px solid black;
 	border-radius: 8px;
 	z-index: 0;
+}
+
+/* Deck Container Styling */
+
+.decks-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.decklist-item {
+	padding: 1em;
+	border-bottom: 2px solid #333;
+	background-color: #c2c2c2
+}
+
+.decks-container .add-new-deck {
+	padding: 1em;
+	border-radius: 0px;
+	border: 0px;
+	border-bottom: 2px solid #333;
+	font-weight: bold;
+	font-size: 16px;
 }
