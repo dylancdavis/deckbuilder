@@ -399,9 +399,11 @@ button.advance:active {
 /* Deck list detail styling */
 
 .selected-deck-view {
+	padding: 0.25em;
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	background-color: #c2c2c2
 }
 
 .card-list-block {
