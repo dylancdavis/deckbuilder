@@ -398,12 +398,44 @@ button.advance:active {
 
 /* Deck list detail styling */
 
-.selected-deck-view {
+.selected-deck-view h2 {
+	font-size: 16px;
+	color: white;
+	background-color: #333;
 	padding: 0.25em;
+	border-bottom: 2px solid #272727;
+	text-align: center;
+	font-weight: bold;
+	position: relative;
+}
+
+.selected-deck-view .back-to-decks {
+	position: absolute;
+	left: 0.5em;
+	background-color: white;
+	padding: 0 0.25em;
+	color: black;
+	border: 1px solid black;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.selected-deck-view .back-to-decks:hover {
+	filter: brightness(1.1)
+}
+
+.selected-deck-view {
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
 	background-color: #c2c2c2
+}
+
+.card-list-container {
+	flex: 1;
+	padding: 0.25em;
+	display: flex;
+	gap: 0.5rem;
+	flex-direction: column;
 }
 
 .card-list-block {

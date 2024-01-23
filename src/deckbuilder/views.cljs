@@ -143,19 +143,20 @@
                                  (:decklists collection))
        [:button {:on-click #(re-frame/dispatch [:add-new-deck]) :class "add-new-deck"} "Add New Deck"]]
       [:div {:class "selected-deck-view"}
-       [:h2 [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "<--"] "Selected Deck: " (:name selected-deck)]
-       [:div {:class "card-list-block"}
-        [:div {:class "card-list-header"} "Rules Card:"]
-        (let [current-rules-card (get-in selected-deck [:rules-card])]
-          (if (nil? current-rules-card)
-            "None"
-            [:ul [:li {:class "deck-card-count-item"} [:span (get current-rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]))]
-       [:div {:class "card-list-block"}
-        [:div {:class "card-list-header"} "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
-        [:ul (map (fn [[card amount]]
-                    [:li {:key (:name card) :class "deck-card-count-item"}
-                     [:span (:name card) " x" amount]
-                     [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]]
+       [:h2 [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "←"] (:name selected-deck)]
+       [:div.card-list-container
+        [:div {:class "card-list-block"}
+         [:div {:class "card-list-header"} "Rules Card:"]
+         (let [current-rules-card (get-in selected-deck [:rules-card])]
+           (if (nil? current-rules-card)
+             "None"
+             [:ul [:li {:class "deck-card-count-item"} [:span (get current-rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]))]
+        [:div {:class "card-list-block"}
+         [:div {:class "card-list-header"} "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
+         [:ul (map (fn [[card amount]]
+                     [:li {:key (:name card) :class "deck-card-count-item"}
+                      [:span (:name card) " x" amount]
+                      [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]]]
 
        [:button {:class "run-deck" :on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
