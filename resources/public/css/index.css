@@ -65,7 +65,7 @@ h1.game-title {
 	width: 250px;
 	height: 350px;
 	border: var(--card-border);
-	border-radius: 8px;
+	border-radius: 16px;
 	/* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
 	background-color: var(--card-border-color);
 }
@@ -74,23 +74,8 @@ h1.game-title {
 	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 
-.card-background {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	text-align: center;
-	background-color: #ebebeb;
-	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
-	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
-	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-	background: linear-gradient(#ccc, #919191);
-	border-radius: 8px;
-}
-
 .card-back {
 		--s: 8px; /* control the size */
-	
 		--c:#0000,#ededed .5deg 119.5deg,#0000 120deg;
 		--g1:conic-gradient(from  60deg at 56.25% calc(425%/6),var(--c));
 		--g2:conic-gradient(from 180deg at 43.75% calc(425%/6),var(--c));
@@ -109,11 +94,30 @@ h1.game-title {
 	animation: none;
 }
 
+.card-background {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	text-align: center;
+	background-color: #ebebeb;
+	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
+	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+	background: linear-gradient(#ccc, #919191);
+	border-radius: 12px;
+	padding: 0.5em;
+	--inner-border-color: #5C5C5C;
+	--title-shadow-color: #00000080;
+}
+
 .card-name {
 	font-weight: bold;
 	padding: 8px;
-	border-radius: 4px 4px 0 0;
-	border-bottom: var(--card-border);
+	border-radius: 8px;
+	border: 1px solid var(--inner-border-color);
+	box-shadow: 0px 2px var(--title-shadow-color);
 	text-align: center;
 	font-size: 18px;
 	background: linear-gradient(#fff, #eee);
@@ -136,14 +140,14 @@ h1.game-title {
 	place-items: center;
 	width: 100%;
 	height: 100%;
-	border: 3px solid var(--card-border-color);
+	border: 1px solid var(--inner-border-color);
 	border-radius: 16px;
 	background: #093153ff;
 	background: linear-gradient(0deg, #093153ff 0%, 	#1077d2 100%);
 }
 
 .card-description {
-	border: 3px solid var(--card-border-color);
+	border: 1px solid var(--inner-border-color);
 	border-radius: 8px;
 	width: 100%;
 	height: 100%;

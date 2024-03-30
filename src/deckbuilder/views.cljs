@@ -29,9 +29,8 @@
   [:div.card-container {:key (js/Math.random)}
    [:div.card-background
     [:div.card-name (:name card)]
-    [:div.card-content
-     [:div.card-image lightning-svg]
-     [:div.card-description [:div.card-label [:div.card-label-inner "Basic"]] (:description card)]]]])
+    [:div.card-image lightning-svg]
+    [:div.card-description [:div.card-label [:div.card-label-inner "Basic"]] (:description card)]]])
 
 (defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
 
