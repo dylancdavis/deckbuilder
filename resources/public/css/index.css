@@ -11,8 +11,8 @@ h1.game-title {
 	--card-grey: #dfdfdf;
 	--animation-time: 0.5s;
 	--card-border-color: rgb(20, 20, 20);
-	--card-border: 4px solid var(--card-border-color);
-
+	--card-width: 250px;
+	--card-border: calc(var(--card-width) * 4/250) solid var(--card-border-color);
 	--standard-blue: #004c67;
 	--standard-orange: orangered;
 }
@@ -62,10 +62,10 @@ h1.game-title {
 }
 
 .card-container {
-	width: 250px;
-	height: 350px;
+	width: var(--card-width);
+	aspect-ratio: 5/7;
 	border: var(--card-border);
-	border-radius: 16px;
+	border-radius: calc(var(--card-width) * 16/250);
 	/* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
 	background-color: var(--card-border-color);
 }
@@ -99,85 +99,54 @@ h1.game-title {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: 0.5em;
+	gap: calc(var(--card-width) * 8/250);
 	text-align: center;
 	background-color: #ebebeb;
-	background-image:  linear-gradient(#e0e0e0 2px, transparent 2px), linear-gradient(90deg, #e0e0e0 2px, transparent 2px), linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, #ebebeb 1px);
-	background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
-	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 	background: linear-gradient(#ccc, #919191);
-	border-radius: 12px;
-	padding: 0.5em;
+	border-radius: calc(var(--card-width) * 12/250);
+	padding: calc(var(--card-width) * 8/250);
 	--inner-border-color: #5C5C5C;
 	--title-shadow-color: #00000080;
 }
 
 .card-name {
 	font-weight: bold;
-	padding: 8px;
-	border-radius: 8px;
-	border: 1px solid var(--inner-border-color);
-	box-shadow: 0px 2px var(--title-shadow-color);
+	padding: calc(var(--card-width) * 8/250);
+	border-radius: calc(var(--card-width) * 8/250);
+	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+	box-shadow: 0px calc(var(--card-width) * 2/250) var(--title-shadow-color);
 	text-align: center;
-	font-size: 18px;
+	font-size: calc(var(--card-width) * 18/250);
 	background: linear-gradient(#fff, #eee);
 }
 
 /* use d9 for background  */
-
-.card-content {
-	border-radius: 0 0 4px 4px;
-	display: grid;
-	place-items: center;
-	grid-template-rows: 1fr 1fr;
-	flex: 1;
-	padding: 0.5em;
-	grid-gap: 1em;
-}
 
 .card-image {
 	display: grid;
 	place-items: center;
 	width: 100%;
 	height: 100%;
-	border: 1px solid var(--inner-border-color);
-	border-radius: 16px;
+	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+	border-radius: calc(var(--card-width) * 16/250);
 	background: #093153ff;
 	background: linear-gradient(0deg, #093153ff 0%, 	#1077d2 100%);
 }
 
 .card-description {
-	border: 1px solid var(--inner-border-color);
-	border-radius: 8px;
+	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+	box-shadow: inset calc(var(--card-width) * 1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25), inset calc(var(--card-width) * -1/250) calc(var(--card-width) * -1/250) 0px rgba(0, 0, 0, 0.25);
+	border-radius: calc(var(--card-width) * 8/250);
 	width: 100%;
 	height: 100%;
 	display: grid;
 	place-items: center;
-	padding: 0.75em;
+	padding: calc(var(--card-width) * 8/250);
 	background: linear-gradient(#e6e6e6, #fff);
 	font-weight: bold;
-	font-size: 12px;
+	font-size: calc(var(--card-width) * 12/250);
 	position: relative;
 }
-
-.card-description .card-label {
-	position: absolute;
-	top: calc(-1em - 3px);
-	color: white;
-	background: #000;
-	clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
-	padding: 2px;
-}
-
-.card-description .card-label-inner {
-	padding: 0.5em 1.5em;
-	width: 100%;
-	height: 100%;
-	color: white;
-	background: linear-gradient(#000, #434343);
-	clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
-}
-
 
 .pile-container {
 	display: flex;
