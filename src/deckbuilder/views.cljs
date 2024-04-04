@@ -8,7 +8,6 @@
   [:svg
    {:xmlns "http://www.w3.org/2000/svg"
     :xmlSpace "preserve"
-    :height 110
     :view-box "-1 -1.4 127 177.8"}
    [:path
     {:strokeLinecap "round"

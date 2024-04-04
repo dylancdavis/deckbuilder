@@ -26,6 +26,10 @@ h1.game-title {
 	flex-direction: column;
 }
 
+svg {
+	height: calc(var(--card-width) * 110/250);
+}
+
 .main-content {
 	display: flex;
 	flex-direction: column;
