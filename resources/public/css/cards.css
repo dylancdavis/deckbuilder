@@ -55,12 +55,12 @@
 
 .card-name {
 	font-weight: bold;
-	padding: calc(var(--card-width) * 8/250);
+	padding: calc(var(--card-width) * 7/250);
 	border-radius: calc(var(--card-width) * 8/250);
 	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
 	box-shadow: 0px calc(var(--card-width) * 2/250) var(--title-shadow-color);
 	text-align: center;
-	font-size: calc(var(--card-width) * 18/250);
+	font-size: calc(var(--card-width) * 20/250);
 	background: linear-gradient(#fff, #eee);
 }
 
@@ -87,8 +87,7 @@
 	place-items: center;
 	padding: calc(var(--card-width) * 8/250);
 	background: linear-gradient(#e6e6e6, #fff);
-	font-weight: bold;
-	font-size: calc(var(--card-width) * 12/250);
+	font-size: calc(var(--card-width) * 20/250);
 	position: relative;
 }
 
