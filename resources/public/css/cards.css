@@ -1,11 +1,12 @@
 * {
 	--card-grey: #dfdfdf;
 	--card-border-color: rgb(20, 20, 20);
-	--card-width: 250px;
+	--collection-card-width: 250px;
 	--card-border: calc(var(--card-width) * 4/250) solid var(--card-border-color);
 }
 
 .card-container {
+	--card-width: var(--collection-card-width);
 	width: var(--card-width);
 	aspect-ratio: 5/7;
 	border: var(--card-border);
