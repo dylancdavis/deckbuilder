@@ -11,7 +11,7 @@ h1.game-title {
 	--card-grey: #dfdfdf;
 	--animation-time: 0.5s;
 	--card-border-color: rgb(20, 20, 20);
-	--card-width: 250px;
+	--card-width: 200px;
 	--card-border: calc(var(--card-width) * 4/250) solid var(--card-border-color);
 	--standard-blue: #004c67;
 	--standard-orange: orangered;
