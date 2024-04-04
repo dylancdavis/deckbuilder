@@ -1,8 +1,8 @@
 (ns deckbuilder.game.run)
 
-(defn add-energy [game] (update game :energy inc))
+(defn add-points [game] (update game :points inc))
 
 (defn generate-credits [game]
-  (if (>= (:energy game) 2)
-    (update (update game :energy dec) :credits inc)
+  (if (>= (:points game) 2)
+    (update (update game :points dec) :credits inc)
     game))

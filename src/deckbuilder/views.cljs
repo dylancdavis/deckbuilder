@@ -61,10 +61,10 @@
   [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
 
 (defn resource-panel [resources]
-  (let [energy (:energy resources)
+  (let [points (:points resources)
         credits (:credits resources)]
     [:div.resource-panel
-     [:div {:class "resource"} (str (:display energy) ": " (:value energy))]
+     [:div {:class "resource"} (str (:display points) ": " (:value points))]
      [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
 
 (defn buy-card [card] (let
