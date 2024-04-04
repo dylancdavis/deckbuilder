@@ -1,7 +1,7 @@
 * {
 	--card-grey: #dfdfdf;
 	--card-border-color: rgb(20, 20, 20);
-	--card-width: 200px;
+	--card-width: 250px;
 	--card-border: calc(var(--card-width) * 4/250) solid var(--card-border-color);
 }
 
