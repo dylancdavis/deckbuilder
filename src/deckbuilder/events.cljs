@@ -21,14 +21,6 @@
    (update-in db [:resources :points :value] inc)))
 
 (re-frame/reg-event-db
- :generate-credit
- (fn [db _]
-   (if
-    (>= (get-in db [:resources :points :value]) 3)
-     (-> db (update-in [:resources :points :value] #(- % 3))
-         (update-in [:resources :credits :value] inc)) db)))
-
-(re-frame/reg-event-db
  :select-deck
  (fn [db [_ deck-name]]
    (assoc-in db [:view-data :selected-deck] deck-name)))

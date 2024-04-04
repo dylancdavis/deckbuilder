@@ -2,8 +2,7 @@
   (:require [deckbuilder.game.cards :as cards]
             [re-frame.core :as re-frame]))
 
-(def starting-resources {:points {:display "Points" :value 0}
-                         :credits {:display "Credits" :value 0}})
+(def starting-resources {:points {:display "Points" :value 0}})
 
 (defn cardlist-from-cardmap [cardmap]
   (mapcat (fn [[card count]] (repeat count card)) cardmap))

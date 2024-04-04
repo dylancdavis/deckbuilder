@@ -61,16 +61,14 @@
   [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
 
 (defn resource-panel [resources]
-  (let [points (:points resources)
-        credits (:credits resources)]
+  (let [points (:points resources)]
     [:div.resource-panel
-     [:div {:class "resource"} (str (:display points) ": " (:value points))]
-     [:div {:class "resource"} (str (:display credits) ": " (:value credits))]]))
+     [:div {:class "resource"} (str (:display points) ": " (:value points))]]))
 
 (defn buy-card [card] (let
                        [resources @(re-frame/subscribe [::subs/resources])
-                        credits (:credits resources)]
-                        (if (>= credits (:cost card))
+                        points (:points resources)]
+                        (if (>= points (:cost card))
                           #(re-frame/dispatch [:add-to-collection card])
                           nil)))
 
@@ -94,9 +92,9 @@
      (if (= modal-view :buy-basic)
        (let [first-card (rand-nth (vec cards/basic-cards))
              second-card (rand-nth (vec cards/basic-cards))
-             credits (:value (:credits resource-data))
-             afford-first? (>= credits (:cost first-card))
-             afford-second? (>= credits (:cost second-card))]
+             points (:value (:points resource-data))
+             afford-first? (>= points (:cost first-card))
+             afford-second? (>= points (:cost second-card))]
          [:div.modal-view.buy-basic
           [:ul
            [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card))
