@@ -3,15 +3,9 @@
    [re-frame.core :as re-frame]
    [deckbuilder.subs :as subs]
    [deckbuilder.game.cards :as cards]
-   [deckbuilder.views.svg :as svg]))
+   [deckbuilder.views.cards :as card-views]))
 
-(defn card-item [card]
-  [:div.card-container {:key (js/Math.random)}
-   [:div.card-background
-    [:div.card-name (:name card)]
-    [:div.card-content
-     [:div.card-image svg/lightning-svg]
-     [:div.card-description (:description card)]]]])
+(def card-item card-views/card-item)
 
 (defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
 
