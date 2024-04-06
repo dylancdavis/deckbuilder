@@ -5,7 +5,7 @@
    [deckbuilder.game.cards :as cards]))
 
 (def lightning-svg
-  [:svg
+  [:svg.lightning-svg
    {:xmlns "http://www.w3.org/2000/svg"
     :xmlSpace "preserve"
     :view-box "-1 -1.4 127 177.8"}
