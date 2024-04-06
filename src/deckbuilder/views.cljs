@@ -2,34 +2,15 @@
   (:require
    [re-frame.core :as re-frame]
    [deckbuilder.subs :as subs]
-   [deckbuilder.game.cards :as cards]))
-
-(def lightning-svg
-  [:svg.lightning-svg
-   {:xmlns "http://www.w3.org/2000/svg"
-    :xmlSpace "preserve"
-    :view-box "-1 -1.4 127 177.8"}
-   [:path
-    {:strokeLinecap "round"
-     :d "M32.903-86.129h-69.677L-61.29 4.194h49.032L-27.74 86.129 61.29-20.323H9.032z"
-     :style {:stroke "#000",
-             :strokeWidth 2,
-             :strokeDasharray "none",
-             :strokeLinecap "butt",
-             :strokeDashoffset 0,
-             :strokeLinejoin "miter",
-             :strokeMiterlimit 4,
-             :fill "#fff",
-             :fillRule "nonzero",
-             :opacity 1}
-     :transform "matrix(1.01974 0 0 1.01592 62.5 87.5)"}]])
+   [deckbuilder.game.cards :as cards]
+   [deckbuilder.views.svg :as svg]))
 
 (defn card-item [card]
   [:div.card-container {:key (js/Math.random)}
    [:div.card-background
     [:div.card-name (:name card)]
     [:div.card-content
-     [:div.card-image lightning-svg]
+     [:div.card-image svg/lightning-svg]
      [:div.card-description (:description card)]]]])
 
 (defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
