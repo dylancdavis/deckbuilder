@@ -12,9 +12,10 @@
 
 (def basic-rules {:name "Basic Rules"
                   :type :rules
-                  :deck-size 10
-                  :total-rounds 1
-                  :turn {:draw-amount 1 :play-amount 1}
+                  :deck-limits {:size 0 :added-cards {:score 7 :buy-basic 1}}
+                  :run-structure {:draw-amount 1
+                                  :play-amount 1}
+                  :end-conditions {:rounds 1}
                   :cost 2})
 
 (def basic-cards #{score buy-basic basic-rules})
