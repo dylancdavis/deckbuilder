@@ -1,4 +1,4 @@
-(ns deckbuilder.views
+(ns deckbuilder.views.main
   (:require
    [re-frame.core :as re-frame]
    [deckbuilder.subs :as subs]
