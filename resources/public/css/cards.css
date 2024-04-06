@@ -67,6 +67,15 @@
 
 /* use d9 for background  */
 
+.card-content {
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--card-width) * 8/250);
+	text-align: center;
+	flex: 1;
+	padding: 0 calc(var(--card-width) * 4/250);
+}
+
 .card-image {
 	display: grid;
 	place-items: center;
