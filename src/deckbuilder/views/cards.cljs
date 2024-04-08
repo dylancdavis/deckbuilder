@@ -6,7 +6,9 @@
 
 (defn rules-card-content [card]
   [:div.rules-info
-   [:div.card-description "Hello"]])
+   (let [deck-limits (:deck-limits card)]
+     [:div.deck-limit-section
+      [:div "Deck Size: " (:size deck-limits)]])])
 
 (defn card-item [card]
   [:div.card-container {:key (js/Math.random)}

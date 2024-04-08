@@ -105,6 +105,20 @@
 	position: relative;
 }
 
+.rules-info {
+		border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+		box-shadow: inset calc(var(--card-width) * 1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25), inset calc(var(--card-width) * -1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25);
+		border-radius: calc(var(--card-width) * 8/250);
+		width: 100%;
+		height: 100%;
+		display: grid;
+		place-items: center;
+		padding: calc(var(--card-width) * 8/250);
+		background: linear-gradient(#e6e6e6, #fff);
+		font-size: calc(var(--card-width) * 20/250);
+		position: relative;
+}
+
 /* Flip card CSS */
 
 .flip-card {
