@@ -10,7 +10,7 @@
                 :event [:buy-basic]
                 :cost 2})
 
-(def basic-rules {:name "Basic Rules"
+(def basic-rules {:name "Starter Rules"
                   :type :rules
                   :deck-limits {:size 0 :added-cards {:score 7 :buy-basic 1}}
                   :run-structure {:draw-amount 1
