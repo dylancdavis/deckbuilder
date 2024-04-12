@@ -7,11 +7,11 @@
 (defn rules-card-content [card]
   [:div.rules-info
    (let [deck-limits (:deck-limits card)]
-     [:div.deck-limit-section
-      [:div.deck-size [:span "Deck Size: "] [:span (:size deck-limits) " Cards"]]])
-   [:div.run-structure-section
+     [:div.section.deck-limit
+      [:div.deck-size [:span "Deck Size:"] [:span (:size deck-limits) " Cards"]]])
+   [:div.section.run-structure
     [:div.turn-structure [:span "Turn:"] [:span "Draw 1, Play 1"]]]
-   [:div.end-conditions-section
+   [:div.section.end-conditions
     [:div.end-conditions [:span "Game End:"] [:span "1 Round"]]]])
 
 (defn card-item [card]
