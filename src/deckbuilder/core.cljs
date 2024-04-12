@@ -4,7 +4,10 @@
    [re-frame.core :as re-frame]
    [deckbuilder.events :as events]
    [deckbuilder.views.main :as views]
-   [deckbuilder.config :as config]))
+   [deckbuilder.config :as config]
+   ["tilt.js" :as tilt]))
+
+(js/console.log tilt)
 
 (defn dev-setup []
   (when config/debug?
