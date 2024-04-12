@@ -8,7 +8,11 @@
   [:div.rules-info
    (let [deck-limits (:deck-limits card)]
      [:div.deck-limit-section
-      [:div "Deck Size: " (:size deck-limits)]])])
+      [:div.deck-size [:span "Deck Size: "] [:span (:size deck-limits) " Cards"]]])
+   [:div.run-structure-section
+    [:div.turn-structure [:span "Turn:"] [:span "Draw 1, Play 1"]]]
+   [:div.end-conditions-section
+    [:div.end-conditions [:span "Game End:"] [:span "1 Round"]]]])
 
 (defn card-item [card]
   [:div.card-container {:key (js/Math.random)}
