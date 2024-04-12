@@ -46,15 +46,22 @@
   (let [selected-deck @(re-frame/subscribe [::subs/selected-deck])
         selected-cards (:cards selected-deck)
         amount-in-decklist (get selected-cards card)
-        card-type (:type card)]
+        card-type (:type card)
+        rules-card-selected? (not (nil? (:rules-card selected-deck)))]
     (if (= card-type :rules)
       [:div.card-collection-item
-       {:key (:name card) :on-click (if (nil? (:rules-card selected-deck)) #(re-frame/dispatch [:set-selected-deck-rules-card card]) nil)}
+       {:key (:name card)
+        :on-click (if rules-card-selected? nil #(re-frame/dispatch [:set-selected-deck-rules-card card]))
+        :class (if rules-card-selected? "disabled" "clickable")}
        (card-item card)
        [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
-       (if (nil? (:rules-card selected-deck)) nil "Rules Card Already Selected")]
+       (if rules-card-selected? [:div.overlay-text "Rules Card Already Selected"] nil)]
       [:div.card-collection-item
-       {:key (:name card) :on-click (if (< amount-in-decklist amount-in-collection) #(re-frame/dispatch [:add-card-to-selected-deck card]) nil)}
+       (let
+        [reached-card-limit? (< amount-in-decklist amount-in-collection)]
+         {:key (:name card)
+          :on-click (if reached-card-limit? nil #(re-frame/dispatch [:add-card-to-selected-deck card]))
+          :class (if reached-card-limit? "disabled" "clickable")})
        (card-item card)
        [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
        (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)])))
