@@ -15,7 +15,7 @@
     [:div.end-conditions [:span "Game End:"] [:span "1 Round"]]]])
 
 (defn card-item [card]
-  [:div.card-container {:key (:name card) :data-tilt true}
+  [:div.card-container {:key (:name card) :data-tilt true :data-tilt-glare true}
    [:div.card-background
     [:div.card-name (:name card)]
     [:div.card-content
