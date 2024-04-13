@@ -336,15 +336,11 @@ button.run-deck.disabled {
 .card-collection-item .card-container {
 	position: relative;
 	z-index: 1;
-	transition: 0.1s transform ease, 0.2s filter;
+	transition: 0.2s filter;
 }
 
 .card-collection-item.clickable .card-container {
 	cursor: pointer;
-}
-
-.card-collection-item:not(.disabled) .card-container:hover {
-	transform: scale(1.02);
 }
 
 .card-collection-item.disabled .card-container {
