@@ -42,9 +42,8 @@
        [:button {:class "run-deck" :on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 
-(defn collection-card-item [[card amount-in-collection]]
-  (let [selected-deck @(re-frame/subscribe [::subs/selected-deck])
-        selected-cards (:cards selected-deck)
+(defn collection-card-item [[card amount-in-collection] selected-deck]
+  (let [selected-cards (:cards selected-deck)
         amount-in-decklist (get selected-cards card)
         card-type (:type card)
         rules-card-selected? (not (nil? (:rules-card selected-deck)))]
@@ -75,7 +74,8 @@
       [:div.panel-header "Decks"]
       (selected-deck-view)]
 
-     [:div.cards-panel
-      [:div.panel-header "Cards"]
-      [:div.card-grid
-       (if (= (:cards collection) {}) "No Cards in Collection. Run the starter deck!" (map collection-card-item (:cards collection)))]]]))
+     (let [selected-deck @(re-frame/subscribe [::subs/selected-deck])]
+       [:div.cards-panel
+        [:div.panel-header "Cards"]
+        [:div.card-grid
+         (if (= (:cards collection) {}) "No Cards in Collection. Run the starter deck!" (map #(collection-card-item % selected-deck) (:cards collection)))]])]))

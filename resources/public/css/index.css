@@ -324,7 +324,6 @@ button.run-deck {
 	transform: scale(1.0);
 	filter: brightness(1);
 	transition: 0.1s transform ease, 0.05s filter;
-
 }
 
 .card-collection-item.clickable .card-container {
