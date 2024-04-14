@@ -52,15 +52,15 @@
    (if rules-card-selected? [:div.overlay-text "Rules Card Already Selected"] nil)])
 
 (defn playable-card-item [card amount-in-decklist amount-in-collection]
-  [:div.card-collection-item
-   (let
-    [reached-card-limit? (< amount-in-decklist amount-in-collection)]
+  (let
+   [reached-card-limit? (>= amount-in-decklist amount-in-collection)]
+    [:div.card-collection-item
      {:key (:name card)
       :on-click (if reached-card-limit? nil #(re-frame/dispatch [:add-card-to-selected-deck card]))
-      :class (if reached-card-limit? "disabled" "clickable")})
-   (card-item card)
-   [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
-   (if (>= amount-in-decklist amount-in-collection) [:div.overlay-text "None Left"] nil)])
+      :class (if reached-card-limit? "disabled" "clickable")}
+     (card-item card)
+     [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
+     (if reached-card-limit? [:div.overlay-text "None Left"] nil)]))
 
 (defn collection-card-item [[card amount-in-collection] selected-deck]
   (let [selected-cards (:cards selected-deck)
