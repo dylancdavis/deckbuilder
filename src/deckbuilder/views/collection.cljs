@@ -60,7 +60,7 @@
       :class (if reached-card-limit? "disabled" "clickable")})
    (card-item card)
    [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
-   (if (>= amount-in-decklist amount-in-collection) "Reached max" nil)])
+   (if (>= amount-in-decklist amount-in-collection) [:div.overlay-text "None Left"] nil)])
 
 (defn collection-card-item [[card amount-in-collection] selected-deck]
   (let [selected-cards (:cards selected-deck)
