@@ -9,12 +9,12 @@
 (defn deck-size [decklist] (reduce + (vals (:cards decklist))))
 
 (defn selected-rules-card-display [rules-card]
-  [:div {:class "card-list-block"}
+  [:div.card-list-block
    (if (nil? rules-card)
-     [:div {:class "card-list-header"} "No Rules Card Selected"]
+     [:div.card-list.block "No Rules Card Selected"]
      [:<>
-      [:div {:class "card-list-header"} "Rules Card:"]
-      [:ul [:li {:class "deck-card-count-item"} [:span (get rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]])])
+      [:div.card-list-header "Rules Card:"]
+      [:ul [:li.deck-card-count-item [:span (get rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]])])
 
 (defn selected-deck-view []
   (let
