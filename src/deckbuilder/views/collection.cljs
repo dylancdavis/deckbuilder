@@ -16,6 +16,14 @@
       [:div.card-list-header "Rules Card:"]
       [:ul [:li.deck-card-count-item [:span (get rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]])])
 
+(defn selected-deck-cards-display [current-deck-size required-deck-size selected-deck]
+  [:div {:class "card-list-block"}
+   [:div {:class "card-list-header"} "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
+   [:ul (map (fn [[card amount]]
+               [:li {:key (:name card) :class "deck-card-count-item"}
+                [:span (:name card) " x" amount]
+                [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]])
+
 (defn selected-deck-view []
   (let
    [selected-deck-key @(re-frame/subscribe [::subs/selected-deck-key])
@@ -35,12 +43,7 @@
        [:h2 [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "←"] (:name selected-deck)]
        [:div.card-list-container
         (selected-rules-card-display (get-in selected-deck [:rules-card]))
-        [:div {:class "card-list-block"}
-         [:div {:class "card-list-header"} "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
-         [:ul (map (fn [[card amount]]
-                     [:li {:key (:name card) :class "deck-card-count-item"}
-                      [:span (:name card) " x" amount]
-                      [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]]]
+        (selected-deck-cards-display current-deck-size required-deck-size selected-deck)]
 
        [:button {:class "run-deck" :on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
