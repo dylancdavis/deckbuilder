@@ -42,34 +42,43 @@
        [:button {:class "run-deck" :on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 
-(defn rules-card-item [card rules-card-selected? amount-in-collection]
+(defn rules-card-item [card rules-card-selected? amount-in-collection editing-deck?]
   [:div.card-collection-item
    {:key (:name card)
-    :on-click (if rules-card-selected? nil #(re-frame/dispatch [:set-selected-deck-rules-card card]))
-    :class (if rules-card-selected? "disabled" "clickable")}
+    :on-click (if editing-deck?
+                (if rules-card-selected? nil #(re-frame/dispatch [:set-selected-deck-rules-card card]))
+                nil)
+    :class (if editing-deck?
+             (if rules-card-selected? "disabled" "clickable")
+             nil)}
    (card-item card)
-   [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
+   [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] (if editing-deck? [:div.add-card "+"] nil)]
    (if rules-card-selected? [:div.overlay-text "Rules Card Already Selected"] nil)])
 
-(defn playable-card-item [card amount-in-decklist amount-in-collection]
+(defn playable-card-item [card amount-in-decklist amount-in-collection editing-deck?]
   (let
    [reached-card-limit? (>= amount-in-decklist amount-in-collection)]
     [:div.card-collection-item
      {:key (:name card)
-      :on-click (if reached-card-limit? nil #(re-frame/dispatch [:add-card-to-selected-deck card]))
-      :class (if reached-card-limit? "disabled" "clickable")}
+      :on-click (if editing-deck?
+                  (if reached-card-limit? nil #(re-frame/dispatch [:add-card-to-selected-deck card]))
+                  nil)
+      :class (if editing-deck?
+               (if reached-card-limit? "disabled" "clickable")
+               nil)}
      (card-item card)
-     [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] [:div.add-card "+"]]
+     [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] (if editing-deck? [:div.add-card "+"] nil)]
      (if reached-card-limit? [:div.overlay-text "None Left"] nil)]))
 
 (defn collection-card-item [[card amount-in-collection] selected-deck]
   (let [selected-cards (:cards selected-deck)
         amount-in-decklist (get selected-cards card)
         card-type (:type card)
+        editing-deck? (not (nil? selected-deck))
         rules-card-selected? (not (nil? (:rules-card selected-deck)))]
     (if (= card-type :rules)
-      (rules-card-item card rules-card-selected? amount-in-collection)
-      (playable-card-item card amount-in-decklist amount-in-collection))))
+      (rules-card-item card rules-card-selected? amount-in-collection editing-deck?)
+      (playable-card-item card amount-in-decklist amount-in-collection editing-deck?))))
 
 (defn collection-view []
   (let
