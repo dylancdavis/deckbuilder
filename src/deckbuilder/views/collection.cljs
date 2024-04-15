@@ -38,14 +38,14 @@
                                                               {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
                                                               name]))
                                  (:decklists collection))
-       [:button {:on-click #(re-frame/dispatch [:add-new-deck]) :class "add-new-deck"} "Add New Deck"]]
-      [:div {:class "selected-deck-view"}
-       [:h2 [:span {:on-click #(re-frame/dispatch [:select-deck nil]) :class "back-to-decks"} "←"] (:name selected-deck)]
+       [:button.add-new-deck {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]]
+      [:div.selected-deck-view
+       [:h2 [:span.back-to-decks {:on-click #(re-frame/dispatch [:select-deck nil])} "←"] (:name selected-deck)]
        [:div.card-list-container
         (selected-rules-card-display (get-in selected-deck [:rules-card]))
         (selected-deck-cards-display current-deck-size required-deck-size selected-deck)]
 
-       [:button {:class "run-deck" :on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
+       [:button.run-deck {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
 
 
 (defn rules-card-item [card rules-card-selected? amount-in-collection editing-deck?]
