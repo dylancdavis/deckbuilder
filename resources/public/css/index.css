@@ -328,6 +328,10 @@ button.run-deck.clickable {
 	cursor: pointer;
 }
 
+button.run-deck.disabled {
+	filter: brightness(0.5);
+}
+
 .card-collection-item .card-container {
 	position: relative;
 	z-index: 1;

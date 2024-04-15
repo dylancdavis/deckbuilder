@@ -34,7 +34,8 @@
     selected-deck @(re-frame/subscribe [::subs/selected-deck])
     collection @(re-frame/subscribe [::subs/collection])
     current-deck-size (deck-size selected-deck)
-    required-deck-size (get-in selected-deck [:rules-card :deck-size])]
+    required-deck-size (get-in selected-deck [:rules-card :deck-limits :size])
+    is-deck-valid? (= current-deck-size required-deck-size)]
     (if
      (nil? selected-deck-key)
       [:div.decks-container (map (fn [[deck-key decklist]] (let [name (:name decklist)]
@@ -48,7 +49,8 @@
        [:div.card-list-container
         (selected-rules-card-display (get-in selected-deck [:rules-card]))
         (selected-deck-cards-display current-deck-size required-deck-size selected-deck)
-        [:button.run-deck.clickable {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]]])))
+        [:button.run-deck {:class (if is-deck-valid? "clickable" "disabled")
+                           :on-click (if is-deck-valid? #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]]])))
 
 
 (defn rules-card-item [card rules-card-selected? amount-in-collection editing-deck?]
