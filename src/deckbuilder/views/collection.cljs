@@ -19,10 +19,14 @@
 (defn selected-deck-cards-display [current-deck-size required-deck-size selected-deck]
   [:div.card-list-block
    [:div.card-list-header "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
-   [:ul (map (fn [[card amount]]
-               [:li.deck-card-count-item {:key (:name card)}
-                [:span (:name card) " x" amount]
-                [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]])
+   (let [deck-selected-cards (:cards selected-deck)
+         has-cards-selected? (seq deck-selected-cards)]
+     (if has-cards-selected?
+       [:ul (map (fn [[card amount]]
+                   [:li.deck-card-count-item {:key (:name card)}
+                    [:span (:name card) " x" amount]
+                    [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]
+       nil))])
 
 (defn selected-deck-view []
   (let
