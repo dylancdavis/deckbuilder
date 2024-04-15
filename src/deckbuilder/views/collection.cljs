@@ -28,12 +28,15 @@
                     [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]
        nil))])
 
+(defn deck-list-entry [[deck-key decklist]]
+  (let [name (:name decklist)]
+    [:div.decklist-item
+     {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
+     name]))
+
 (defn deck-list-view [collection]
-  [:div.decks-container (map (fn [[deck-key decklist]] (let [name (:name decklist)]
-                                                         [:div.decklist-item
-                                                          {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
-                                                          name]))
-                             (:decklists collection))
+  [:div.decks-container
+   (map deck-list-entry (:decklists collection))
    [:button.add-new-deck {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]])
 
 (defn deck-edit-view [selected-deck current-deck-size required-deck-size is-deck-valid?]
