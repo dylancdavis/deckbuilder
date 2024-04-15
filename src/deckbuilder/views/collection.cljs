@@ -47,9 +47,8 @@
        [:h2 [:span.back-to-decks {:on-click #(re-frame/dispatch [:select-deck nil])} "←"] (:name selected-deck)]
        [:div.card-list-container
         (selected-rules-card-display (get-in selected-deck [:rules-card]))
-        (selected-deck-cards-display current-deck-size required-deck-size selected-deck)]
-
-       [:button.run-deck {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]])))
+        (selected-deck-cards-display current-deck-size required-deck-size selected-deck)
+        [:button.run-deck {:on-click (if (= current-deck-size required-deck-size) #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]]])))
 
 
 (defn rules-card-item [card rules-card-selected? amount-in-collection editing-deck?]
