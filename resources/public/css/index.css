@@ -319,6 +319,15 @@ button.run-deck {
 	font-weight: bold;
 }
 
+button.run-deck.clickable:hover {
+	filter: brightness(1.1);
+	transform: scale(1.01);
+}
+
+button.run-deck.clickable {
+	cursor: pointer;
+}
+
 .card-collection-item .card-container {
 	position: relative;
 	z-index: 1;
