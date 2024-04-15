@@ -28,6 +28,23 @@
                     [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]
        nil))])
 
+(defn deck-list-view [collection]
+  [:div.decks-container (map (fn [[deck-key decklist]] (let [name (:name decklist)]
+                                                         [:div.decklist-item
+                                                          {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
+                                                          name]))
+                             (:decklists collection))
+   [:button.add-new-deck {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]])
+
+(defn deck-edit-view [selected-deck current-deck-size required-deck-size is-deck-valid?]
+  [:div.selected-deck-view
+   [:h2 [:span.back-to-decks {:on-click #(re-frame/dispatch [:select-deck nil])} "←"] (:name selected-deck)]
+   [:div.card-list-container
+    (selected-rules-card-display (get-in selected-deck [:rules-card]))
+    (selected-deck-cards-display current-deck-size required-deck-size selected-deck)
+    [:button.run-deck {:class (if is-deck-valid? "clickable" "disabled")
+                       :on-click (if is-deck-valid? #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]]])
+
 (defn selected-deck-view []
   (let
    [selected-deck-key @(re-frame/subscribe [::subs/selected-deck-key])
@@ -38,19 +55,8 @@
     is-deck-valid? (= current-deck-size required-deck-size)]
     (if
      (nil? selected-deck-key)
-      [:div.decks-container (map (fn [[deck-key decklist]] (let [name (:name decklist)]
-                                                             [:div.decklist-item
-                                                              {:key name :on-click #(re-frame/dispatch [:select-deck deck-key])}
-                                                              name]))
-                                 (:decklists collection))
-       [:button.add-new-deck {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]]
-      [:div.selected-deck-view
-       [:h2 [:span.back-to-decks {:on-click #(re-frame/dispatch [:select-deck nil])} "←"] (:name selected-deck)]
-       [:div.card-list-container
-        (selected-rules-card-display (get-in selected-deck [:rules-card]))
-        (selected-deck-cards-display current-deck-size required-deck-size selected-deck)
-        [:button.run-deck {:class (if is-deck-valid? "clickable" "disabled")
-                           :on-click (if is-deck-valid? #(re-frame/dispatch [:start-run selected-deck]) nil)} "Run This Deck"]]])))
+      (deck-list-view collection)
+      (deck-edit-view selected-deck current-deck-size required-deck-size is-deck-valid?))))
 
 
 (defn rules-card-item [card rules-card-selected? amount-in-collection editing-deck?]
