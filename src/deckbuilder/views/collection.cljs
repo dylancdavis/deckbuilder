@@ -17,10 +17,10 @@
       [:ul [:li.deck-card-count-item [:span (get rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]])])
 
 (defn selected-deck-cards-display [current-deck-size required-deck-size selected-deck]
-  [:div {:class "card-list-block"}
-   [:div {:class "card-list-header"} "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
+  [:div.card-list-block
+   [:div.card-list-header "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
    [:ul (map (fn [[card amount]]
-               [:li {:key (:name card) :class "deck-card-count-item"}
+               [:li.deck-card-count-item {:key (:name card)}
                 [:span (:name card) " x" amount]
                 [:button {:on-click #(re-frame/dispatch [:remove-card-from-selected-deck card])} "X"]]) (:cards selected-deck))]])
 
