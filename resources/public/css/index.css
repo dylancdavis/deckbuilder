@@ -11,6 +11,7 @@ h1.game-title {
 	--animation-time: 0.5s;
 	--standard-blue: #004c67;
 	--standard-orange: orangered;
+	user-select: none;
 }
 
 #app {
