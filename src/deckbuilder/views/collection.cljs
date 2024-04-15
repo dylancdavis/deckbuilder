@@ -18,7 +18,12 @@
 
 (defn selected-deck-cards-display [current-deck-size required-deck-size selected-deck]
   [:div.card-list-block
-   [:div.card-list-header "Cards in Deck: (" current-deck-size "/" required-deck-size ")"]
+   [:div.card-list-header
+    "Cards in Deck: "
+    [:span.deck-card-amount (if
+                             (not (nil? required-deck-size))
+                              [:span "(" current-deck-size "/" required-deck-size ")"]
+                              current-deck-size)]]
    (let [deck-selected-cards (:cards selected-deck)
          has-cards-selected? (seq deck-selected-cards)]
      (if has-cards-selected?
