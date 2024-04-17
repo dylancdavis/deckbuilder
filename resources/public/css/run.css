@@ -5,12 +5,25 @@
 	padding: 1em;
 	height: 100%;
 	border-radius: 14px;
+	gap: 1em;
 }
 
-.overview-panel {
+.run-view .panel {
 	background-color: white;
 	border-radius: 14px;
 	padding: 1em;
+}
+
+.run-view .panel:first-child {
+	box-shadow: -4px 4px #555, -2px 2px #555;
+}
+
+.run-view .panel:not(:first-child):not(:last-child) {
+	box-shadow: 0px 4px #555, 0px 2px #555;
+}
+
+.run-view .panel:last-child {
+	box-shadow: 4px 4px #555, 2px 2px #555;
 }
 
 .round-panel {
@@ -20,9 +33,6 @@
 .deck-discard-panel {
 	display: flex;
 	flex-direction: column;
-	background-color: white;
-	border-radius: 14px;
-	padding: 1em;
 }
 
 /* Pile and other styles */
@@ -136,7 +146,6 @@ button.advance:active {
 	flex-direction: column;
 	align-items: center;
 	gap: 1em;
-	margin: 2px;
 	padding: 1em 2em;
 	background-color: #fdfdfd;
 	border-radius: 14px;

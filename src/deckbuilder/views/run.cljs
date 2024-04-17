@@ -50,13 +50,13 @@
 (defn overview-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
         rules-card (get deck-data :rules-card)]
-    [:div.overview-panel (card-item rules-card)]))
+    [:div.panel.overview-panel (card-item rules-card)]))
 
 (defn round-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
         resource-data @(re-frame/subscribe [::subs/resources])
         modal-view @(re-frame/subscribe [::subs/modal-view])]
-    [:div.round-panel
+    [:div.panel.round-panel
      [:div.pile-container
       (draw-pile (:draw-pile deck-data))
       (hand-display (:hand deck-data))
@@ -87,7 +87,7 @@
 
 (defn deck-discard-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])]
-    [:div.deck-discard-panel
+    [:div.panel.deck-discard-panel
      (draw-pile (:draw-pile deck-data))
      (discard-pile (:discard-pile deck-data))]))
 
