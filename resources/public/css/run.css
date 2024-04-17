@@ -45,6 +45,11 @@
 
 .draw-pile {
 	position: relative;
+	transform: translateX(10px);
+}
+
+.draw-pile .card-back {
+	box-shadow: -2px 0px 2px #00000080
 }
 
 .draw-pile .card-back:nth-child(1) {
