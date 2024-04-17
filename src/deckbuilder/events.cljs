@@ -2,8 +2,7 @@
   (:require
    [re-frame.core :as re-frame]
    [deckbuilder.db :as db]
-   [deckbuilder.game.round :as round]
-   [deckbuilder.game.cards :as cards]))
+   [deckbuilder.game.round :as round]))
 
 (re-frame/reg-event-db
  ::initialize-db

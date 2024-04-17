@@ -7,7 +7,13 @@
 (defn cardlist-from-cardmap [cardmap]
   (mapcat (fn [[card count]] (repeat count card)) cardmap))
 
-(defn starting-round-data-from-deck [deck] (let [cards (:cards deck)] {:draw-pile (shuffle (cardlist-from-cardmap cards))}))
+(defn starting-round-data-from-deck [deck]
+  (let
+   [deck-cardmap (:cards deck)
+    added-cardmap (get-in deck [:rules-card :deck-limits :added-cards])]
+    {:draw-pile (shuffle (concat
+                          (cardlist-from-cardmap deck-cardmap)
+                          (cardlist-from-cardmap added-cardmap)))}))
 
 (defn play-hand [deck]
   (if (:hand deck)

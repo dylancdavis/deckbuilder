@@ -12,7 +12,7 @@
 
 (def basic-rules {:name "Starter Rules"
                   :type :rules
-                  :deck-limits {:size 0 :added-cards {:score 7 :buy-basic 1}}
+                  :deck-limits {:size 0 :added-cards {score 7 buy-basic 1}}
                   :run-structure {:draw-amount 1
                                   :play-amount 1}
                   :end-conditions {:rounds 1}
