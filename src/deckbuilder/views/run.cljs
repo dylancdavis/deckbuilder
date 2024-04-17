@@ -93,6 +93,6 @@
 
 (defn run-view []
   [:div.run-view
-   (overview-panel)
+   (deck-discard-panel)
    (round-panel)
-   (deck-discard-panel)])
+   (overview-panel)])
