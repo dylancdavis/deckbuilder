@@ -47,6 +47,11 @@
                           #(re-frame/dispatch [:add-to-collection card])
                           nil)))
 
+(defn overview-panel []
+  (let [deck-data @(re-frame/subscribe [::subs/round-deck])
+        rules-card (get deck-data :rules-card)]
+    [:div.overview-panel (card-item rules-card)]))
+
 (defn round-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
         resource-data @(re-frame/subscribe [::subs/resources])
@@ -79,3 +84,15 @@
           [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
        nil)
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
+
+(defn deck-discard-panel []
+  (let [deck-data @(re-frame/subscribe [::subs/round-deck])]
+    [:div.pile-container
+     (draw-pile (:draw-pile deck-data))
+     (discard-pile (:discard-pile deck-data))]))
+
+(defn run-view []
+  [:div.run-view
+   (overview-panel)
+   (round-panel)
+   (deck-discard-panel)])
