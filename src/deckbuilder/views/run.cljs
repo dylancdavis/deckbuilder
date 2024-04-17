@@ -87,7 +87,7 @@
 
 (defn deck-discard-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])]
-    [:div.pile-container
+    [:div.deck-discard-panel
      (draw-pile (:draw-pile deck-data))
      (discard-pile (:discard-pile deck-data))]))
 

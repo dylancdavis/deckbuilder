@@ -1,3 +1,31 @@
+/* Panel layout */
+.run-view {
+	display:flex;
+	background-color:#333;
+	padding: 1em;
+	height: 100%;
+	border-radius: 14px;
+}
+
+.overview-panel {
+	background-color: white;
+	border-radius: 14px;
+	padding: 1em;
+}
+
+.round-panel {
+	flex: 1;
+}
+
+.deck-discard-panel {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	border-radius: 14px;
+	padding: 1em;
+}
+
+/* Pile and other styles */
 .pile-container {
 	display: flex;
 	justify-content: center;
