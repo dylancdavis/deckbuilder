@@ -33,6 +33,7 @@
 .deck-discard-panel {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-around;
 }
 
 /* Pile and other styles */
