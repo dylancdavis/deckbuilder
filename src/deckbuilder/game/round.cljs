@@ -13,7 +13,8 @@
     added-cardmap (get-in deck [:rules-card :deck-limits :added-cards])]
     {:draw-pile (shuffle (concat
                           (cardlist-from-cardmap deck-cardmap)
-                          (cardlist-from-cardmap added-cardmap)))}))
+                          (cardlist-from-cardmap added-cardmap)))
+     :rules-card (:rules-card deck)}))
 
 (defn play-hand [deck]
   (if (:hand deck)
