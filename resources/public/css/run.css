@@ -122,9 +122,17 @@ button.advance:active {
 	transform :translateY(5px);
 }
 
+.round-panel .pile-container {
+	width: 100%;
+}
+
+.hand-group {
+	flex: 1
+}
+
 .empty-pile {
-	width: 250px;
-	height: 350px;
+	width: 100%;
+	height: calc(350px + 8px + 8px);
 	border: 4px solid var(--card-grey);
 	background-color: #eee;
 	box-shadow: inset 0px 1px 0px 1px grey;
@@ -132,6 +140,10 @@ button.advance:active {
 	display: grid;
 	place-items: center;
 	color: #9a9a9a;
+}
+
+.pile-text {
+	position: absolute;
 }
 
 .hand-group {
@@ -143,8 +155,7 @@ button.advance:active {
 }
 
 .hand-group .flip-card {
-	position: absolute;
-	top: 0
+	position: relative;
 }
 
 .round-panel {

@@ -33,7 +33,7 @@
      (card-back)]]])
 
 (defn hand-display [hand]
-  [:div.hand-group [:div.empty-pile "hand"] (if (nil? hand) nil (flippable-card hand))])
+  [:div.hand-group [:div.empty-pile (if (nil? hand) nil (flippable-card hand))]])
 
 (defn resource-panel [resources]
   (let [points (:points resources)]
@@ -58,9 +58,7 @@
         modal-view @(re-frame/subscribe [::subs/modal-view])]
     [:div.panel.round-panel
      [:div.pile-container
-      (draw-pile (:draw-pile deck-data))
-      (hand-display (:hand deck-data))
-      (discard-pile (:discard-pile deck-data))]
+      (hand-display (:hand deck-data))]
      (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
        [:div.button-wrapper
         [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
