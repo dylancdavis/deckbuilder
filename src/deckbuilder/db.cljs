@@ -6,3 +6,11 @@
   {:view :collection
    :collection {:cards {cards/score 12 cards/basic-rules 7} :card-backs {} :decklists {:starting-deck constants/starting-deck-list}}
    :view-data {:selected-deck nil}})
+
+(def new-db
+  {:game
+   {:collection {:cards {cards/score 12 cards/basic-rules 7} :card-backs {} :decklists {:starting-deck constants/starting-deck-list}}
+    :run nil}
+   :ui
+   {:current-view [:collection]
+    :collection {:selected-deck nil}}})
