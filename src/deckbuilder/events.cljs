@@ -15,11 +15,6 @@
    (update-in db [:round :deck] round/advance-deck)))
 
 (re-frame/reg-event-db
- :add-points
- (fn [db _]
-   (update-in db [:resources :points :value] inc)))
-
-(re-frame/reg-event-db
  :select-deck
  (fn [db [_ deck-name]]
    (assoc-in db [:view-data :selected-deck] deck-name)))
@@ -72,10 +67,6 @@
  (fn [db _] (update-in db [:collection :decklists] #(assoc % (random-uuid) {:name (js/prompt "Deck Name") :cards {}}))))
 
 (re-frame/reg-event-db
- :add-card-to-deck
- (fn [db [_ card key]] (js/console.log (= (get-in db [:view-data :selected-deck]) :starting-deck)) (update-in db [:collection :decklists key :cards] #(inc-in-map % card))))
-
-(re-frame/reg-event-db
  :add-card-to-selected-deck
  (fn [db [_ card]]
    (let [current-deck-key (get-in db [:view-data :selected-deck])]
@@ -99,6 +90,6 @@
 
 (re-frame/reg-event-db
  :clear-selected-deck-rules-card
- (fn [db [_ rules-card]]
+ (fn [db [_ _rules-card]]
    (let [current-deck-key (get-in db [:view-data :selected-deck])]
      (assoc-in db [:collection :decklists current-deck-key :rules-card] nil))))

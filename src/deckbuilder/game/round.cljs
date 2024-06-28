@@ -1,5 +1,5 @@
 (ns deckbuilder.game.round
-  (:require [deckbuilder.game.cards :as cards]
+  (:require
             [re-frame.core :as re-frame]))
 
 (def starting-resources {:points {:display "Points" :value 0}})
@@ -31,10 +31,3 @@
 
 (defn advance-deck [deck]
   (draw-card (play-hand deck)))
-
-(defn play-deck
-  ([term deck]
-   (if (and (empty? (:draw-pile deck)) (nil? (:hand deck)))
-     deck
-     (play-deck term (advance-deck deck))))
-  ([term] (play-deck term cards/starting-round)))

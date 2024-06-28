@@ -25,12 +25,12 @@
                  :cost 4})
 
 (def save-reward {:name "A Penny Saved"
-                   :description "If you haven't purchased a card this round, gain 2 points."
-                   :cost 4})
+                  :description "If you haven't purchased a card this round, gain 2 points."
+                  :cost 4})
 
 (def zero-reward {:name "Starting Surge"
-                   :description "If you have 0 points, gain 6 points."
-                   :cost 4})
+                  :description "If you have 0 points, gain 6 points."
+                  :cost 4})
 
 (def point-reset {:name "Point Reboot"
                   :description "Lose all points, then gain 4 points."
@@ -40,27 +40,33 @@
                      :description "If you have 4 or less points, double them."})
 
 (def score-surge {:name "Score Surge"
-                   :description "Gain 2 points for each \"Score\"played this round (up to 4)."
-                   :cost 10})
+                  :description "Gain 2 points for each \"Score\"played this round (up to 4)."
+                  :cost 10})
 
 (def score-synergy {:name "Score Synergy"
-                     :description "Gain 1 point for each \"Score\" in your deck (up to 6)."
+                    :description "Gain 1 point for each \"Score\" in your deck (up to 6)."
                     :cost 10})
 
 (def borrow-points {:name "Borrowed Points"
-                     :description "Gain 6 points. In 2 turns, lose 6 points (down to zero)"
-                     :cost 10})
+                    :description "Gain 6 points. In 2 turns, lose 6 points (down to zero)"
+                    :cost 10})
 
 (def last-resort {:name "Last Resort"
-                   :description "Gain 8 Points, then destroy this card"
-                   :cost 12})
+                  :description "Gain 8 Points, then destroy this card"
+                  :cost 12})
 
-(def basic-cards #{score buy-basic basic-rules})
+(def cards
+  {::score score
+   ::buy-basic buy-basic
+   ::basic-rules basic-rules
+   ::dual-score dual-score
+   ::save-reward save-reward
+   ::zero-reward zero-reward
+   ::point-reset point-reset
+   ::point-multiply point-multiply
+   ::score-surge score-surge
+   ::score-synergy score-synergy
+   ::borrow-points borrow-points
+   ::last-resort last-resort})
 
-(def starting-deck-list (cons buy-basic (take 7 (repeat score))))
-
-(defn with-keys [coll]
-  (map-indexed (fn [idx item] (assoc item :key idx)) coll))
-
-(def starting-round {:draw-pile (with-keys starting-deck-list) :hand nil
-                     :discard-pile []})
+(def basic-cards #{::score ::buy-basic ::basic-rules})
