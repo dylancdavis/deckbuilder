@@ -52,6 +52,31 @@
         rules-card (get deck-data :rules-card)]
     [:div.panel.overview-panel (card-item rules-card)]))
 
+(defn advance-button [deck-data modal-view]
+  (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
+    [:div.button-wrapper
+     [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
+    [:div.button-wrapper
+     [:button.advance
+      {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))}
+      "Advance"]]))
+
+(defn buy-modal [modal-view resource-data]
+  (if (= modal-view :buy-basic)
+    (let [first-card (rand-nth (vec cards/basic-cards))
+          second-card (rand-nth (vec cards/basic-cards))
+          points (:value (:points resource-data))
+          afford-first? (>= points (:cost first-card))
+          afford-second? (>= points (:cost second-card))]
+      [:div.modal-view.buy-basic
+       [:ul
+        [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card))
+         [:button {:disabled (not afford-first?) :on-click (if afford-first? #(re-frame/dispatch [:add-to-collection first-card]) nil)} "Buy"]]
+        [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card))
+         [:button {:disabled (not afford-second?) :on-click (if afford-second? #(re-frame/dispatch [:add-to-collection second-card]) nil)} "Buy"]]]
+       [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
+    nil))
+
 (defn round-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
         resource-data @(re-frame/subscribe [::subs/resources])
@@ -59,28 +84,9 @@
     [:div.panel.round-panel
      [:div.pile-container
       (hand-display (:hand deck-data))]
-     (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
-       [:div.button-wrapper
-        [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
-       [:div.button-wrapper
-        [:button.advance
-         {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))}
-         "Advance"]])
+     (advance-button deck-data modal-view)
      (resource-panel resource-data)
-     (if (= modal-view :buy-basic)
-       (let [first-card (rand-nth (vec cards/basic-cards))
-             second-card (rand-nth (vec cards/basic-cards))
-             points (:value (:points resource-data))
-             afford-first? (>= points (:cost first-card))
-             afford-second? (>= points (:cost second-card))]
-         [:div.modal-view.buy-basic
-          [:ul
-           [:li (str "Card is: " (:name first-card) ". Costs: " (:cost first-card))
-            [:button {:disabled (not afford-first?) :on-click (if afford-first? #(re-frame/dispatch [:add-to-collection first-card]) nil)} "Buy"]]
-           [:li (str "Card is: " (:name second-card) ". Costs: " (:cost second-card))
-            [:button {:disabled (not afford-second?) :on-click (if afford-second? #(re-frame/dispatch [:add-to-collection second-card]) nil)} "Buy"]]]
-          [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
-       nil)
+     (buy-modal modal-view resource-data)
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
 
 (defn deck-discard-panel []
