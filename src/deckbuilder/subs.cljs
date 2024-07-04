@@ -10,29 +10,24 @@
 (re-frame/reg-sub
  ::resources
  (fn [db]
-   (get-in db [:round :resources])))
+   (get-in db [:game :run :resources])))
 
 (re-frame/reg-sub
  ::view
  (fn [db]
-   (:view db)))
+   (get-in db [:ui :current-view])))
 
 (re-frame/reg-sub
  ::collection
  (fn [db]
-   (:collection db)))
+   (get-in db [:game :collection])))
 
 (re-frame/reg-sub
  ::selected-deck
  (fn [db]
-   (get-in db [:collection :decklists (get-in db [:view-data :selected-deck])])))
+   (get-in db [:collection :decklists (get-in db [:ui :collection :selected-deck])])))
 
 (re-frame/reg-sub
  ::selected-deck-key
  (fn [db]
-   (get-in db [:view-data :selected-deck])))
-
-(re-frame/reg-sub
- ::modal-view
- (fn [db]
-   (get-in db [:view-data :modal-view])))
+   (get-in db [:ui :collection :selected-deck])))

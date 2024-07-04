@@ -7,7 +7,7 @@
 (re-frame/reg-event-db
  ::initialize-db
  (fn [_ _]
-   db/default-db))
+   db/new-db))
 
 (re-frame/reg-event-db
  :advance-game
