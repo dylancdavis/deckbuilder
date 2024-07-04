@@ -5,7 +5,10 @@
    [deckbuilder.views.run :as run-panel]
    [deckbuilder.views.collection :as collection-view]))
 
-(defn get-view [name] (js/console.log name) ((first name) {:collection collection-view/collection-view :round run-panel/run-view}))
+(defn get-view [name]
+  (case name
+    [:collection] collection-view/collection-view
+    [:run] run-panel/run-view))
 
 (def nav-divider [:div.nav-divider])
 

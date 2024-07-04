@@ -17,7 +17,7 @@
 (re-frame/reg-event-db
  :select-deck
  (fn [db [_ deck-name]]
-   (assoc-in db [:view-data :selected-deck] deck-name)))
+   (assoc-in db [:ui :collection :selected-deck] deck-name)))
 
 (re-frame/reg-event-db
  :start-run
