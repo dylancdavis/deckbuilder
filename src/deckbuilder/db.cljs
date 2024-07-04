@@ -15,7 +15,17 @@
    {:current-view [:collection]
     :collection {:selected-deck nil}}})
 
-(def run-data {:resources {:points 0}
-               :cards {:draw-pile [] :hand [] :discard-pile []}
-               :deck-info {:cards [] :rules-card nil}
-               :outcomes []})
+(def example-run
+  {:resources {:points 0}
+   :cards {:draw-pile [] :hand [] :discard-pile []}
+   :deck-info {:cards [] :rules-card nil}
+   :data {}
+   :effects []
+   :outcomes []})
+
+(defn make-run [deck] {:resources {:points 0}
+                       :cards {:draw-pile [] :hand [] :discard-pile []}
+                       :deck-info {:cards [] :rules-card nil}
+                       :data {:turn 0 :round 0}
+                       :effects []
+                       :outcomes []})
