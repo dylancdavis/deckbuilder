@@ -14,3 +14,8 @@
    :ui
    {:current-view [:collection]
     :collection {:selected-deck nil}}})
+
+(def run-data {:resources {:points 0}
+               :cards {:draw-pile [] :hand [] :discard-pile []}
+               :deck-info {:cards [] :rules-card nil}
+               :outcomes []})
