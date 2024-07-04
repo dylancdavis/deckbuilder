@@ -25,7 +25,7 @@
 (re-frame/reg-sub
  ::selected-deck
  (fn [db]
-   (get-in db [:collection :decklists (get-in db [:ui :collection :selected-deck])])))
+   (get-in db [:game :collection :decklists (get-in db [:ui :collection :selected-deck])])))
 
 (re-frame/reg-sub
  ::selected-deck-key
