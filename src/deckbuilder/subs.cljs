@@ -3,6 +3,12 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
+ ::run-deck
+ (fn [db]
+   (get-in db [:game :run :deck-info])))
+
+
+(re-frame/reg-sub
  ::run-cards
  (fn [db]
    (get-in db [:game :run :cards])))

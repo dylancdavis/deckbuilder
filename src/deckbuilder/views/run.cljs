@@ -41,8 +41,8 @@
      [:div {:class "resource"} (str (:display points) ": " (:value points))]]))
 
 (defn overview-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/run-cards])
-        rules-card (get deck-data :rules-card)]
+  (let [deck-info @(re-frame/subscribe [::subs/run-deck])
+        rules-card (get deck-info :rules-card)]
     [:div.panel.overview-panel (card-item rules-card)]))
 
 (defn advance-button [deck-data]
