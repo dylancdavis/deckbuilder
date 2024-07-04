@@ -68,7 +68,7 @@
  (fn [db [_ card]]
    (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
      (update-in db
-                [:collection :decklists current-deck-key :cards]
+                [:game :collection :decklists current-deck-key :cards]
                 #(inc-in-map % card)))))
 
 (re-frame/reg-event-db
@@ -83,7 +83,7 @@
  :set-selected-deck-rules-card
  (fn [db [_ rules-card]]
    (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
-     (assoc-in db [:collection :decklists current-deck-key :rules-card] rules-card))))
+     (assoc-in db [:game :collection :decklists current-deck-key :rules-card] rules-card))))
 
 (re-frame/reg-event-db
  :clear-selected-deck-rules-card
