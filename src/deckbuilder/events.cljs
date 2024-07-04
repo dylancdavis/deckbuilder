@@ -3,7 +3,8 @@
    [re-frame.core :as re-frame]
    [deckbuilder.db :as db]
    [deckbuilder.game.round :as round]
-   [deckbuilder.game.run :as run]))
+   [deckbuilder.game.run :as run]
+   [deckbuilder.game.cards :as cards]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -39,3 +40,7 @@
  :buy-basic
  (fn [db _]
    (assoc-in db [:view-data :modal-view] :buy-basic)))
+
+(re-frame/reg-event-db
+ :draw-cards
+ (fn [db [_ n]] (update-in db [:game :run :cards] run/draw-cards n)))

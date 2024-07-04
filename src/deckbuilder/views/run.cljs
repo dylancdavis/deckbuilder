@@ -13,9 +13,9 @@
   (let [size (count draw-pile)]
     (cond
       (= size 0) [:div.empty-pile "draw"]
-      (= size 1) [:div.draw-pile (card-back)]
-      (= size 2) [:div.draw-pile (card-back) (card-back)]
-      :else [:div.draw-pile (card-back) (card-back) (card-back)])))
+      (= size 1) [:div.draw-pile {:on-click #(re-frame/dispatch [:draw-cards 1])} (card-back)]
+      (= size 2) [:div.draw-pile {:on-click #(re-frame/dispatch [:draw-cards 1])} (card-back) (card-back)]
+      :else [:div.draw-pile  {:on-click #(re-frame/dispatch [:draw-cards 1])} (card-back) (card-back) (card-back)])))
 
 (defn discard-pile [discard-pile]
   (let [size (count discard-pile)]
@@ -33,7 +33,7 @@
      (card-back)]]])
 
 (defn hand-display [hand]
-  [:div.hand-group [:div.empty-pile (if (nil? hand) nil (flippable-card hand))]])
+  [:div.hand-group [:div.empty-pile (map flippable-card hand)]])
 
 (defn resource-panel [resources]
   (let [points (:points resources)]
@@ -41,7 +41,7 @@
      [:div {:class "resource"} (str (:display points) ": " (:value points))]]))
 
 (defn overview-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/run-deck])
+  (let [deck-data @(re-frame/subscribe [::subs/run-cards])
         rules-card (get deck-data :rules-card)]
     [:div.panel.overview-panel (card-item rules-card)]))
 
@@ -71,20 +71,20 @@
     nil))
 
 (defn hand-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/run-deck])
+  (let [cards-data @(re-frame/subscribe [::subs/run-cards])
         resource-data @(re-frame/subscribe [::subs/resources])]
     [:div.panel.round-panel
      [:div.pile-container
-      (hand-display (:hand deck-data))]
-     (advance-button deck-data)
+      (hand-display (:hand cards-data))]
+     (advance-button cards-data)
      (resource-panel resource-data)
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
 
 (defn deck-discard-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/run-deck])]
+  (let [cards-data @(re-frame/subscribe [::subs/run-cards])]
     [:div.panel.deck-discard-panel
-     (draw-pile (:draw-pile deck-data))
-     (discard-pile (:discard-pile deck-data))]))
+     (draw-pile (:draw-pile cards-data))
+     (discard-pile (:discard-pile cards-data))]))
 
 (defn run-view []
   [:div.run-view

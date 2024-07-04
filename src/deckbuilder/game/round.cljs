@@ -1,20 +1,6 @@
 (ns deckbuilder.game.round
   (:require
-            [re-frame.core :as re-frame]))
-
-(def starting-resources {:points {:display "Points" :value 0}})
-
-(defn cardlist-from-cardmap [cardmap]
-  (mapcat (fn [[card count]] (repeat count card)) cardmap))
-
-(defn starting-round-data-from-deck [deck]
-  (let
-   [deck-cardmap (:cards deck)
-    added-cardmap (get-in deck [:rules-card :deck-limits :added-cards])]
-    {:draw-pile (shuffle (concat
-                          (cardlist-from-cardmap deck-cardmap)
-                          (cardlist-from-cardmap added-cardmap)))
-     :rules-card (:rules-card deck)}))
+   [re-frame.core :as re-frame]))
 
 (defn play-hand [deck]
   (if (:hand deck)

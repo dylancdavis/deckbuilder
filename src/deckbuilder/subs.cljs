@@ -3,9 +3,9 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
- ::run-deck
+ ::run-cards
  (fn [db]
-   (get-in db [:round :deck])))
+   (get-in db [:game :run :cards])))
 
 (re-frame/reg-sub
  ::resources

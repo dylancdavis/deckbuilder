@@ -10,10 +10,16 @@
    :effects []
    :outcomes []})
 
+(defn count-map->shuffled-vector [cm]
+  (-> cm
+      count-map/to-seq
+      shuffle
+      vec))
+
 (defn starting-draw-pile [deck]
   (let [deck-cards (:cards deck)
         cards-to-add (get-in deck [:rules-card :deck-limits :added-cards])]
-    (count-map/to-seq
+    (count-map->shuffled-vector
      (if (nil? cards-to-add)
        deck-cards
        (count-map/merge-count-maps deck-cards cards-to-add)))))
