@@ -10,7 +10,7 @@
 
 (defn make-run [deck] {:resources {:points 0}
                        :cards {:draw-pile (:cards deck) :hand [] :discard-pile []}
-                       :deck-info {:cards [] :rules-card (:rules-card deck)}
+                       :deck-info {:cards (:cards deck) :rules-card (:rules-card deck)}
                        :data {:turn 1 :round 1}
                        :effects []
                        :outcomes []})

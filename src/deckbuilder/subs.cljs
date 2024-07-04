@@ -3,7 +3,7 @@
    [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub
- ::round-deck
+ ::run-deck
  (fn [db]
    (get-in db [:round :deck])))
 

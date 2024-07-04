@@ -2,7 +2,8 @@
   (:require
    [re-frame.core :as re-frame]
    [deckbuilder.db :as db]
-   [deckbuilder.game.round :as round]))
+   [deckbuilder.game.round :as round]
+   [deckbuilder.game.run :as run]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -22,21 +23,17 @@
 (re-frame/reg-event-db
  :start-run
  (fn [db [_ deck]]
-   (assoc db
-          :view :round
-          :round {:deck (round/starting-round-data-from-deck deck) :resources round/starting-resources})))
+   (assoc-in (assoc-in db [:ui :current-view] :run) [:game :run] (run/make-run deck))))
 
 (re-frame/reg-event-db
  :end-run
  (fn [db _]
-   (assoc db
-          :view :collection
-          :round nil)))
+   (assoc-in (assoc-in db [:ui :current-view] :collection) [:game :run] nil)))
 
 (re-frame/reg-event-db
  :gain-resource
  (fn [db [_ resource-name amount]]
-   (update-in db [:round :resources resource-name :value] + amount)))
+   (update-in db [:game :run :resources resource-name] + amount)))
 
 (re-frame/reg-event-db
  :buy-basic
@@ -69,7 +66,7 @@
 (re-frame/reg-event-db
  :add-card-to-selected-deck
  (fn [db [_ card]]
-   (let [current-deck-key (get-in db [:view-data :selected-deck])]
+   (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
      (update-in db
                 [:collection :decklists current-deck-key :cards]
                 #(inc-in-map % card)))))
@@ -77,19 +74,19 @@
 (re-frame/reg-event-db
  :remove-card-from-selected-deck
  (fn [db [_ card]]
-   (let [current-deck-key (get-in db [:view-data :selected-deck])]
+   (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
      (update-in db
-                [:collection :decklists current-deck-key :cards]
+                [:game :collection :decklists current-deck-key :cards]
                 #(dec-in-map % card)))))
 
 (re-frame/reg-event-db
  :set-selected-deck-rules-card
  (fn [db [_ rules-card]]
-   (let [current-deck-key (get-in db [:view-data :selected-deck])]
+   (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
      (assoc-in db [:collection :decklists current-deck-key :rules-card] rules-card))))
 
 (re-frame/reg-event-db
  :clear-selected-deck-rules-card
  (fn [db [_ _rules-card]]
-   (let [current-deck-key (get-in db [:view-data :selected-deck])]
-     (assoc-in db [:collection :decklists current-deck-key :rules-card] nil))))
+   (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
+     (assoc-in db [:game :collection :decklists current-deck-key :rules-card] nil))))

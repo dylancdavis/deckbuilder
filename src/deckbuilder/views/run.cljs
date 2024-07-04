@@ -41,7 +41,7 @@
      [:div {:class "resource"} (str (:display points) ": " (:value points))]]))
 
 (defn overview-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/round-deck])
+  (let [deck-data @(re-frame/subscribe [::subs/run-deck])
         rules-card (get deck-data :rules-card)]
     [:div.panel.overview-panel (card-item rules-card)]))
 
@@ -71,7 +71,7 @@
     nil))
 
 (defn round-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/round-deck])
+  (let [deck-data @(re-frame/subscribe [::subs/run-deck])
         resource-data @(re-frame/subscribe [::subs/resources])
         modal-view @(re-frame/subscribe [::subs/modal-view])]
     [:div.panel.round-panel
@@ -82,7 +82,7 @@
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
 
 (defn deck-discard-panel []
-  (let [deck-data @(re-frame/subscribe [::subs/round-deck])]
+  (let [deck-data @(re-frame/subscribe [::subs/run-deck])]
     [:div.panel.deck-discard-panel
      (draw-pile (:draw-pile deck-data))
      (discard-pile (:discard-pile deck-data))]))
