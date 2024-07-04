@@ -3,6 +3,7 @@
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
    [deckbuilder.events :as events]
+   [deckbuilder.events.collection :as collection-events]
    [deckbuilder.views.main :as views]
    [deckbuilder.config :as config]))
 
