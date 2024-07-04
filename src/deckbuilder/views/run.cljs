@@ -40,13 +40,6 @@
     [:div.resource-panel
      [:div {:class "resource"} (str (:display points) ": " (:value points))]]))
 
-(defn buy-card [card] (let
-                       [resources @(re-frame/subscribe [::subs/resources])
-                        points (:points resources)]
-                        (if (>= points (:cost card))
-                          #(re-frame/dispatch [:add-to-collection card])
-                          nil)))
-
 (defn overview-panel []
   (let [deck-data @(re-frame/subscribe [::subs/round-deck])
         rules-card (get deck-data :rules-card)]
@@ -86,7 +79,6 @@
       (hand-display (:hand deck-data))]
      (advance-button deck-data modal-view)
      (resource-panel resource-data)
-     (buy-modal modal-view resource-data)
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
 
 (defn deck-discard-panel []

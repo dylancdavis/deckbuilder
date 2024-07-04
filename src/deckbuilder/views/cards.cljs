@@ -15,7 +15,7 @@
     [:div.end-conditions [:span "Game End:"] [:span "1 Round"]]]])
 
 (defn card-item [card]
-  [:div.card-container {:key (js/Math.random)}
+  [:div.card-container
    [:div.card-background
     [:div.card-name (:name card)]
     [:div.card-content

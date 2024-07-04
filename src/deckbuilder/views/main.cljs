@@ -5,13 +5,13 @@
    [deckbuilder.views.run :as run-panel]
    [deckbuilder.views.collection :as collection-view]))
 
-(defn get-view [name] (name {:collection collection-view/collection-view :round run-panel/run-view}))
+(defn get-view [name] (js/console.log name) ((first name) {:collection collection-view/collection-view :round run-panel/run-view}))
 
 (def nav-divider [:div.nav-divider])
 
-(defn main-panel []
+(defn app []
   (let [view @(re-frame/subscribe [::subs/view])]
-    [:<>
+    [:div.app
      [:h1.game-title "Deckbuilder"]
      [:div.main-content
       [:div.main-panel
