@@ -1,6 +1,7 @@
 (ns deckbuilder.events.collection
   (:require
-   [re-frame.core :as re-frame]))
+   [re-frame.core :as re-frame]
+   [deckbuilder.utilities.count-map :as count-map :refer [inc-in-map dec-in-map]]))
 
 (defn remove-modal-view [db] (update-in db [:view-data] #(dissoc % :modal-view)))
 
@@ -8,14 +9,6 @@
  :clear-modal-view
  (fn [db _]
    (remove-modal-view db)))
-
-(defn inc-in-map [map key] (if (nil? (get map key)) (assoc map key 1) (update-in map [key] inc)))
-
-(defn dec-in-map [map key]
-  (cond
-    (nil? (get map key)) map
-    (= 1 (get map key)) (dissoc map key)
-    :else (update-in map [key] dec)))
 
 (re-frame/reg-event-db
  :add-to-collection
