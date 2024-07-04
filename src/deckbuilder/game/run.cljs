@@ -1,4 +1,6 @@
-(ns deckbuilder.game.run)
+(ns deckbuilder.game.run
+  (:require
+   [deckbuilder.utilities.count-map :as count-map]))
 
 (def example-run
   {:resources {:points 0}
@@ -8,8 +10,16 @@
    :effects []
    :outcomes []})
 
+(defn starting-draw-pile [deck]
+  (let [deck-cards (:cards deck)
+        cards-to-add (get-in deck [:rules-card :deck-limits :added-cards])]
+    (count-map/to-seq
+     (if (nil? cards-to-add)
+       deck-cards
+       (count-map/merge-count-maps deck-cards cards-to-add)))))
+
 (defn make-run [deck] {:resources {:points 0}
-                       :cards {:draw-pile (:cards deck) :hand [] :discard-pile []}
+                       :cards {:draw-pile (starting-draw-pile deck) :hand [] :discard-pile []}
                        :deck-info {:cards (:cards deck) :rules-card (:rules-card deck)}
                        :data {:turn 1 :round 1}
                        :effects []

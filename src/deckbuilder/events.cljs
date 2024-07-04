@@ -23,12 +23,12 @@
 (re-frame/reg-event-db
  :start-run
  (fn [db [_ deck]]
-   (assoc-in (assoc-in db [:ui :current-view] :run) [:game :run] (run/make-run deck))))
+   (assoc-in (assoc-in db [:ui :current-view] [:run]) [:game :run] (run/make-run deck))))
 
 (re-frame/reg-event-db
  :end-run
  (fn [db _]
-   (assoc-in (assoc-in db [:ui :current-view] :collection) [:game :run] nil)))
+   (assoc-in (assoc-in db [:ui :current-view] [:collection]) [:game :run] nil)))
 
 (re-frame/reg-event-db
  :gain-resource

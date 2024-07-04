@@ -45,13 +45,13 @@
         rules-card (get deck-data :rules-card)]
     [:div.panel.overview-panel (card-item rules-card)]))
 
-(defn advance-button [deck-data modal-view]
+(defn advance-button [deck-data]
   (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
     [:div.button-wrapper
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
     [:div.button-wrapper
      [:button.advance
-      {:on-click #(re-frame/dispatch [:advance-game]) :disabled (not (nil? modal-view))}
+      {:on-click #(re-frame/dispatch [:advance-game])}
       "Advance"]]))
 
 (defn buy-modal [modal-view resource-data]
@@ -70,14 +70,13 @@
        [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
     nil))
 
-(defn round-panel []
+(defn hand-panel []
   (let [deck-data @(re-frame/subscribe [::subs/run-deck])
-        resource-data @(re-frame/subscribe [::subs/resources])
-        modal-view @(re-frame/subscribe [::subs/modal-view])]
+        resource-data @(re-frame/subscribe [::subs/resources])]
     [:div.panel.round-panel
      [:div.pile-container
       (hand-display (:hand deck-data))]
-     (advance-button deck-data modal-view)
+     (advance-button deck-data)
      (resource-panel resource-data)
      [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
 
@@ -90,5 +89,5 @@
 (defn run-view []
   [:div.run-view
    (deck-discard-panel)
-   (round-panel)
+   (hand-panel)
    (overview-panel)])
