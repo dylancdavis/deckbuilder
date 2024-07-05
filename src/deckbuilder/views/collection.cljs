@@ -16,14 +16,21 @@
       [:div.card-list-header "Rules Card:"]
       [:ul [:li.deck-card-count-item [:span (get rules-card :name)] [:button {:on-click #(re-frame/dispatch [:clear-selected-deck-rules-card])} "X"]]]])])
 
+(defn deck-size-text [current-deck-size required-deck-size]
+  [:div.card-list-header
+   (if (zero? required-deck-size)
+     "No Cards Allowed"
+     [:<>
+      "Cards in Deck: "
+      [:span.deck-card-amount
+       (if
+        (not (nil? required-deck-size))
+         [:span "(" current-deck-size "/" required-deck-size ")"]
+         current-deck-size)]])])
+
 (defn selected-deck-cards-display [current-deck-size required-deck-size selected-deck]
   [:div.card-list-block
-   [:div.card-list-header
-    "Cards in Deck: "
-    [:span.deck-card-amount (if
-                             (not (nil? required-deck-size))
-                              [:span "(" current-deck-size "/" required-deck-size ")"]
-                              current-deck-size)]]
+   (deck-size-text current-deck-size required-deck-size)
    (let [deck-selected-cards (:cards selected-deck)
          has-cards-selected? (seq deck-selected-cards)]
      (if has-cards-selected?
