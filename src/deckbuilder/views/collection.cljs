@@ -87,20 +87,23 @@
    [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] (if editing-deck? [:div.add-card "+"] nil)]
    (if rules-card-selected? [:div.overlay-text "Rules Card Already Selected"] nil)])
 
-(defn playable-card-item [card amount-in-decklist amount-in-collection editing-deck?]
+(defn playable-card-item [card amount-in-decklist amount-in-collection editing-deck? selected-deck]
   (let
-   [reached-card-limit? (>= amount-in-decklist amount-in-collection)]
+   [no-cards-allowed? (zero? (get-in selected-deck [:rules-card :deck-limits :size]))
+    reached-collection-limit? (>= amount-in-decklist amount-in-collection)
+    reached-deck-limit? (and (:deck-limit card) (>= amount-in-decklist (:deck-limit card)))
+    disable-adding? (or no-cards-allowed? reached-collection-limit? reached-deck-limit?)]
     [:div.card-collection-item
      {:key (:name card)
       :on-click (if editing-deck?
-                  (if reached-card-limit? nil #(re-frame/dispatch [:add-card-to-selected-deck card]))
+                  (if disable-adding? nil #(re-frame/dispatch [:add-card-to-selected-deck card]))
                   nil)
       :class (if editing-deck?
-               (if reached-card-limit? "disabled" "clickable")
+               (if disable-adding? "disabled" "clickable")
                nil)}
      (card-item card)
      [:div.card-interaction-row [:div.amount (str "x " amount-in-collection)] (if editing-deck? [:div.add-card "+"] nil)]
-     (if reached-card-limit? [:div.overlay-text "None Left"] nil)]))
+     (if disable-adding? [:div.overlay-text "None Left"] nil)]))
 
 (defn collection-card-item [[card amount-in-collection] selected-deck]
   (let [selected-cards (:cards selected-deck)
@@ -110,7 +113,7 @@
         rules-card-selected? (not (nil? (:rules-card selected-deck)))]
     (if (= card-type :rules)
       (rules-card-item card rules-card-selected? amount-in-collection editing-deck?)
-      (playable-card-item card amount-in-decklist amount-in-collection editing-deck?))))
+      (playable-card-item card amount-in-decklist amount-in-collection editing-deck? selected-deck))))
 
 (defn collection-view []
   (let
