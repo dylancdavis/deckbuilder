@@ -5,25 +5,23 @@
    [deckbuilder.game.cards :as cards]
    [deckbuilder.views.cards :as card-views]))
 
+(def MAX_DRAW_PILE_SIZE 3)
+
 (def card-item card-views/card-item)
 
 (defn card-back [] [:div.card-container.card-back {:key (js/Math.random)}])
 
-(defn draw-pile [draw-pile]
-  (let [size (count draw-pile)]
-    (cond
-      (= size 0) [:div.empty-pile "draw"]
-      (= size 1) [:div.draw-pile {:on-click #(re-frame/dispatch [:draw-cards 1])} (card-back)]
-      (= size 2) [:div.draw-pile {:on-click #(re-frame/dispatch [:draw-cards 1])} (card-back) (card-back)]
-      :else [:div.draw-pile  {:on-click #(re-frame/dispatch [:draw-cards 1])} (card-back) (card-back) (card-back)])))
+(defn draw-pile [card-list]
+  (let [pile-size (min (count card-list) MAX_DRAW_PILE_SIZE)]
+    (if (zero? pile-size)
+      [:div.empty-pile "draw"]
+      [:div.draw-pile {:on-click #(re-frame/dispatch [:draw-cards 1])} (repeat pile-size (card-back))])))
 
-(defn discard-pile [discard-pile]
-  (let [size (count discard-pile)]
-    (cond
-      (= size 0) [:div.empty-pile "discard"]
-      (= size 1) [:div.discard-pile (card-item (first discard-pile))]
-      (= size 2) [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile))]
-      :else [:div.discard-pile (card-item (first discard-pile)) (card-item (second discard-pile)) (card-item (second (rest discard-pile)))])))
+(defn discard-pile [card-list]
+  (let [pile-size (min (count card-list) MAX_DRAW_PILE_SIZE)]
+    (if (zero? pile-size)
+      [:div.empty-pile "discard"]
+      (map card-item (take pile-size card-list)))))
 
 (defn flippable-card [card]
   [:div.flip-card {:key (js/Math.random)}
