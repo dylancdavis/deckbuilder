@@ -15,7 +15,7 @@
   (let [pile-size (min (count card-list) MAX_DRAW_PILE_SIZE)]
     (if (zero? pile-size)
       [:div.empty-pile "draw"]
-      [:div.draw-pile {:on-click #(re-frame/dispatch [:draw-cards 1])} (repeat pile-size (card-back))])))
+      [:div.draw-pile (repeat pile-size (card-back))])))
 
 (defn discard-pile [card-list]
   (let [pile-size (min (count card-list) MAX_DRAW_PILE_SIZE)]
