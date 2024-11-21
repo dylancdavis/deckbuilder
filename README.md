@@ -15,26 +15,15 @@ An incremental-game style deckbuilder created using the [re-frame](https://githu
   4) Select `:app` in "Select which build to connect to"
   5) Connect to http://localhost:8280/ in the browser to start a [browser REPL](https://clojurescript.org/reference/repl#using-the-browser-as-an-evaluation-environment)
 
-Once the project is running, the project will be hosted at http://localhost:8280/ and a `shadow-cljs` server will be hosted at http://127.0.0.1:9630/.
+Once the project is running, the project will be hosted at http://localhost:8280/ and a `shadow-cljs` server will be hosted at http://localhost:9630/.
 
 ### Project Overview
-* Architecture:
-[Single Page Application (SPA)](https://en.wikipedia.org/wiki/Single-page_application)
-* Languages
-  - Front end is [ClojureScript](https://clojurescript.org/) with ([re-frame](https://github.com/day8/re-frame))
-* Dependencies
-  - UI framework: [re-frame](https://github.com/day8/re-frame)
-  ([docs](https://github.com/day8/re-frame/blob/master/docs/README.md),
-  [FAQs](https://github.com/day8/re-frame/blob/master/docs/FAQs/README.md)) ->
-  [Reagent](https://github.com/reagent-project/reagent) ->
-  [React](https://github.com/facebook/react)
-* Build tools
-  - CLJS compilation, dependency management, REPL, & hot reload: [`shadow-cljs`](https://github.com/thheller/shadow-cljs)
-* Development tools
-  - Debugging: [CLJS DevTools](https://github.com/binaryage/cljs-devtools)
+- Deckbuilder is a [Single Page Application](https://en.wikipedia.org/wiki/Single-page_application) built with [ClojureScript](https://clojurescript.org/)
+- Uses the [`re-frame`](https://github.com/day8/re-frame) frontend framework (built on [Reagent](https://github.com/reagent-project/reagent), [React](https://github.com/facebook/react))
+* Uses [`shadow-cljs`](https://github.com/thheller/shadow-cljs) for a CLJS build tool
+* Uses [CLJS DevTools](https://github.com/binaryage/cljs-devtools) and and [`re-frame-10x`](https://github.com/day8/re-frame-10x) for debugging
 
-#### Directory structure
-
+#### Project Structure
 * [`/`](/../../): project config files
 * [`dev/`](dev/): source files compiled only with the [dev](#running-the-app) profile
   - [`user.cljs`](dev/cljs/user.cljs): symbols for use during development in the
@@ -46,20 +35,13 @@ Once the project is running, the project will be hosted at http://localhost:8280
         ```html
         <div id="app"></div>
         ```
-    - Customizable; add headers, footers, links to other scripts and styles, etc.
   - Generated directories and files
     - Created on build with either the [dev](#running-the-app) or [prod](#production) profile
     - `js/compiled/`: compiled CLJS (`shadow-cljs`)
-      - Not tracked in source control; see [`.gitignore`](.gitignore)
-* [`src/deckbuilder/`](src/deckbuilder/): SPA source files (ClojureScript,
-[re-frame](https://github.com/Day8/re-frame))
-  - [`core.cljs`](src/deckbuilder/core.cljs): contains the SPA entry point, `init`
-* [`.github/workflows/`](.github/workflows/): contains the
-[github actions](https://github.com/features/actions) pipelines.
-  - [`test.yaml`](.github/workflows/test.yaml): Pipeline for testing.
+* [`src/deckbuilder/`](src/deckbuilder/): project source files. `core.cljs.init` is the entry point.
 
 ### Browser Setup
-- Browser caching should be disabled when browser developer tools are opened
+- Browser caching should be disabled when browser developer tools are opened.
 - Browser custom formatters must be enabled for displaying ClojureScript data correctly.
 
 ## Development
