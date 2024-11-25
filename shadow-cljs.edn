@@ -13,7 +13,7 @@
  :dev-http
  {8280 "resources/public"
   8290 "target/browser-test"
-  9800 ["public" "classpath:public" "resources/public/css"]
+  9800 ["public" "classpath:public"]
   }
 
  :builds
