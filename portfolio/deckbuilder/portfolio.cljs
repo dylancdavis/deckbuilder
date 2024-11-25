@@ -4,7 +4,7 @@
             [deckbuilder.views.cards :refer [card-item]]))
 
 (ui/start!
- {:config {:css-paths ["/css/cards.css"]}}
+ {:config {:css-paths ["/css/cards.css" "/css/index.css"]}}
  )
 
 (defscene my-first-scene [:h1 "Hello world!"])
