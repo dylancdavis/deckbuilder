@@ -1,6 +1,14 @@
 (ns deckbuilder.portfolio
-  (:require [portfolio.ui :as ui]))
+  (:require [portfolio.ui :as ui]
+            [portfolio.reagent :refer-macros [defscene]]
+            [deckbuilder.views.cards :refer [card-item]]))
 
-(ui/start!)
+(ui/start!
+ {:config {:css-paths ["/css/cards.css"]}}
+ )
+
+(defscene my-first-scene [:h1 "Hello world!"])
+
+(defscene test-card (card-item {:name "Example UI" :description "Some example card rendered as a UI component."}) )
 
 (defn init [])

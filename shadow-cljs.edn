@@ -1,6 +1,6 @@
 {:nrepl {:port 8777}
 
- :source-paths ["src" "test" "portfolio"]
+ :source-paths ["src" "test" "portfolio" "resources"]
 
  :dependencies
  [[reagent "1.1.1"]
@@ -13,7 +13,7 @@
  :dev-http
  {8280 "resources/public"
   8290 "target/browser-test"
-  9800 ["public" "classpath:public"]
+  9800 ["public" "classpath:public" "resources/public/css"]
   }
 
  :builds
