@@ -6,7 +6,7 @@ An incremental-game style deckbuilder created using the [re-frame](https://githu
 
 - Install [JDK 8 or later](https://openjdk.java.net/install/), [Node.js](https://nodejs.org/), and [Clojure](https://clojure.org/guides/install_clojure).
 - At the repository root, install dependencies with `npm install`.
-- Start the project with `npm run watch` or `npx shadow-cljs watch app`
+- Start the project with `npm run dev` or `npx shadow-cljs watch app`
 
 - For a more integrated development experience, use the [Calva](https://calva.io/) VSCode extension. Then, instead of using `npm run dev`:
   1) Run the "Start a Project REPL and Connect" command in VSCode
@@ -48,20 +48,18 @@ Once the project is running, the project will be hosted at http://localhost:8280
 
 ### Running the App
 
-Start a temporary local web server, build the app with the `dev` profile, and serve the app,
-browser test runner and karma test runner with hot reload:
+Build the application, start a Shadow CLJS server and serve the built output with hot reloading:
 
 ```sh
 npm install
-npx shadow-cljs watch app
+npm run dev # to run the main application
+npm run dev portfolio # to also run portfolio for UI development
+npm run portfolio # or run portfolio in isolation
 ```
 
-Please be patient; it may take over 20 seconds to see any output, and over 40 seconds to complete.
-
-When `[:app] Build completed` appears in the output, browse to
-[http://localhost:8280/](http://localhost:8280/). Opening the app in your browser starts a
-[ClojureScript browser REPL](https://clojurescript.org/reference/repl#using-the-browser-as-an-evaluation-environment),
-to which you may now connect.
+When `[:app] Build completed` appears in the output, browse to the
+[Shadow CLJS dashboard (http://localhost:9630/)](http://localhost:9630/). From here, the builds for the application (on port `8280`) and the portfolio dashboard (port `9800`) are accessible. Opening either in the browser starts a
+[ClojureScript browser REPL](https://clojurescript.org/reference/repl#using-the-browser-as-an-evaluation-environment), which can be connected to with `npx shadow-cljs cljs-repl <app-name>` (`app` or `portfolio`). Evaluation can also be done via the Shadow CLJS dashboard.
 
 [`shadow-cljs`](https://github.com/thheller/shadow-cljs) will automatically push ClojureScript code
 changes to your browser on save. To prevent a few common issues, see
@@ -124,7 +122,7 @@ Use `debug?` for logging or other tasks that should run only on `dev` builds:
 
 ```clj
 (ns deckbuilder.example
-  (:require [deckbuilder.config :as config])
+  (:require [deckbuilder.config :as config]))
 
 (when config/debug?
   (println "This message will appear in the browser console only on dev builds."))
