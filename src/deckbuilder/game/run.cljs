@@ -25,11 +25,27 @@
        (count-map/merge-count-maps deck-cards cards-to-add)))))
 
 (defn make-run [deck] {:resources {:points 0}
-                       :cards {:draw-pile (starting-draw-pile deck) :hand [] :discard-pile []}
+                       :cards {:draw-pile (starting-draw-pile deck) :hand [] :board [] :discard-pile []}
                        :deck-info {:cards (:cards deck) :rules-card (:rules-card deck)}
-                       :data {:turn 1 :round 1}
+                       :stats {:turn 1 :round 1}
                        :effects []
                        :outcomes []})
+
+(def card-locations [:draw-pile :hand :board :discard-pile])
+
+
+(defn move-card
+  "Move a card with `id` from its location to destination `to`."
+  [run id to]
+  (let [cards (:cards run)
+        from (some (fn [loc] (when (some #(= (:id %) id) (get cards loc)) loc)) card-locations)
+        card (some #(when (= (:id %) id) %) (get cards from))]
+    (cond
+      (nil? from) (throw (ex-info "Card ID not found in any location" {:id id}))
+      (= from to) (throw (ex-info "Card is already in the intended destination" {:id id :to to}))
+      :else (-> run
+                (update-in [:cards from] (fn [loc-cards] (vec (remove #(= (:id %) id) loc-cards))))
+                (update-in [:cards to] conj card)))))
 
 ; TODO: Rewrite with update-in to avoid redeclaring other keys
 (defn draw-cards
