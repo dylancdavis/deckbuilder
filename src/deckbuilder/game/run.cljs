@@ -33,7 +33,6 @@
 
 (def card-locations [:draw-pile :hand :board :discard-pile])
 
-
 (defn move-card
   "Move a card with `id` from its location to destination `to`."
   [run id to]
