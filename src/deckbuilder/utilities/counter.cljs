@@ -11,12 +11,11 @@
                  :else (update-in map [key] #(- % n))))
   ([map key] (sub map key 1)))
 
-(defn merge-counters [m1 m2] (reduce (fn [acc [k v]] (add acc k v)) m1 m2))
+(defn merge-counters [m1 m2]
+  (reduce (fn [acc [k v]] (add acc k v)) m1 m2))
 
-(defn as-list [map] (mapcat (fn [[k v]] (repeat v k)) map))
+(defn as-list [map]
+  (mapcat (fn [[k v]] (repeat v k)) map))
 
 (defn as-shuffled-vector [c]
-  (-> c
-      as-list
-      shuffle
-      vec))
+  (-> c as-list shuffle vec))
