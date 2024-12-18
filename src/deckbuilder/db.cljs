@@ -1,6 +1,6 @@
 (ns deckbuilder.db
-  (:require [deckbuilder.constants :as constants])
-  (:require [deckbuilder.game.cards :as cards]))
+  (:require [deckbuilder.constants :as constants]
+            [deckbuilder.game.cards :as cards]))
 
 (def new-db
   {:game
