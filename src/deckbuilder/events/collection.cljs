@@ -1,7 +1,7 @@
 (ns deckbuilder.events.collection
   (:require
    [re-frame.core :as re-frame]
-   [deckbuilder.utilities.count-map :as count-map :refer [inc-in-map dec-in-map]]))
+   [deckbuilder.utilities.counter :as counter :refer [add sub]]))
 
 (defn remove-modal-view [db] (update-in db [:view-data] #(dissoc % :modal-view)))
 
@@ -10,9 +10,9 @@
  (fn [db _]
    (remove-modal-view db)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-db 
  :add-to-collection
- (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(inc-in-map % card)))))
+ (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(add % card)))))
 
 (re-frame/reg-event-db
  :add-new-deck
@@ -24,7 +24,7 @@
    (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
      (update-in db
                 [:game :collection :decklists current-deck-key :cards]
-                #(inc-in-map % card)))))
+                #(add % card)))))
 
 (re-frame/reg-event-db
  :remove-card-from-selected-deck
@@ -32,7 +32,7 @@
    (let [current-deck-key (get-in db [:ui :collection :selected-deck])]
      (update-in db
                 [:game :collection :decklists current-deck-key :cards]
-                #(dec-in-map % card)))))
+                #(sub % card)))))
 
 (re-frame/reg-event-db
  :set-selected-deck-rules-card

@@ -1,6 +1,6 @@
 (ns deckbuilder.game.run
   (:require
-   [deckbuilder.utilities.count-map :as count-map]))
+   [deckbuilder.utilities.counter :as count-map]))
 
 (def example-run
   {:resources {:points 0}
