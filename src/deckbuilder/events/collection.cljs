@@ -1,7 +1,7 @@
 (ns deckbuilder.events.collection
   (:require
    [re-frame.core :as re-frame]
-   [deckbuilder.utilities.counter :as counter :refer [add sub]]))
+   [deckbuilder.utilities.counter :refer [add sub]]))
 
 (defn remove-modal-view [db] (update-in db [:view-data] #(dissoc % :modal-view)))
 
@@ -10,7 +10,7 @@
  (fn [db _]
    (remove-modal-view db)))
 
-(re-frame/reg-event-db 
+(re-frame/reg-event-db
  :add-to-collection
  (fn [db [_ card]] (remove-modal-view (update-in db [:collection :cards] #(add % card)))))
 

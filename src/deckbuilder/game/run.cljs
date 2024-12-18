@@ -1,6 +1,6 @@
 (ns deckbuilder.game.run
   (:require
-   [deckbuilder.utilities.counter :as count-map]))
+   [deckbuilder.utilities.counter :refer [merge-counters as-shuffled-vector]]))
 
 (def example-run
   {:resources {:points 0}
@@ -10,19 +10,13 @@
    :effects []
    :outcomes []})
 
-(defn count-map->shuffled-vector [cm]
-  (-> cm
-      count-map/to-seq
-      shuffle
-      vec))
-
 (defn starting-draw-pile [deck]
   (let [deck-cards (:cards deck)
         cards-to-add (get-in deck [:rules-card :deck-limits :added-cards])]
-    (count-map->shuffled-vector
+    (as-shuffled-vector
      (if (nil? cards-to-add)
        deck-cards
-       (count-map/merge-count-maps deck-cards cards-to-add)))))
+       (merge-counters deck-cards cards-to-add)))))
 
 (defn make-run [deck] {:resources {:points 0}
                        :cards {:draw-pile (starting-draw-pile deck) :hand [] :board [] :discard-pile []}
