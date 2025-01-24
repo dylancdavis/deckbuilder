@@ -5,8 +5,9 @@ An incremental-game style deckbuilder created using the [re-frame](https://githu
 ### Quick Start
 
 - Install [JDK 8 or later](https://openjdk.java.net/install/), [Node.js](https://nodejs.org/), and [Clojure](https://clojure.org/guides/install_clojure).
-- At the repository root, install dependencies with `npm install`.
-- Start the project with `npm run dev` or `npx shadow-cljs watch app`
+- At the repository root, install the dependencies with `npm install`.
+- Run the command `npm run dev`. This script starts the project by running `npx shadow-cljs watch app`.
+- Shadow CLJS will compile `src/deckbuilder` into `resources/public`, and then serve it at `http://localhost:8280`.
 
 - For a more integrated development experience, use the [Calva](https://calva.io/) VSCode extension. Then, instead of using `npm run dev`:
   1) Run the "Start a Project REPL and Connect" command in VSCode
@@ -53,9 +54,14 @@ Build the application, start a Shadow CLJS server and serve the built output wit
 ```sh
 npm install
 npm run dev # to run the main application
-npm run dev portfolio # to also run portfolio for UI development
-npm run portfolio # or run portfolio in isolation
 ```
+
+The project also features a testing suite and portfolio build targets, which correspond to `npm run portfolio` and `npm run test`. To run all three, you can simply specify them as additional parameters to the development command:
+```sh
+npm run dev portfolio test
+```
+
+Because npm passes additional script arguments to the script itself, `portfolio` and `test` are included as targets to the `shadow-cljs watch` command.
 
 When `[:app] Build completed` appears in the output, browse to the
 [Shadow CLJS dashboard (http://localhost:9630/)](http://localhost:9630/). From here, the builds for the application (on port `8280`) and the portfolio dashboard (port `9800`) are accessible. Opening either in the browser starts a
