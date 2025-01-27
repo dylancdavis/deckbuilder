@@ -18,12 +18,18 @@
        deck-cards
        (merge-counters deck-cards cards-to-add)))))
 
-(defn make-run [deck] {:resources {:points 0}
-                       :cards {:draw-pile (starting-draw-pile deck) :hand [] :board [] :discard-pile []}
-                       :deck-info {:cards (:cards deck) :rules-card (:rules-card deck)}
-                       :stats {:turn 1 :round 1}
-                       :effects []
-                       :outcomes []})
+(defn move-cards [from-pile to-pile amount]
+  (let [cards-to-move (take amount from-pile)]
+    [(concat (drop amount from-pile) cards-to-move) (concat to-pile cards-to-move)]))
+
+(defn make-run [deck] (let [starting-draw (starting-draw-pile deck)
+                            [starting-hand remaining-draw] (move-cards starting-draw [] 5)]
+                        {:resources {:points 0}
+                         :cards {:draw-pile remaining-draw :hand starting-hand :board [] :discard-pile []}
+                         :deck-info deck
+                         :stats {:turn 1 :round 1}
+                         :effects []
+                         :outcomes []}))
 
 (def card-locations [:draw-pile :hand :board :discard-pile])
 
