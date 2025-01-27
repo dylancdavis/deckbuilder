@@ -1,0 +1,8 @@
+(ns deckbuilder.utilities.utils (:require [clojure.set :as set]))
+
+(defn first-missing-num
+  "Given a list of integers, return the smallest positive integer not in the list."
+  [xs]
+  (let [potential-missing-nums (conj (set (map inc xs)) 1)
+        missing-nums (set/difference potential-missing-nums (set xs))]
+    (apply min missing-nums)))
