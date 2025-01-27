@@ -2,7 +2,8 @@
   (:require
    [re-frame.core :as re-frame]
    [deckbuilder.subs :as subs]
-   [deckbuilder.views.cards :as card-views]))
+   [deckbuilder.views.cards :as card-views]
+   [deckbuilder.game.deck :refer [check-deck-validity]]))
 
 (def card-item card-views/card-item)
 
@@ -67,7 +68,7 @@
     collection @(re-frame/subscribe [::subs/collection])
     current-deck-size (deck-size selected-deck)
     required-deck-size (get-in selected-deck [:rules-card :deck-limits :size])
-    is-deck-valid? (= current-deck-size required-deck-size)]
+    is-deck-valid? (check-deck-validity selected-deck collection)]
     (if
      (nil? selected-deck-key)
       (deck-list-view collection)
