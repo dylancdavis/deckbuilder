@@ -26,7 +26,7 @@
                           {:ns-aliases
                            {day8.re-frame.tracing day8.re-frame.tracing-stubs}}}}
           :browser-test {:target :browser-test
-                 :test-dir "out/test"}
+                         :test-dir "out/test"}
           :node-test {:target :node-test :output-to "out/test/node-test.js"}
           :portfolio {:target :browser
                       :modules {:main {:init-fn deckbuilder.portfolio/init}}}}}
