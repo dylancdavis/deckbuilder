@@ -1,4 +1,4 @@
-(ns test.utilities.collection-test
+(ns deckbuilder.utilities.collection-test
   (:require [cljs.test :refer [deftest is]]
             [deckbuilder.utilities.collection :refer [new-deck-name]]))
 

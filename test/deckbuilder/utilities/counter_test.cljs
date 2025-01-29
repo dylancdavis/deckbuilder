@@ -1,4 +1,4 @@
-(ns test.utilities.counter-test
+(ns deckbuilder.utilities.counter-test
   (:require [cljs.test :refer [deftest testing is]]
             [deckbuilder.utilities.counter :refer [add sub total merge-counters]]))
 

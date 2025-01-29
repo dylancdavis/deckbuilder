@@ -1,4 +1,4 @@
-(ns test.utilities.utils-test
+(ns deckbuilder.utilities.utils-test
   (:require [cljs.test :refer [deftest is]]
             [deckbuilder.utilities.utils :refer [first-missing-num]]))
 

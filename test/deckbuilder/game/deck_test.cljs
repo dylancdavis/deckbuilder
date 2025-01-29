@@ -1,4 +1,4 @@
-(ns test.game.deck-test
+(ns deckbuilder.game.deck-test
   (:require [cljs.test :refer [deftest is]]
             [deckbuilder.game.deck :refer [check-deck-validity]]))
 
