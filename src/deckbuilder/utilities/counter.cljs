@@ -17,6 +17,10 @@
 (defn merge-counters [m1 m2]
   (reduce (fn [acc [k v]] (add acc k v)) m1 m2))
 
+(defn counter-difference "Returns another counter with the difference between `m1` and `m2`, with negative values allowed."
+  [m1 m2]
+  (reduce (fn [acc [k v]] (sub acc k v)) m1 m2))
+
 (defn as-list [map]
   (mapcat (fn [[k v]] (repeat v k)) map))
 
