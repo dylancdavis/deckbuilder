@@ -6,9 +6,11 @@
 
 (defn rules-card-content [card]
   [:div.rules-info
-   (let [deck-limits (:deck-limits card)]
+   (let [deck-limits (:deck-limits card)
+         [min-size max-size] (:size deck-limits)
+         deck-text (if (= min-size max-size) (str min-size) (str min-size "-" max-size))]
      [:div.section.deck-limit
-      [:div.deck-size [:span "Deck Size:"] [:span (:size deck-limits) " Cards"]]])
+      [:div.deck-size [:span "Deck Size:"] [:span deck-text " Cards"]]])
    [:div.section.run-structure
     [:div.turn-structure [:span "Turn:"] [:span "Draw 1, Play 1"]]]
    [:div.section.end-conditions

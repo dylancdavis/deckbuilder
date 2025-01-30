@@ -19,14 +19,15 @@
 
 (defn deck-size-text [current-deck-size required-deck-size]
   [:div.card-list-header
-   (if (zero? required-deck-size)
+   (if (zero? (second required-deck-size))
      "No Cards Allowed"
      [:<>
       "Cards in Deck: "
       [:span.deck-card-amount
        (if
         (not (nil? required-deck-size))
-         [:span "(" current-deck-size "/" required-deck-size ")"]
+         [:span "(" current-deck-size "/" (let [[min-size max-size] (required-deck-size)
+                                                deck-text (if (= min-size max-size) (str min-size) (str min-size "-" max-size))] deck-text) ")"]
          current-deck-size)]])])
 
 (defn selected-deck-cards-display [current-deck-size required-deck-size selected-deck]
