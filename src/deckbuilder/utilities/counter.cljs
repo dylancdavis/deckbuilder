@@ -1,4 +1,5 @@
-(ns deckbuilder.utilities.counter)
+(ns deckbuilder.utilities.counter
+  (:require [deckbuilder.utilities.utils :refer [select-keys-by]]))
 
 (defn add "Adds `n` to the value of `key` in `map`. If `key` doesn't exist, it is added with value `n`."
   ([map key n] (if (nil? (get map key)) (assoc map key n) (update-in map [key] #(+ % n))))
@@ -16,10 +17,6 @@
 
 (defn merge-counters [m1 m2]
   (reduce (fn [acc [k v]] (add acc k v)) m1 m2))
-
-(defn select-keys-by "Returns a map containing only those entries in map whose key has a value that satisfies a predicate" [m pred]
-  (let [selected-keys (filter #(pred (second %)) m)]
-    (select-keys m (map first selected-keys))))
 
 (defn missing-counts "Returns a counter tracking for each key the value within `m1` minus the value within `m2`, with non-positive values omitted."
   [m1 m2]
