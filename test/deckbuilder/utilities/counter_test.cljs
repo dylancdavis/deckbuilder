@@ -1,6 +1,6 @@
 (ns deckbuilder.utilities.counter-test
   (:require [cljs.test :refer [deftest testing is]]
-            [deckbuilder.utilities.counter :refer [add sub total merge-counters]]))
+            [deckbuilder.utilities.counter :refer [add sub total missing-counts merge-counters]]))
 
 (deftest counter
   (testing "Counter"
@@ -17,6 +17,13 @@
       (is (= (total {}) 0) "Total of empty counter")
       (is (= (total {:a 1}) 1) "Total of one key")
       (is (= (total {:a 1 :b 2 :c 3}) 6) "Total of multiple keys"))
+    (testing "counts missing correctly"
+      (is (= (missing-counts {:a 1} {}) {:a 1}) "Should correctly subtract empty counter")
+      (is (= (missing-counts {:a 1} {:a 1}) {}) "Should correctly return empty counter when counters are equal")
+      (is (= (missing-counts {:a 3} {:a 1}) {:a 2}) "Should correctly subtract a single key")
+      (is (= (missing-counts {:a 1} {:a 3}) {}) "Should return an empty counter when second is greater")
+      (is (= (missing-counts {:a 3} {:b 3}) {:a 3}) "Should ignore keys not in first counter")
+      (is (= (missing-counts {:a 3 :b 3 :c 3} {:a 1 :b 5 :d 3}) {:a 2 :c 3}) "Should count multiple keys correctly"))
     (testing "merges correctly"
       (is (= (merge-counters {:a 1} {:b 2}) {:a 1 :b 2}) "Merging two counters")
       (is (= (merge-counters {:a 1} {:a 2}) {:a 3}) "Merging two counters with same key"))))

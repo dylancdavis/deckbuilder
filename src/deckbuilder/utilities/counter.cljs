@@ -17,9 +17,15 @@
 (defn merge-counters [m1 m2]
   (reduce (fn [acc [k v]] (add acc k v)) m1 m2))
 
-(defn counter-difference "Returns another counter with the difference between `m1` and `m2`, with negative values allowed."
+(defn select-keys-by "Returns a map containing only those entries in map whose key has a value that satisfies a predicate" [m pred]
+  (let [selected-keys (filter #(pred (second %)) m)]
+    (select-keys m (map first selected-keys))))
+
+(defn missing-counts "Returns a counter tracking for each key the value within `m1` minus the value within `m2`, with non-positive values omitted."
   [m1 m2]
-  (reduce (fn [acc [k v]] (sub acc k v)) m1 m2))
+  (let [diffs (reduce (fn [acc [k v1]] (assoc acc k (- v1 (get m2 k 0)))) {} m1)
+        positive-diffs (select-keys-by diffs pos?)]
+    positive-diffs))
 
 (defn as-list [map]
   (mapcat (fn [[k v]] (repeat v k)) map))

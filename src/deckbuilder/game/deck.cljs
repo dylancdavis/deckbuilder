@@ -1,5 +1,5 @@
 (ns deckbuilder.game.deck
-  (:require [deckbuilder.utilities.counter :refer [total counter-difference]]))
+  (:require [deckbuilder.utilities.counter :refer [total missing-counts]]))
 
 (defn deck-in-size-range? "Returns true if a `deck` has a size within the range specified by its rules card." [deck]
   (let [deck-size (total (:cards deck))
@@ -10,11 +10,7 @@
 (def deck-checks {:in-size-range deck-in-size-range?})
 
 (defn cards-not-in-collection "Returns a counter of cards in `deck` that are not in `collection`, with values equal to the number of cards missing."
-  [deck collection]
-  (let [diff (counter-difference collection (:cards deck))
-        negative-counts (filter #(neg? (second %)) diff)
-        missing-counts (map (fn [[k v]] [k (- v)]) negative-counts)]
-    missing-counts))
+  [deck collection] (missing-counts (:cards deck) collection))
 
 (defn check-deck-validity "Given a `deck`, a `collection` and a `checks` list of keyword-predicate pairs, returns a map for whether each check was passed."
   [deck collection]
