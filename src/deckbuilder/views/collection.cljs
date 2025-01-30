@@ -68,7 +68,8 @@
     collection @(re-frame/subscribe [::subs/collection])
     current-deck-size (deck-size selected-deck)
     required-deck-size (get-in selected-deck [:rules-card :deck-limits :size])
-    is-deck-valid? (check-deck-validity selected-deck collection)]
+    deck-checks (check-deck-validity selected-deck collection)
+    is-deck-valid? (every? second deck-checks)]
     (if
      (nil? selected-deck-key)
       (deck-list-view collection)
