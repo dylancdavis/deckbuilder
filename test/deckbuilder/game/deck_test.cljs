@@ -1,6 +1,10 @@
 (ns deckbuilder.game.deck-test
   (:require [cljs.test :refer [deftest is]]
-            [deckbuilder.game.deck :refer [deck-in-size-range?]]))
+            [deckbuilder.game.deck :refer [has-rules-card? deck-in-size-range?]]))
+
+(deftest has-rules-card?-test 
+  (is (= (has-rules-card? {:cards {} :rules-card nil}) false) "Should return false when no rules card")
+  (is (= (has-rules-card? {:cards {} :rules-card {}}) true) "Should return true when rules card"))
 
 (deftest deck-in-size-range?-test
   (is (= (deck-in-size-range? {:cards {} :rules-card nil}) true) "Empty deck should be vacuously true when no rules card")
