@@ -18,10 +18,10 @@
 (re-frame/reg-event-db
  :add-new-deck
  (fn [db _]
-   (update-in db [:collection :decklists]
+   (update-in db [:game :collection :decklists]
               #(assoc %
                       (random-uuid)
-                      (let [deck-map (get-in db [:collection :decklists])
+                      (let [deck-map (get-in db [:game :collection :decklists])
                             current-deck-names (map :name (vals deck-map))]
                         {:name (new-deck-name current-deck-names) :cards {}})))))
 
