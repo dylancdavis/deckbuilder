@@ -44,3 +44,7 @@
 (re-frame/reg-event-db
  :draw-cards
  (fn [db [_ n]] (update-in db [:game :run :cards] run/draw-cards n)))
+
+(re-frame/reg-event-db
+ :change-deck-name
+ (fn [db [_ key new-name]] (assoc-in db [:game :collection :decklists key :name] new-name)))

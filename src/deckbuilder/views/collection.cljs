@@ -53,9 +53,13 @@
    (map deck-list-entry (:decklists collection))
    [:button.add-new-deck {:on-click #(re-frame/dispatch [:add-new-deck])} "Add New Deck"]])
 
-(defn deck-edit-view [selected-deck current-deck-size required-deck-size is-deck-valid?]
+(defn deck-name-input [selected-deck-key selected-deck]
+  [:input {:on-change #(re-frame/dispatch [:change-deck-name selected-deck-key (-> % .-target .-value)])
+           :value (:name selected-deck)}])
+
+(defn deck-edit-view [selected-deck-key selected-deck current-deck-size required-deck-size is-deck-valid?]
   [:div.selected-deck-view
-   [:h2 [:span.back-to-decks {:on-click #(re-frame/dispatch [:select-deck nil])} "←"] (:name selected-deck)]
+   [:h2 [:span.back-to-decks {:on-click #(re-frame/dispatch [:select-deck nil])} "←"] (deck-name-input selected-deck-key selected-deck)]
    [:div.card-list-container
     (selected-rules-card-display (get-in selected-deck [:rules-card]))
     (selected-deck-cards-display current-deck-size required-deck-size selected-deck)
@@ -74,7 +78,7 @@
     (if
      (nil? selected-deck-key)
       (deck-list-view collection)
-      (deck-edit-view selected-deck current-deck-size required-deck-size is-deck-valid?))))
+      (deck-edit-view selected-deck-key selected-deck current-deck-size required-deck-size is-deck-valid?))))
 
 
 (defn rules-card-item [card rules-card-selected? amount-in-collection editing-deck?]
