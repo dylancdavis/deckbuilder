@@ -4,7 +4,7 @@
 
 (def new-db
   {:game
-   {:collection {:cards {cards/score 9 cards/basic-rules 1}
+   {:collection {:cards {cards/score 9 cards/starter-rules 1}
                  :decklists {:starting-deck constants/starting-deck-list}}
     :run nil}
    :ui

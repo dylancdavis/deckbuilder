@@ -10,7 +10,7 @@
                 :event [:buy-basic]
                 :cost 2})
 
-(def basic-rules {:name "Starter Rules"
+(def starter-rules {:name "Starter Rules"
                   :type :rules
                   :deck-limits {:size [0,0] :added-cards {score 7 buy-basic 1}}
                   :run-structure {:draw-amount 1
@@ -58,7 +58,7 @@
 (def cards
   {::score score
    ::buy-basic buy-basic
-   ::basic-rules basic-rules
+   ::starter-rules starter-rules
    ::dual-score dual-score
    ::save-reward save-reward
    ::zero-reward zero-reward
@@ -69,4 +69,4 @@
    ::borrow-points borrow-points
    ::last-resort last-resort})
 
-(def basic-cards #{::score ::buy-basic ::basic-rules})
+(def basic-cards #{::score ::buy-basic})
