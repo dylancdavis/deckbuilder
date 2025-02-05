@@ -32,7 +32,7 @@
   [run from-location to-location amount]
   (let [run-cards (:cards run)
         [new-from new-to] (move-items (from-location run-cards) (to-location run-cards) amount)]
-    (assoc run-cards from-location new-from to-location new-to)))
+    (assoc run :cards (assoc run-cards from-location (vec new-from) to-location (vec new-to)))))
 
 (defn run-template [deck]
   {:resources {:points 0}
