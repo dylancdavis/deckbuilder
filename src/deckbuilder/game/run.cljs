@@ -1,6 +1,8 @@
 (ns deckbuilder.game.run
   (:require
-   [deckbuilder.utilities.counter :refer [merge-counters as-shuffled-vector]]))
+   [deckbuilder.utilities.counter :refer [merge-counters as-shuffled-vector]]
+   [deckbuilder.utilities.utils :refer [move-items]]
+   [deckbuilder.game.cards :as cards]))
 
 (def example-run
   {:resources {:points 0}
@@ -10,30 +12,9 @@
    :effects []
    :outcomes []})
 
-(defn starting-draw-pile [deck]
-  (let [deck-cards (:cards deck)
-        cards-to-add (get-in deck [:rules-card :deck-limits :added-cards])]
-    (as-shuffled-vector
-     (if (nil? cards-to-add)
-       deck-cards
-       (merge-counters deck-cards cards-to-add)))))
-
-(defn move-cards [from-pile to-pile amount]
-  (let [cards-to-move (take amount from-pile)]
-    [(concat (drop amount from-pile) cards-to-move) (concat to-pile cards-to-move)]))
-
-(defn make-run [deck] (let [starting-draw (starting-draw-pile deck)
-                            [starting-hand remaining-draw] (move-cards starting-draw [] 5)]
-                        {:resources {:points 0}
-                         :cards {:draw-pile remaining-draw :hand starting-hand :board [] :discard-pile []}
-                         :deck-info deck
-                         :stats {:turn 1 :round 1}
-                         :effects []
-                         :outcomes []}))
-
 (def card-locations [:draw-pile :hand :board :discard-pile])
 
-(defn move-card
+(defn move-card-by-id
   "Move a card with `id` from its location to destination `to`."
   [run id to]
   (let [cards (:cards run)
@@ -45,6 +26,51 @@
       :else (-> run
                 (update-in [:cards from] (fn [loc-cards] (vec (remove #(= (:id %) id) loc-cards))))
                 (update-in [:cards to] conj card)))))
+
+(defn move-cards 
+  "Move `amount` cards from `from-location` to `to-location`."
+  [run from-location to-location amount]
+  (let [run-cards (:cards run)
+        [new-from new-to] (move-items (from-location run-cards) (to-location run-cards) amount)]
+    (assoc run-cards from-location new-from to-location new-to)))
+
+(defn run-template [deck]
+  {:resources {:points 0}
+   :cards {:draw-pile [] :hand [] :board [] :discard-pile []}
+   :deck-info deck
+   :stats {:turn 0 :round 0}
+   :effects []
+   :outcomes []})
+
+(defn populate-draw-pile 
+  "Add to a run's draw pile the cards from the deck, shuffled." 
+  [run]
+  (assoc-in run [:cards :draw-pile] (-> run :deck-info :cards as-shuffled-vector )))
+
+(defn process-start-of-game 
+  "Process the game-start effects of the rules card, if any."
+  [run]
+  (let [game-start-effects (get-in run [:deck-info :rules-card :effects :game-start])]
+    (if (nil? game-start-effects)
+      run
+      (reduce (fn [run effect]
+                (let [effect-type (first effect)
+                      effect-args (rest effect)]
+                  (case effect-type
+                    :add-cards (let [[add-location cards-to-add] effect-args]
+                                 (update-in run [:cards add-location] #(merge-counters % cards-to-add)))
+                    :else run)))
+              run
+              game-start-effects))))
+
+(defn draw-first-hand 
+  "Move cards from the draw pile to the hand according to the rules card, and initialize the turn and round counters."
+  [run]
+  (let [draw-amount (get-in run [:deck-info :rules-card :run-structure :draw-amount])
+        run-with-draw-cards (update-in run [:cards] #(move-cards % :draw-pile :hand draw-amount))]
+    (assoc-in run-with-draw-cards [:stats :turn] {:turn 1 :round 1 :drawn-cards draw-amount})))
+
+(defn make-run [deck] (-> deck run-template populate-draw-pile process-start-of-game draw-first-hand))
 
 ; TODO: Rewrite with update-in to avoid redeclaring other keys
 (defn draw-cards
