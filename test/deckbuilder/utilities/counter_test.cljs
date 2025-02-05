@@ -1,6 +1,6 @@
 (ns deckbuilder.utilities.counter-test
   (:require [cljs.test :refer [deftest testing is]]
-            [deckbuilder.utilities.counter :refer [add sub total missing-counts merge-counters]]))
+            [deckbuilder.utilities.counter :refer [add make-counter sub total missing-counts merge-counters]]))
 
 (deftest counter
   (testing "Counter"
@@ -8,6 +8,10 @@
       (is (= (add {} :a) {:a 1}) "Adding to empty counter")
       (is (= (add {:a 1} :a) {:a 2}) "Adding to existing key")
       (is (= (add {:a 1} :b) {:a 1 :b 1})) "Adding new key to existing counter")
+    (testing "initializes correctly"
+      (is (= (make-counter []) {}) "Empty sequence")
+      (is (= (make-counter [:a :b :a]) {:a 2 :b 1}) "Sequence with duplicates")
+      (is (= (make-counter [:a :b :c]) {:a 1 :b 1 :c 1}) "Sequence with unique elements"))
     (testing "subtracts correctly"
       (is (= (sub {:a 1} :a) {}) "Subtracting to zero doesn't yield empty counter")
       (is (= (sub {:a 2} :a) {:a 1}) "Subtracting from existing key")

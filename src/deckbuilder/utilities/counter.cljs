@@ -5,6 +5,10 @@
   ([map key n] (if (nil? (get map key)) (assoc map key n) (update-in map [key] #(+ % n))))
   ([map key] (add map key 1)))
 
+(defn make-counter "Creates a counter from a sequence of items."
+  [seq]
+  (reduce (fn [acc item] (add acc item)) {} seq))
+
 (defn sub "Subtracts `n` from the count of `key` in `map`. If the count reaches 0, the key is removed."
   ([map key n] (cond
                  (nil? (get map key)) map
