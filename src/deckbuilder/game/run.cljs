@@ -1,7 +1,7 @@
 (ns deckbuilder.game.run
   (:require
-   [deckbuilder.utilities.counter :refer [merge-counters as-shuffled-vector]]
-   [deckbuilder.utilities.utils :refer [move-items]]
+   [deckbuilder.utilities.counter :refer [as-shuffled-vector]]
+   [deckbuilder.utilities.utils :refer [move-items into-randomly]]
    [deckbuilder.game.cards :as cards]))
 
 (def example-run
@@ -27,7 +27,7 @@
                 (update-in [:cards from] (fn [loc-cards] (vec (remove #(= (:id %) id) loc-cards))))
                 (update-in [:cards to] conj card)))))
 
-(defn move-cards 
+(defn move-cards
   "Move `amount` cards from `from-location` to `to-location`."
   [run from-location to-location amount]
   (let [run-cards (:cards run)
@@ -42,12 +42,12 @@
    :effects []
    :outcomes []})
 
-(defn populate-draw-pile 
+(defn populate-draw-pile
   "Takes the card counter of the deck and adds those cards to a run's draw pile vector."
   [run]
-  (assoc-in run [:cards :draw-pile] (-> run :deck-info :cards as-shuffled-vector )))
+  (assoc-in run [:cards :draw-pile] (-> run :deck-info :cards as-shuffled-vector)))
 
-(defn process-start-of-game 
+(defn process-start-of-game
   "Process the game-start effects of the rules card, if any."
   [run]
   (let [game-start-effects (get-in run [:deck-info :rules-card :effects :game-start])]
@@ -57,13 +57,14 @@
                 (let [effect-type (first effect)
                       effect-args (rest effect)]
                   (case effect-type
-                    :add-cards (let [[add-location cards-to-add] effect-args]
-                                 (update-in run [:cards add-location] #(merge-counters % cards-to-add)))
+                    :add-cards (let [[add-location cards-to-add] effect-args
+                                     cards-to-add-vec (as-shuffled-vector cards-to-add)]
+                                 (update-in run [:cards add-location] #(into-randomly % cards-to-add-vec)))
                     :else run)))
               run
               game-start-effects))))
 
-(defn draw-first-hand 
+(defn draw-first-hand
   "Move cards from the draw pile to the hand according to the rules card, and initialize the turn and round counters."
   [run]
   (let [draw-amount (get-in run [:deck-info :rules-card :run-structure :draw-amount])
