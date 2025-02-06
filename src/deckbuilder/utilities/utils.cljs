@@ -25,7 +25,7 @@
   (let [index (rand-int (inc (count coll)))]
     (concat (take index coll) [item] (drop index coll))))
 
-(defn into-randomly 
+(defn into-randomly
   "Inserts `items` into `coll` at a random index, one at a time."
   [coll items]
   (if (empty? items)
