@@ -43,7 +43,7 @@
    :outcomes []})
 
 (defn populate-draw-pile 
-  "Add to a run's draw pile the cards from the deck, shuffled." 
+  "Takes the card counter of the deck and adds those cards to a run's draw pile vector."
   [run]
   (assoc-in run [:cards :draw-pile] (-> run :deck-info :cards as-shuffled-vector )))
 

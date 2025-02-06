@@ -11,10 +11,12 @@
                     :effects {:game-start [:add-cards :deck {::score 2 ::buy-basic 2}]}
                     :cost 2})
 
+(def example-counter {:a 3 :b 2 :c 1})
+
 (def example-run
   {:resources {:points 0}
    :cards {:draw-pile [] :hand [] :discard-pile []}
-   :deck-info {:cards [] :rules-card example-rules}
+   :deck-info {:cards example-counter :rules-card example-rules}
    :data {}
    :effects []
    :outcomes []})
@@ -24,4 +26,7 @@
 
 (deftest move-cards-test
   (is (= post-move-run (move-cards pre-move-run :draw-pile :hand 3)) "Should move 3 cards from draw-pile to hand"))
+
+(deftest populate-draw-pile-test
+  (is (= example-counter (-> example-run populate-draw-pile :cards :draw-pile :frequencies))))
 
