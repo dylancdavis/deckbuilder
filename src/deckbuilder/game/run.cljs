@@ -69,7 +69,7 @@
   [run]
   (let [draw-amount (get-in run [:deck-info :rules-card :run-structure :draw-amount])
         run-with-draw-cards (update-in run [:cards] #(move-cards % :draw-pile :hand draw-amount))]
-    (assoc-in run-with-draw-cards [:stats :turn] {:turn 1 :round 1 :drawn-cards draw-amount})))
+    (assoc run-with-draw-cards :stats {:turn 1 :round 1 :drawn-cards draw-amount})))
 
 (defn make-run [deck] (-> deck run-template populate-draw-pile process-start-of-game draw-first-hand))
 
