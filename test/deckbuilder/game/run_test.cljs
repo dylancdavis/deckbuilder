@@ -5,8 +5,8 @@
 (def base-rules {:name "Example Rules"
                  :type :rules
                  :deck-limits {:size [0,0]}
-                 :run-structure {:draw-amount 1
-                                 :play-amount 1}
+                 :turn-structure {:draw-amount 1
+                                  :play-amount 1}
                  :end-conditions {:rounds 1}
                  :effects nil
                  :cost 2})
@@ -14,8 +14,8 @@
 (def rules-with-added-cards {:name "Example Rules"
                              :type :rules
                              :deck-limits {:size [0,0]}
-                             :run-structure {:draw-amount 1
-                                             :play-amount 1}
+                             :turn-structure {:draw-amount 1
+                                              :play-amount 1}
                              :end-conditions {:rounds 1}
                              :effects {:game-start [[:add-cards :draw-pile {:foo 2 :bar 2}]]}
                              :cost 2})

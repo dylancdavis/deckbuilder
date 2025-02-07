@@ -67,7 +67,7 @@
 (defn draw-first-hand
   "Move cards from the draw pile to the hand according to the rules card, and initialize the turn and round counters."
   [run]
-  (let [draw-amount (get-in run [:deck-info :rules-card :run-structure :draw-amount])
+  (let [draw-amount (get-in run [:deck-info :rules-card :turn-structure :draw-amount])
         run-with-draw-cards (update-in run [:cards] #(move-cards % :draw-pile :hand draw-amount))]
     (assoc run-with-draw-cards :stats {:turn 1 :round 1 :drawn-cards draw-amount})))
 
@@ -83,5 +83,5 @@
    ([run] (draw-cards run 1))))
 
 (defn advance-turn [run]
-  (let [num-cards-to-draw (get-in run [:deck-info :rules-card :run-structure :draw-amount])]
+  (let [num-cards-to-draw (get-in run [:deck-info :rules-card :turn-structure :draw-amount])]
     (update-in (draw-cards run num-cards-to-draw) [:data :turn] inc)))

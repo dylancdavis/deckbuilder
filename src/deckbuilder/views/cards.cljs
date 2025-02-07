@@ -11,7 +11,7 @@
          deck-text (if (= min-size max-size) (str min-size) (str min-size "-" max-size))]
      [:div.section.deck-limit
       [:div.deck-size [:span "Deck Size:"] [:span deck-text " Cards"]]])
-   [:div.section.run-structure
+   [:div.section.turn-structure
     [:div.turn-structure [:span "Turn:"] [:span "Draw 1, Play 1"]]]
    [:div.section.end-conditions
     [:div.end-conditions [:span "Game End:"] [:span "1 Round"]]]])
