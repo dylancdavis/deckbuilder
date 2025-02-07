@@ -18,5 +18,5 @@
      [:h1.game-title "Deckbuilder"]
      [:div.main-content
       [:div.main-panel
-       [:div.nav "Collection" nav-divider "Current Run" nav-divider "Shop"]
+       [:div.nav "Collection" nav-divider "Current Run"]
        ((get-view view))]]]))
