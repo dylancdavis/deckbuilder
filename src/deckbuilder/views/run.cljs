@@ -33,24 +33,14 @@
 (defn hand-display [hand]
   [:div.hand-group [:div.empty-pile (map flippable-card hand)]])
 
+(defn resource-item [resource]
+  (print resource)
+  [:div.resource {:class "resource"} (str "• " (:display resource) ": " (:value resource))])
+
 (defn resource-panel [resources]
-  (let [points (:points resources)]
-    [:div.resource-panel
-     [:div {:class "resource"} (str (:display points) ": " (:value points))]]))
-
-(defn overview-panel []
-  (let [deck-info @(re-frame/subscribe [::subs/run-deck])
-        rules-card (get deck-info :rules-card)]
-    [:div.panel.overview-panel (card-item rules-card)]))
-
-(defn advance-button [deck-data]
-  (if (and (empty? (:draw-pile deck-data)) (empty? (:hand deck-data)))
-    [:div.button-wrapper
-     [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "End Run"]]
-    [:div.button-wrapper
-     [:button.advance
-      {:on-click #(re-frame/dispatch [:advance-game])}
-      "Advance"]]))
+  [:div.resource-list
+   [:h2 "Resources"]
+   (map resource-item (vals resources))])
 
 (defn buy-modal [modal-view resource-data]
   (if (= modal-view :buy-basic)
@@ -68,24 +58,29 @@
        [:button {:on-click #(re-frame/dispatch [:clear-modal-view])} "Continue"]])
     nil))
 
-(defn hand-panel []
-  (let [cards-data @(re-frame/subscribe [::subs/run-cards])
-        resource-data @(re-frame/subscribe [::subs/resources])]
-    [:div.panel.round-panel
-     [:div.pile-container
-      (hand-display (:hand cards-data))]
-     (advance-button cards-data)
-     (resource-panel resource-data)
-     [:button.navigation {:on-click #(re-frame/dispatch [:end-run])} "Scrap Run"]]))
+(defn rules-draw-panel [draw-cards rules-card]
+  [:div.panel.rules-draw (card-item rules-card) (draw-pile draw-cards)])
 
-(defn deck-discard-panel []
-  (let [cards-data @(re-frame/subscribe [::subs/run-cards])]
-    [:div.panel.deck-discard-panel
-     (draw-pile (:draw-pile cards-data))
-     (discard-pile (:discard-pile cards-data))]))
+(defn board-display [board-cards]
+  [:div.hand-group [:div.empty-pile (map card-item board-cards)]])
+
+(defn board-hand-panel [board-cards hand-cards resources]
+  [:div.panel.board-hand-panel
+   (board-display board-cards)
+   (hand-display hand-cards)
+   (resource-panel resources)])
+
+(defn discard-stats-panel [discard-cards stats]
+  [:div.panel.discard-stats-panel
+   (discard-pile discard-cards)
+   (map resource-item (vals stats))])
+
+(defn run-panel [run]
+  [:div.run-view
+   (rules-draw-panel (get-in run [:cards :draw-pile]) (get-in run [:deck-info :rules-card]))
+   (board-hand-panel (get-in run [:cards :board]) (get-in run [:cards :hand]) (get-in run [:resources]))
+   (discard-stats-panel (get-in run [:cards :discard-pile]) (get-in run [:stats]))])
 
 (defn run-view []
-  [:div.run-view
-   (deck-discard-panel)
-   (hand-panel)
-   (overview-panel)])
+  (let [run @(re-frame/subscribe [::subs/run])]
+    (run-panel run)))

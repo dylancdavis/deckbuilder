@@ -5,7 +5,7 @@
    [deckbuilder.game.cards :as cards]))
 
 (def example-run
-  {:resources {:points 0}
+  {:resources {:points {:display "Points" :value 1}}
    :cards {:draw-pile [] :hand [] :discard-pile []}
    :deck-info {:cards [] :rules-card nil}
    :data {}
@@ -35,10 +35,10 @@
     (assoc run :cards (assoc run-cards from-location (vec new-from) to-location (vec new-to)))))
 
 (defn run-template [deck]
-  {:resources {:points 0}
+  {:resources {:points {:display "Points" :value 0}}
    :cards {:draw-pile [] :hand [] :board [] :discard-pile []}
    :deck-info deck
-   :stats {:turn 0 :round 0}
+   :stats {:turn {:display "Turn" :value "0"} :round {:display "Round" :value "0"}}
    :effects []
    :outcomes []})
 
@@ -69,7 +69,10 @@
   [run]
   (let [draw-amount (get-in run [:deck-info :rules-card :turn-structure :draw-amount])
         run-with-draw-cards (move-cards run :draw-pile :hand draw-amount)]
-    (assoc run-with-draw-cards :stats {:turn 1 :round 1 :drawn-cards draw-amount})))
+    (assoc run-with-draw-cards
+           :stats {:turn {:display "Turn" :value 1}
+                   :round {:display "Round" :value 1}
+                   :drawn-cards {:display "Drawn Cards" :value draw-amount}})))
 
 (defn make-run [deck] (-> deck run-template populate-draw-pile process-start-of-game draw-first-hand))
 
