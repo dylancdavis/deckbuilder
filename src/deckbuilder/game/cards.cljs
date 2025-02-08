@@ -16,7 +16,7 @@
                     :turn-structure {:draw-amount 1
                                      :play-amount 1}
                     :end-conditions {:rounds 1}
-                    :effects {:game-start [[:add-cards :deck {::score 7 ::buy-basic 1}]]}
+                    :effects {:game-start [[:add-cards :draw-pile {::score 7 ::buy-basic 1}]]}
                     :cost 2})
 
 (def dual-score {:name "Dual Score"
