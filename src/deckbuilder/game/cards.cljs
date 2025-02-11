@@ -12,12 +12,13 @@
 
 (def starter-rules {:name "Starter Rules"
                     :type :rules
-                    :deck-limits {:size [0,0]}
-                    :turn-structure {:draw-amount 1
-                                     :play-amount 1}
+                    :deck-limits {:size [0,4]}
+                    :turn-structure {:draw-amount 2
+                                     :play-amount :any
+                                     :discard-amount :all}
                     :end-conditions {:rounds 1}
                     :effects {:game-start [[:add-cards :draw-pile {::score 7 ::buy-basic 1}]]}
-                    :cost 2})
+                    :permament true})
 
 (def dual-score {:name "Dual Score"
                  :description "Gain 2 Points. Deck Limit 2."
