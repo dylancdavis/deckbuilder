@@ -74,6 +74,13 @@
                    :round {:display "Round" :value 1}
                    :drawn-cards {:display "Drawn Cards" :value draw-amount}})))
 
+(defn discard-hand
+  "Move cards from the hand to the discard pile according to the rules card."
+  [run]
+  (let [discard-specifier (get-in run [:deck-info :rules-card :turn-structure :discard-amount])
+        discard-amount (if (= :all discard-specifier) (count (get-in run [:cards :hand])) discard-specifier)]
+    (move-cards run :hand :discard-pile discard-amount)))
+
 (defn make-run [deck] (-> deck run-template populate-draw-pile process-start-of-game draw-first-hand))
 
 ; TODO: Rewrite with update-in to avoid redeclaring other keys
