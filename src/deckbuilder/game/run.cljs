@@ -43,26 +43,28 @@
    :outcomes []})
 
 (defn populate-draw-pile
-  "Takes the card counter of the deck and adds those cards to a run's draw pile vector."
-  [run]
-  (assoc-in run [:cards :draw-pile] (map cards/registry (-> run :deck-info :cards as-shuffled-vector))))
+  "Populates a run's draw pile with cards from the deck's counter, according to the given registry."
+  ([run] (populate-draw-pile run cards/registry))
+  ([run registry]
+   (assoc-in run [:cards :draw-pile] (map registry (-> run :deck-info :cards as-shuffled-vector)))))
 
 (defn process-start-of-game
   "Process the game-start effects of the rules card, if any."
-  [run]
-  (let [game-start-effects (get-in run [:deck-info :rules-card :effects :game-start])]
-    (if (nil? game-start-effects)
-      run
-      (reduce (fn [run effect]
-                (let [effect-type (first effect)
-                      effect-args (rest effect)]
-                  (case effect-type
-                    :add-cards (let [[add-location cards-to-add] effect-args
-                                     cards-to-add-vec (map cards/registry (as-shuffled-vector cards-to-add))]
-                                 (update-in run [:cards add-location] #(into-randomly % cards-to-add-vec)))
-                    :else run)))
-              run
-              game-start-effects))))
+  ([run] (process-start-of-game run cards/registry))
+  ([run registry]
+   (let [game-start-effects (get-in run [:deck-info :rules-card :effects :game-start])]
+     (if (nil? game-start-effects)
+       run
+       (reduce (fn [run effect]
+                 (let [effect-type (first effect)
+                       effect-args (rest effect)]
+                   (case effect-type
+                     :add-cards (let [[add-location cards-to-add] effect-args
+                                      cards-to-add-vec (map registry (as-shuffled-vector cards-to-add))]
+                                  (update-in run [:cards add-location] #(into-randomly % cards-to-add-vec)))
+                     :else run)))
+               run
+               game-start-effects)))))
 
 (defn draw-first-hand
   "Move cards from the draw pile to the hand according to the rules card, and initialize the turn and round counters."
