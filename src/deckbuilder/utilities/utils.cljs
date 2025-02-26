@@ -17,7 +17,7 @@
   "Transfers the first `amount` items from the first sequence to the second, returning the updated sequence."
   [from-seq to-seq amount]
   (let [items-to-move (take amount from-seq)]
-    [(drop amount from-seq) (concat to-seq items-to-move)]))
+    [(drop amount from-seq) (into to-seq items-to-move)]))
 
 (defn insert-randomly
   "Inserts `item` into `coll` at a random index."
