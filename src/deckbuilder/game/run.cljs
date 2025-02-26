@@ -49,7 +49,7 @@
    (assoc-in run [:cards :draw-pile] (map registry (-> run :deck-info :cards as-shuffled-vector)))))
 
 (defn process-start-of-game
-  "Process the game-start effects of the rules card, if any."
+  "Process the game-start effects of the rules card, if any, adding cards accoding to the given registry."
   ([run] (process-start-of-game run cards/registry))
   ([run registry]
    (let [game-start-effects (get-in run [:deck-info :rules-card :effects :game-start])]
