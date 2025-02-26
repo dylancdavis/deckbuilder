@@ -20,17 +20,19 @@
                              :effects {:game-start [[:add-cards :draw-pile {:foo 2 :bar 2}]]}
                              :cost 2})
 
-(def pre-move-run {:cards {:draw-pile [:a :b :c :d :e] :hand [:f :g :h :i] :discard-pile []}})
+(def pre-move-run {:cards {:draw-pile '(:a :b :c :d :e) :hand '(:f :g :h :i) :discard-pile '()}})
 
-(def post-move-run {:cards {:draw-pile [:d :e] :hand [:f :g :h :i :a :b :c] :discard-pile []}})
 (deftest move-cards-test
-  (is (= post-move-run (move-cards pre-move-run :draw-pile :hand 3)) "Should move 3 cards from draw-pile to hand"))
+  (is (= (move-cards pre-move-run :draw-pile :hand 3) 
+         {:cards {:draw-pile '(:d :e) :hand '(:c :b :a :f :g :h :i) :discard-pile '()}}) "Should move top 3 cards from draw-pile to hand")
+  (is (= (move-cards pre-move-run :draw-pile :discard-pile 3) 
+         {:cards {:draw-pile '(:d :e) :hand '(:f :g :h :i) :discard-pile '(:c :b :a)}}) "Should move top 3 cards from draw-pile to discard"))
 
 (def example-counter {:a 3 :b 2 :c 1})
 
 (def empty-hand-run
   {:resources {:points 0}
-   :cards {:draw-pile [] :hand [] :discard-pile []}
+   :cards {:draw-pile '() :hand '() :discard-pile '()}
    :deck-info {:cards example-counter :rules-card rules-with-added-cards}
    :data {}
    :effects []
@@ -44,7 +46,7 @@
 
 (def populated-hand-run
   {:resources {:points 0}
-   :cards {:draw-pile [:a :a :a :b :b :c] :hand [] :discard-pile []}
+   :cards {:draw-pile '(:a :a :a :b :b :c) :hand '() :discard-pile '()}
    :deck-info {:cards example-counter :rules-card rules-with-added-cards}
    :data {}
    :effects []
@@ -52,7 +54,7 @@
 
 (def populated-hand-run-no-added
   {:resources {:points 0}
-   :cards {:draw-pile [:a :a :a :b :b :c] :hand [] :discard-pile []}
+   :cards {:draw-pile '(:a :a :a :b :b :c) :hand '() :discard-pile '()}
    :deck-info {:cards example-counter :rules-card base-rules}
    :data {}
    :effects []
