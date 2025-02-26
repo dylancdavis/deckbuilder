@@ -36,8 +36,10 @@
    :effects []
    :outcomes []})
 
+(def populate-with-identity #(populate-draw-pile % identity))
+
 (deftest populate-draw-pile-test
-  (is (= example-counter (-> empty-hand-run populate-draw-pile :cards :draw-pile frequencies))
+  (is (= example-counter (-> empty-hand-run populate-with-identity :cards :draw-pile frequencies))
       "Should add cards to draw-pile from deck"))
 
 (def populated-hand-run
@@ -56,16 +58,18 @@
    :effects []
    :outcomes []})
 
+(def process-start-with-identity #(process-start-of-game % identity))
+
 (deftest process-start-of-game-test
   (is (=
-       (-> populated-hand-run-no-added process-start-of-game :cards :draw-pile)
+       (-> populated-hand-run-no-added process-start-with-identity :cards :draw-pile)
        (get-in populated-hand-run-no-added [:cards :draw-pile]))
       "Shouldn't modify cards in draw-pile when no cards are added")
   (is (=
-       (-> populated-hand-run process-start-of-game :cards :draw-pile frequencies)
+       (-> populated-hand-run process-start-with-identity :cards :draw-pile frequencies)
        {:a 3 :b 2 :c 1 :foo 2 :bar 2})
       "Should add cards to draw-pile from rules card")
   (is (=
-       (filter #(not (or (= % :foo) (= % :bar))) (-> populated-hand-run process-start-of-game :cards :draw-pile))
+       (filter #(not (or (= % :foo) (= % :bar))) (-> populated-hand-run process-start-with-identity :cards :draw-pile))
        (get-in populated-hand-run [:cards :draw-pile]))
       "Should preserve original draw order when cards are added"))
