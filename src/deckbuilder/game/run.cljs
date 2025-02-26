@@ -45,7 +45,7 @@
 (defn populate-draw-pile
   "Takes the card counter of the deck and adds those cards to a run's draw pile vector."
   [run]
-  (assoc-in run [:cards :draw-pile] (map cards/cards (-> run :deck-info :cards as-shuffled-vector))))
+  (assoc-in run [:cards :draw-pile] (map cards/registry (-> run :deck-info :cards as-shuffled-vector))))
 
 (defn process-start-of-game
   "Process the game-start effects of the rules card, if any."
@@ -58,7 +58,7 @@
                       effect-args (rest effect)]
                   (case effect-type
                     :add-cards (let [[add-location cards-to-add] effect-args
-                                     cards-to-add-vec (map cards/cards (as-shuffled-vector cards-to-add))]
+                                     cards-to-add-vec (map cards/registry (as-shuffled-vector cards-to-add))]
                                  (update-in run [:cards add-location] #(into-randomly % cards-to-add-vec)))
                     :else run)))
               run

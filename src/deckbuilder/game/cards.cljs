@@ -57,7 +57,7 @@
                   :description "Gain 8 Points, then destroy this card"
                   :cost 12})
 
-(def cards
+(def registry
   {::score score
    ::buy-basic buy-basic
    ::starter-rules starter-rules
