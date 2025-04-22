@@ -6,8 +6,7 @@ An incremental-game style deckbuilder created using the [re-frame](https://githu
 
 - Install [JDK 8 or later](https://openjdk.java.net/install/), [Node.js](https://nodejs.org/), and [Clojure](https://clojure.org/guides/install_clojure).
 - At the repository root, install the dependencies with `npm install`.
-- Run the command `npm run dev`. This script starts the project by running `npx shadow-cljs watch app`.
-- Shadow CLJS will compile `src/deckbuilder` into `resources/public`, and then serve it at `http://localhost:8280`.
+- Run `npm run dev`. This starts the project by running `npx shadow-cljs watch app`. Shadow CLJS will compile `src/deckbuilder` into `resources/public`, and serve it at `http://localhost:8280`.
 
 - For a more integrated development experience, use the [Calva](https://calva.io/) VSCode extension. Then, instead of using `npm run dev`:
   1) Run the "Start a Project REPL and Connect" command in VSCode
