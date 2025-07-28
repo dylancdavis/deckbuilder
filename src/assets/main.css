@@ -1,2 +1,7 @@
 @import './base.css';
+@import './css/reset.css';
+@import './css/index.css';
+@import './css/cards.css';
+@import './css/collection.css';
+@import './css/run.css';
 

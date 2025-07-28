@@ -13,7 +13,7 @@ gameStore.initializeDb()
 </script>
 
 <template>
-  <div class="app">
+  <div id="app">
     <h1 class="game-title">Deckbuilder</h1>
     <div class="main-content">
       <div class="main-panel">
@@ -25,31 +25,3 @@ gameStore.initializeDb()
   </div>
 </template>
 
-<style scoped>
-.app {
-  min-height: 100vh;
-  background-color: #f5f5f5;
-}
-
-.game-title {
-  text-align: center;
-  color: #333;
-  margin: 0;
-  padding: 1rem;
-  background-color: #fff;
-  border-bottom: 2px solid #ddd;
-}
-
-.main-content {
-  padding: 1rem;
-}
-
-.main-panel {
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-</style>

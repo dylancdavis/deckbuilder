@@ -1,0 +1,196 @@
+* {
+	--card-grey: #dfdfdf;
+	--card-border-color: rgb(20, 20, 20);
+	--collection-card-width: 250px;
+	--card-border: calc(var(--card-width) * 4/250) solid var(--card-border-color);
+}
+
+.card-container {
+	--card-width: var(--collection-card-width);
+	width: var(--card-width);
+	aspect-ratio: 5/7;
+	border: var(--card-border);
+	border-radius: calc(var(--card-width) * 16/250);
+	/* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
+	background-color: var(--card-border-color);
+}
+
+.collection-view .card-container {
+	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.7);
+}
+
+.card-back {
+		--s: 8px; /* control the size */
+		--c:#0000,#ededed .5deg 119.5deg,#0000 120deg;
+		--g1:conic-gradient(from  60deg at 56.25% calc(425%/6),var(--c));
+		--g2:conic-gradient(from 180deg at 43.75% calc(425%/6),var(--c));
+		--g3:conic-gradient(from -60deg at 50%   calc(175%/12),var(--c));
+		
+		background:
+			var(--g1),var(--g1) var(--s) calc(1.73*var(--s)),
+			var(--g2),var(--g2) var(--s) calc(1.73*var(--s)),
+			var(--g3) var(--s) 0,var(--g3) 0 calc(1.73*var(--s)) 
+			#dfdfdf;
+		background-size: calc(2*var(--s)) calc(3.46*var(--s));
+		animation: card-shifting var(--animation-time) ease 0s forwards;
+}
+
+.card-back:last-child {
+	animation: none;
+}
+
+.card-background {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--card-width) * 8/250);
+	text-align: center;
+	background-color: #ebebeb;
+	background: linear-gradient(#ccc, #919191);
+	border-radius: calc(var(--card-width) * 12/250);
+	padding: calc(var(--card-width) * 8/250);
+	--inner-border-color: #5C5C5C;
+	--title-shadow-color: #00000080;
+}
+
+.card-name {
+	font-weight: bold;
+	padding: calc(var(--card-width) * 7/250);
+	border-radius: calc(var(--card-width) * 8/250);
+	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+	box-shadow: 0px calc(var(--card-width) * 2/250) var(--title-shadow-color);
+	text-align: center;
+	font-size: calc(var(--card-width) * 20/250);
+	background: linear-gradient(#fff, #eee);
+}
+
+/* use d9 for background  */
+
+.card-content {
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--card-width) * 8/250);
+	text-align: center;
+	flex: 1;
+	padding: 0 calc(var(--card-width) * 4/250);
+}
+
+.card-image {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+	border-radius: calc(var(--card-width) * 16/250);
+	background: #093153ff;
+	background: linear-gradient(0deg, #093153ff 0%, 	#1077d2 100%);
+}
+
+.lightning-svg {
+	filter: drop-shadow(-4px 4px 0px rgba(0, 0, 0, 0.25));
+}
+
+.card-description {
+	border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+	box-shadow: inset calc(var(--card-width) * 1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25), inset calc(var(--card-width) * -1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25);
+	border-radius: calc(var(--card-width) * 8/250);
+	width: 100%;
+	height: 100%;
+	display: grid;
+	place-items: center;
+	padding: calc(var(--card-width) * 8/250);
+	background: linear-gradient(#e6e6e6, #fff);
+	font-size: calc(var(--card-width) * 20/250);
+	position: relative;
+}
+
+/* Rules Card CSS */
+
+.rules-info {
+		border: calc(var(--card-width) * 1/250) solid var(--inner-border-color);
+		box-shadow: inset calc(var(--card-width) * 1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25), inset calc(var(--card-width) * -1/250) calc(var(--card-width) * 1/250) 0px rgba(0, 0, 0, 0.25);
+		border-radius: calc(var(--card-width) * 8/250);
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		padding: calc(var(--card-width) * 8/250);
+		background: linear-gradient(#e6e6e6, #fff);
+		font-size: calc(var(--card-width) * 16/250);
+		position: relative;
+		color: #444;
+		font-weight: bold;
+}
+
+.rules-info .section {
+		padding: calc(var(--card-width) * 8/250) 0;
+}
+
+.rules-info .section:not(:last-child) {
+		border-bottom: calc(var(--card-width) * 1/250) solid #c2c2c2;
+}
+
+.section div {
+	display: flex;
+	justify-content: space-between;
+}
+
+/* Flip card CSS */
+
+.flip-card {
+  background-color: transparent;
+  width: 250px;
+  height: 350px;
+  perspective: 3000px;
+	border-radius: 8px;
+	transform: translateX(calc(-100% - 2em));
+	animation: card-sliding var(--animation-time) ease 0s forwards;
+	z-index: 3;
+}
+
+@keyframes card-sliding {
+	from { transform: translateX(calc(-100% - 2em)); }
+	to { transform: translateX(0%);}
+}
+
+@keyframes card-shifting {
+	from { transform: translateX(calc(-0.5em)); }
+	to { transform: translateX(0%);}
+}
+
+@keyframes card-flipping {
+	from { transform: rotateY(-180deg)}
+	to { transform: rotateY(0deg)}
+}
+
+.flip-card-inner {
+	transform: rotateY(-180deg);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.2s;
+  transform-style: preserve-3d;
+	border-radius: 8px;
+	animation: card-flipping var(--animation-time) ease 0s forwards;
+}
+
+.flip-card-front, .flip-card-back {
+	border-radius: inherit;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-card-front {
+  background-color: #bbb;
+  color: black;
+}
+
+.flip-card-back {
+  background-color: #2980b9;
+  color: white;
+  transform: rotateY(180deg);
+}
