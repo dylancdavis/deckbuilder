@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+h1.game-title {
+	color: rgb(255, 255, 255);
+	background-color: #003a50;
+	font-weight: bold;
+	padding: 0.5em;
+	font-size: 32px;
+	border-bottom: 4px solid #004057;
+}
+
+* {
+	--animation-time: 0.5s;
+	--standard-blue: #004c67;
+	--standard-orange: orangered;
+	user-select: none;
+}
+
+#app {
+	font-family: 'Lexend', sans-serif;
+	width: 100vw;
+	height: 100vh;
+	background-color: var(--standard-blue);
+	display: flex;
+	flex-direction: column;
+}
+
+svg {
+	height: calc(var(--card-width) * 110/250);
+}
+
+.main-content {
+	display: flex;
+	flex-direction: column;
+	padding: 2em 4em;
+	flex: 1;
+}
+
+.main-panel {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border: 2px solid #272727;
+	background-color: #272727;
+	border-radius: 16px;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.main-panel .nav {
+	padding: 0.75em;
+	color: white;
+	font-size: 18px;
+	display: flex;
+	gap: 0.5em;
+}
+
+.main-panel .nav .nav-divider {
+	border-left: 1px solid var(--standard-orange);
+}
+
+.collection-view {
+	flex: 1;
+}
