@@ -10,7 +10,7 @@ import { moveItems } from './utils.js'
 export function moveCards(run, fromLocation, toLocation, amount) {
   const runCards = run.cards
   const [newFrom, newTo] = moveItems(runCards[fromLocation], runCards[toLocation], amount)
-  
+
   return {
     ...run,
     cards: {
@@ -27,14 +27,14 @@ export function moveCards(run, fromLocation, toLocation, amount) {
 export function populateDrawPile(run, shuffleFn = arr => [...arr].sort(() => Math.random() - 0.5)) {
   const cards = run.deckInfo.cards
   const cardArray = []
-  
+
   // Convert counter to array
   for (const [cardKey, count] of Object.entries(cards)) {
     for (let i = 0; i < count; i++) {
       cardArray.push(cardKey)
     }
   }
-  
+
   return {
     ...run,
     cards: {
@@ -49,29 +49,29 @@ export function populateDrawPile(run, shuffleFn = arr => [...arr].sort(() => Mat
  */
 export function processStartOfGame(run, shuffleFn = arr => [...arr].sort(() => Math.random() - 0.5)) {
   const gameStartEffects = run.deckInfo.rulesCard?.effects?.gameStart
-  
+
   if (!gameStartEffects) {
     return run
   }
-  
+
   let updatedRun = run
-  
+
   for (const effect of gameStartEffects) {
     const [effectType, ...effectArgs] = effect
-    
+
     if (effectType === 'add-cards') {
       const [addLocation, cardsToAdd] = effectArgs
       const cardsArray = []
-      
+
       // Convert counter to array
       for (const [cardKey, count] of Object.entries(cardsToAdd)) {
         for (let i = 0; i < count; i++) {
           cardsArray.push(cardKey)
         }
       }
-      
+
       const shuffledCards = shuffleFn(cardsArray)
-      
+
       updatedRun = {
         ...updatedRun,
         cards: {
@@ -81,7 +81,7 @@ export function processStartOfGame(run, shuffleFn = arr => [...arr].sort(() => M
       }
     }
   }
-  
+
   return updatedRun
 }
 

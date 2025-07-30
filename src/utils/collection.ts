@@ -14,7 +14,7 @@ export function newDeckName(deckNames) {
       return match ? parseInt(match[1], 10) : null
     })
     .filter(num => num !== null)
-  
+
   const nextNumber = newDeckNumbers.length === 0 ? 1 : firstMissingNum(newDeckNumbers)
   return `New Deck ${nextNumber}`
 }

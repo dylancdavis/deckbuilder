@@ -16,10 +16,10 @@ export function hasRulesCard(deck) {
  */
 export function deckInSizeRange(deck) {
   if (!deck.rulesCard) return true
-  
+
   const deckSize = total(deck.cards)
   const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
-  
+
   return minSize <= deckSize && deckSize <= maxSize
 }
 
@@ -35,7 +35,7 @@ export function cardsNotInCollection(deck, collection) {
  */
 export function checkDeckValidity(deck, collection) {
   const missingCards = cardsNotInCollection(deck, collection)
-  
+
   return {
     hasCardsInCollection: Object.keys(missingCards).length === 0,
     hasRulesCard: hasRulesCard(deck),
