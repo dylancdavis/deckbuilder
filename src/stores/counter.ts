@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { cards } from '../utils/cards.js'
-import { startingDeckList } from '../constants.js'
+import { cards } from '../utils/cards.ts'
+import { startingDeckList } from '../constants.ts'
 
 export const useGameStore = defineStore('game', () => {
   const gameState = ref({
@@ -64,7 +64,7 @@ export const useGameStore = defineStore('game', () => {
 
   function gainResource(resourceName, amount) {
     if (gameState.value.game.run) {
-      gameState.value.game.run.resources[resourceName] = 
+      gameState.value.game.run.resources[resourceName] =
         (gameState.value.game.run.resources[resourceName] || 0) + amount
     }
   }

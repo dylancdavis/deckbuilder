@@ -2,7 +2,7 @@
  * Collection utility functions
  */
 
-import { firstMissingNum } from './utils.js'
+import { firstMissingNum } from './utils.ts'
 
 /**
  * Generates a new deck name based on existing deck names

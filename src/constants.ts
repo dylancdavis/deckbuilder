@@ -1,4 +1,4 @@
-import { cards } from './utils/cards.js'
+import { cards } from './utils/cards.ts'
 
 export const startingDeckList = {
   name: "Starter Deck",

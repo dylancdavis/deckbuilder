@@ -2,7 +2,7 @@
  * Game run utility functions
  */
 
-import { moveItems } from './utils.js'
+import { moveItems } from './utils.ts'
 
 /**
  * Move amount cards from fromLocation to toLocation.

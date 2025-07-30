@@ -2,7 +2,7 @@
  * Deck utility functions
  */
 
-import { total, missingCounts } from './counter.js'
+import { total, missingCounts } from './counter.ts'
 
 /**
  * Returns true if a deck has a rules card.
