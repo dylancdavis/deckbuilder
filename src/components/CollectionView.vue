@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useGameStore } from '../stores/counter'
 import CardItem from './CardItem.vue'
@@ -79,10 +79,10 @@ function deckSizeText(currentSize, requiredSize) {
   if (!requiredSize || requiredSize[1] === 0) {
     return "No Cards Allowed"
   }
-  
+
   const [minSize, maxSize] = requiredSize
   const deckText = minSize === maxSize ? minSize.toString() : `${minSize}-${maxSize}`
-  
+
   return `Cards in Deck: (${currentSize}/${deckText})`
 }
 </script>
@@ -91,11 +91,11 @@ function deckSizeText(currentSize, requiredSize) {
   <div class="collection-view">
     <div class="decklist-panel">
       <div class="panel-header">Decks</div>
-      
+
       <!-- Deck List View -->
       <div v-if="!selectedDeckKey" class="decks-container">
-        <div 
-          v-for="entry in deckListEntries" 
+        <div
+          v-for="entry in deckListEntries"
           :key="entry.key"
           class="decklist-item"
           @click="onSelectDeck(entry.deckKey)"
@@ -104,17 +104,17 @@ function deckSizeText(currentSize, requiredSize) {
         </div>
         <button class="add-new-deck" @click="onAddNewDeck">Add New Deck</button>
       </div>
-      
+
       <!-- Deck Edit View -->
       <div v-else class="selected-deck-view">
         <h2>
           <span class="back-to-decks" @click="onBackToDecks">←</span>
-          <input 
-            :value="selectedDeck?.name || ''" 
+          <input
+            :value="selectedDeck?.name || ''"
             @change="onChangeDeckName"
           />
         </h2>
-        
+
         <div class="card-list-container">
           <!-- Rules Card Display -->
           <div class="card-list-block">
@@ -131,15 +131,15 @@ function deckSizeText(currentSize, requiredSize) {
               </ul>
             </div>
           </div>
-          
+
           <!-- Selected Deck Cards Display -->
           <div class="card-list-block">
             <div class="card-list-header">
               {{ deckSizeText(currentDeckSize, requiredDeckSize) }}
             </div>
             <ul v-if="selectedDeckCardsEntries.length > 0">
-              <li 
-                v-for="[card, amount] in selectedDeckCardsEntries" 
+              <li
+                v-for="[card, amount] in selectedDeckCardsEntries"
                 :key="card.name"
                 class="deck-card-count-item"
               >
@@ -148,8 +148,8 @@ function deckSizeText(currentSize, requiredSize) {
               </li>
             </ul>
           </div>
-          
-          <button 
+
+          <button
             class="run-deck"
             :class="isDeckValid ? 'clickable' : 'disabled'"
             @click="isDeckValid ? onStartRun() : null"
@@ -159,15 +159,15 @@ function deckSizeText(currentSize, requiredSize) {
         </div>
       </div>
     </div>
-    
+
     <div class="cards-panel">
       <div class="panel-header">Cards</div>
       <div class="card-grid">
         <div v-if="collectionCardsEntries.length === 0">
           No Cards in Collection. Run the starter deck!
         </div>
-        <div 
-          v-for="[card, amountInCollection] in collectionCardsEntries" 
+        <div
+          v-for="[card, amountInCollection] in collectionCardsEntries"
           :key="card.name"
           class="card-collection-item"
           :class="selectedDeck ? 'clickable' : ''"

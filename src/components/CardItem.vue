@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import LightningSvg from './LightningSvg.vue'
 
 defineProps({
@@ -23,7 +23,7 @@ function rulesCardContent(card) {
   const deckLimits = card.deckLimits
   const [minSize, maxSize] = deckLimits.size
   const deckText = minSize === maxSize ? minSize.toString() : `${minSize}-${maxSize}`
-  
+
   return {
     template: `
       <div class="rules-info">

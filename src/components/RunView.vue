@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useGameStore } from '../stores/counter'
 import CardItem from './CardItem.vue'
@@ -31,11 +31,11 @@ function discardPile(cardList) {
   }
 }
 
-const drawPileData = computed(() => 
+const drawPileData = computed(() =>
   drawPile(run.value?.cards?.drawPile || [])
 )
 
-const discardPileData = computed(() => 
+const discardPileData = computed(() =>
   discardPile(run.value?.cards?.discardPile || [])
 )
 
@@ -53,36 +53,36 @@ const resourceItems = computed(() => {
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
       <CardItem v-if="run.deckInfo?.rulesCard" :card="run.deckInfo.rulesCard" />
-      
+
       <!-- Draw Pile -->
       <div v-if="drawPileData.isEmpty" class="empty-pile">draw</div>
       <div v-else class="draw-pile">
-        <div 
-          v-for="i in drawPileData.pileSize" 
+        <div
+          v-for="i in drawPileData.pileSize"
           :key="i"
           class="card-container card-back"
         />
       </div>
     </div>
-    
+
     <!-- Board Hand Panel -->
     <div class="panel board-hand-panel">
       <!-- Board Display -->
       <div class="hand-group">
         <div class="empty-pile">
-          <CardItem 
-            v-for="card in (run.cards?.board || [])" 
+          <CardItem
+            v-for="card in (run.cards?.board || [])"
             :key="card.name"
-            :card="card" 
+            :card="card"
           />
         </div>
       </div>
-      
+
       <!-- Hand Display -->
       <div class="hand-group">
         <div class="empty-pile">
-          <div 
-            v-for="card in (run.cards?.hand || [])" 
+          <div
+            v-for="card in (run.cards?.hand || [])"
             :key="card.name"
             class="flip-card"
           >
@@ -97,12 +97,12 @@ const resourceItems = computed(() => {
           </div>
         </div>
       </div>
-      
+
       <!-- Resource Panel -->
       <div class="resource-list">
         <h2>Resources</h2>
-        <div 
-          v-for="resource in resourceItems" 
+        <div
+          v-for="resource in resourceItems"
           :key="resource.display"
           class="resource"
         >
@@ -110,23 +110,23 @@ const resourceItems = computed(() => {
         </div>
       </div>
     </div>
-    
+
     <!-- Discard Stats Panel -->
     <div class="panel discard-stats-panel">
       <!-- Discard Pile -->
       <div v-if="discardPileData.isEmpty" class="empty-pile">discard</div>
       <div v-else>
-        <CardItem 
-          v-for="card in discardPileData.cards" 
+        <CardItem
+          v-for="card in discardPileData.cards"
           :key="card.name"
-          :card="card" 
+          :card="card"
         />
       </div>
-      
+
       <!-- Stats -->
       <div v-if="run.stats">
-        <div 
-          v-for="stat in Object.values(run.stats)" 
+        <div
+          v-for="stat in Object.values(run.stats)"
           :key="stat.display"
           class="resource"
         >
