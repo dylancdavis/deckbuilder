@@ -3,6 +3,27 @@
  */
 
 /**
+ * Returns Object.keys with correct type information.
+ */
+export const keys = <T extends object>(obj: T): (keyof T)[] => {
+  return Object.keys(obj) as (keyof T)[]
+}
+
+/**
+ * Returns Object.values with correct type information.
+ */
+export const values = <T extends object>(obj: T): T[keyof T][] => {
+  return Object.values(obj) as T[keyof T][]
+}
+
+/**
+ * Returns Object.entries with correct type information.
+ */
+export const entries = <T extends object>(obj: T): [keyof T, T[keyof T]][] => {
+  return Object.entries(obj) as [keyof T, T[keyof T]][]
+}
+
+/**
  * Given an array of integers, return the smallest positive integer not in the array.
  */
 export function firstMissingNum(numbers: number[]) {
@@ -20,20 +41,12 @@ export function firstMissingNum(numbers: number[]) {
   return Math.max(...numbers) + 1
 }
 
-type Entries<T> = {
-    [K in keyof T]: [K, T[K]];
-}[keyof T][];
-
-const typedEntries = <T extends object>(obj: T): Entries<T> => {
-  return Object.entries(obj) as Entries<T>;
-};
-
 /**
  * Returns an object containing only those entries whose value satisfies the predicate
  */
 export function selectKeysBy<T extends object>(obj: T, predicate: (value: T[keyof T]) => boolean) {
   const result: Partial<T> = {}
-  for (const [key, value] of typedEntries(obj)) {
+  for (const [key, value] of entries(obj)) {
     if (predicate(value)) {
       result[key] = value
     }

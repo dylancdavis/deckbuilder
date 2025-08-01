@@ -2,28 +2,9 @@
  * Counter utility functions for managing counts of items
  */
 
+import { entries, values } from "./utils"
+
 type Counter<T extends string = string> = Record<T, number>
-
-/**
- * Typed version of Object.keys for Counter
- */
-export function typedKeys<T extends string>(counter: Counter<T>): T[] {
-  return Object.keys(counter) as T[]
-}
-
-/**
- * Typed version of Object.values for Counter
- */
-export function typedValues<T extends string>(counter: Counter<T>): number[] {
-  return Object.values(counter) as number[]
-}
-
-/**
- * Typed version of Object.entries for Counter
- */
-export function typedEntries<T extends string>(counter: Counter<T>): [T, number][] {
-  return Object.entries(counter) as [T, number][]
-}
 
 /**
  * Adds `n` to the value of `key` in `counter`. If `key` doesn't exist, it is added with value `n`.
@@ -61,7 +42,7 @@ export function sub<T extends string>(counter: Counter<T>, key: T, n = 1): Count
  * Returns the total of all count values in `counter`.
  */
 export function total<T extends string>(counter: Counter<T>): number {
-  return typedValues(counter).reduce((sum, count) => sum + count, 0)
+  return values(counter).reduce((sum, count) => sum + count, 0)
 }
 
 /**
@@ -69,7 +50,7 @@ export function total<T extends string>(counter: Counter<T>): number {
  */
 export function mergeCounters<T extends string>(counter1: Counter<T>, counter2: Counter<T>): Counter<T> {
   const result = { ...counter1 }
-  for (const [key, value] of typedEntries(counter2)) {
+  for (const [key, value] of entries(counter2)) {
     result[key] = (result[key] || 0) + value
   }
   return result
@@ -81,7 +62,7 @@ export function mergeCounters<T extends string>(counter1: Counter<T>, counter2: 
  */
 export function missingCounts<T extends string>(counter1: Counter<T>, counter2: Counter<T>): Counter<T> {
   const result: Counter<T> = {} as Counter<T>
-  for (const [key, value1] of typedEntries(counter1)) {
+  for (const [key, value1] of entries(counter1)) {
     const value2 = counter2[key] || 0
     const diff = value1 - value2
     if (diff > 0) {
