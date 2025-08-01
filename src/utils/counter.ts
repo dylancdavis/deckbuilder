@@ -2,12 +2,33 @@
  * Counter utility functions for managing counts of items
  */
 
-type Counter = Record<string, number>
+type Counter<T extends string = string> = Record<T, number>
+
+/**
+ * Typed version of Object.keys for Counter
+ */
+export function typedKeys<T extends string>(counter: Counter<T>): T[] {
+  return Object.keys(counter) as T[]
+}
+
+/**
+ * Typed version of Object.values for Counter
+ */
+export function typedValues<T extends string>(counter: Counter<T>): number[] {
+  return Object.values(counter) as number[]
+}
+
+/**
+ * Typed version of Object.entries for Counter
+ */
+export function typedEntries<T extends string>(counter: Counter<T>): [T, number][] {
+  return Object.entries(counter) as [T, number][]
+}
 
 /**
  * Adds `n` to the value of `key` in `counter`. If `key` doesn't exist, it is added with value `n`.
  */
-export function add(counter: Counter, key: keyof Counter, n = 1) {
+export function add<T extends string>(counter: Counter<T>, key: T, n = 1): Counter<T> {
   return {
     ...counter,
     [key]: (counter[key] || 0) + n
@@ -17,18 +38,18 @@ export function add(counter: Counter, key: keyof Counter, n = 1) {
 /**
  * Creates a counter from a sequence of items.
  */
-export function makeCounter(items: Array<keyof Counter>): Counter {
-  return items.reduce((acc, item) => add(acc, item), {})
+export function makeCounter<T extends string>(items: Array<T>): Counter<T> {
+  return items.reduce((acc, item) => add(acc, item), {} as Counter<T>)
 }
 
 /**
  * Subtracts `n` from the count of `key` in `counter`. If the count reaches 0, the key is removed.
  */
-export function sub(counter: Counter, key: keyof Counter, n = 1) {
+export function sub<T extends string>(counter: Counter<T>, key: T, n = 1): Counter<T> {
   const currentCount = counter[key] || 0
   if (currentCount <= n) {
     const { [key]: _, ...rest } = counter
-    return rest
+    return rest as Counter<T>
   }
   return {
     ...counter,
@@ -39,16 +60,16 @@ export function sub(counter: Counter, key: keyof Counter, n = 1) {
 /**
  * Returns the total of all count values in `counter`.
  */
-export function total(counter: Counter) {
-  return Object.values(counter).reduce((sum, count) => sum + count, 0)
+export function total<T extends string>(counter: Counter<T>): number {
+  return typedValues(counter).reduce((sum, count) => sum + count, 0)
 }
 
 /**
  * Merges two counters by adding their values together.
  */
-export function mergeCounters(counter1: Counter, counter2: Counter) {
+export function mergeCounters<T extends string>(counter1: Counter<T>, counter2: Counter<T>): Counter<T> {
   const result = { ...counter1 }
-  for (const [key, value] of Object.entries(counter2)) {
+  for (const [key, value] of typedEntries(counter2)) {
     result[key] = (result[key] || 0) + value
   }
   return result
@@ -58,9 +79,9 @@ export function mergeCounters(counter1: Counter, counter2: Counter) {
  * Returns a counter tracking for each key the value within `counter1` minus the value within `counter2`,
  * with non-positive values omitted.
  */
-export function missingCounts(counter1: Counter, counter2: Counter): Counter {
-  const result: Counter = {}
-  for (const [key, value1] of Object.entries(counter1)) {
+export function missingCounts<T extends string>(counter1: Counter<T>, counter2: Counter<T>): Counter<T> {
+  const result: Counter<T> = {} as Counter<T>
+  for (const [key, value1] of typedEntries(counter1)) {
     const value2 = counter2[key] || 0
     const diff = value1 - value2
     if (diff > 0) {
