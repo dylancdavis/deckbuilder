@@ -1,26 +1,70 @@
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import { cards } from '../utils/cards.ts'
-import { startingDeckList } from '../constants.ts'
+import { startingDeck } from '../constants.ts'
+import type { Counter } from '@/utils/counter.ts'
+import type { PlayableCard } from '@/utils/cards.ts'
+
+export enum Resource {
+  POINTS = 'points',
+}
+
+export type Deck = {
+  name: string
+  rulesCard: string
+  cards: Counter
+}
+
+export type Run = {
+  deck: Deck
+  cards: {
+    drawPile: PlayableCard[]
+    hand: PlayableCard[]
+    board: PlayableCard[]
+    discardPile: PlayableCard[]
+  }
+  resources: { points: number }
+}
+
+type GameState = {
+  game: {
+    collection: {
+      cards: Counter
+      decks: Record<string, Deck>
+    }
+    run: Run | null
+  }
+  ui: {
+    currentView: string[]
+    collection: {
+      selectedDeck: string | null
+    }
+  }
+  viewData: {
+    modalView: string | null
+  }
+}
 
 export const useGameStore = defineStore('game', () => {
-  const gameState = ref({
+  const gameState: Ref<GameState> = ref({
     game: {
       collection: {
-        cards: { [cards.score]: 9, [cards.starterRules]: 1 },
-        decklists: { startingDeck: startingDeckList }
+        cards: { Score: 9, 'Starter Rules': 1 },
+        decks: { startingDeck: startingDeck },
       },
-      run: null
+      run: null,
     },
     ui: {
       currentView: ['collection'],
-      collection: { selectedDeck: null }
-    }
+      collection: { selectedDeck: null },
+    },
+    viewData: {
+      modalView: null,
+    },
   })
 
   // Getters
   const run = computed(() => gameState.value.game.run)
-  const runDeck = computed(() => gameState.value.game.run?.deckInfo)
+  const runDeck = computed(() => gameState.value.game.run?.deck)
   const runCards = computed(() => gameState.value.game.run?.cards)
   const resources = computed(() => gameState.value.game.run?.resources)
   const view = computed(() => gameState.value.ui.currentView)
@@ -28,7 +72,7 @@ export const useGameStore = defineStore('game', () => {
   const selectedDeckKey = computed(() => gameState.value.ui.collection.selectedDeck)
   const selectedDeck = computed(() => {
     const key = selectedDeckKey.value
-    return key ? gameState.value.game.collection.decklists[key] : null
+    return key ? gameState.value.game.collection.decks[key] : null
   })
 
   // Actions
@@ -36,23 +80,26 @@ export const useGameStore = defineStore('game', () => {
     gameState.value = {
       game: {
         collection: {
-          cards: { [cards.score]: 9, [cards.starterRules]: 1 },
-          decklists: { startingDeck: startingDeckList }
+          cards: { Score: 9, 'Starter Rules': 1 },
+          decks: { startingDeck: startingDeck },
         },
-        run: null
+        run: null,
       },
       ui: {
         currentView: ['collection'],
-        collection: { selectedDeck: null }
-      }
+        collection: { selectedDeck: null },
+      },
+      viewData: {
+        modalView: null,
+      },
     }
   }
 
-  function selectDeck(deckName) {
-    gameState.value.ui.collection.selectedDeck = deckName
+  function selectDeck(key: string) {
+    gameState.value.ui.collection.selectedDeck = key
   }
 
-  function startRun(deck) {
+  function startRun(deck: Deck) {
     gameState.value.ui.currentView = ['run']
     gameState.value.game.run = makeRun(deck)
   }
@@ -62,7 +109,7 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.game.run = null
   }
 
-  function gainResource(resourceName, amount) {
+  function gainResource(resourceName: Resource, amount: number) {
     if (gameState.value.game.run) {
       gameState.value.game.run.resources[resourceName] =
         (gameState.value.game.run.resources[resourceName] || 0) + amount
@@ -73,24 +120,35 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.viewData = { modalView: 'buy-basic' }
   }
 
-  function drawCards(n) {
+  function drawCards(n: number) {
     if (gameState.value.game.run) {
-      // Implement draw cards logic here
+      const drawPile = gameState.value.game.run.cards.drawPile
+      const hand = gameState.value.game.run.cards.hand
+
+      for (let i = 0; i < n && drawPile.length > 0; i++) {
+        const card = drawPile.pop()
+        if (card) {
+          hand.push(card)
+        }
+      }
+
+      // Update the run state
+      gameState.value.game.run.cards.drawPile = drawPile
+      gameState.value.game.run.cards.hand = hand
     }
   }
 
-  function changeDeckName(key, newName) {
-    if (gameState.value.game.collection.decklists[key]) {
-      gameState.value.game.collection.decklists[key].name = newName
+  function changeDeckName(oldName: string, newName: string) {
+    if (gameState.value.game.collection.decks[oldName]) {
+      gameState.value.game.collection.decks[oldName].name = newName
     }
   }
 
-  // Placeholder for makeRun function - will implement when migrating run logic
-  function makeRun(deck) {
+  function makeRun(deck: Deck): Run {
     return {
-      deckInfo: deck,
-      cards: { hand: [], drawPile: [], discardPile: [] },
-      resources: { points: 0 }
+      deck: deck,
+      cards: { drawPile: [], hand: [], board: [], discardPile: [] },
+      resources: { points: 0 },
     }
   }
 
@@ -111,6 +169,6 @@ export const useGameStore = defineStore('game', () => {
     gainResource,
     buyBasic,
     drawCards,
-    changeDeckName
+    changeDeckName,
   }
 })

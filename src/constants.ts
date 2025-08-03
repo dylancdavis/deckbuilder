@@ -1,6 +1,6 @@
 import { cards } from './utils/cards.ts'
 
-export const startingDeckList = {
+export const startingDeck = {
   name: "Starter Deck",
   cards: {},
   rulesCard: cards.starterRules,

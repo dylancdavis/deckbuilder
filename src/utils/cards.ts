@@ -1,16 +1,16 @@
-interface Card {
+export interface Card {
   id: string
   name: string
 }
 
-interface PlayableCard extends Card {
+export interface PlayableCard extends Card {
   description: string,
   cost: number,
   effects: any[],
   deckLimit?: number
 }
 
-interface RulesCard extends Card {
+export interface RulesCard extends Card {
   deckLimits: {
     size: [number, number]
   }

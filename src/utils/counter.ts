@@ -4,7 +4,7 @@
 
 import { entries, values } from "./utils"
 
-type Counter<T extends string = string> = Record<T, number>
+export type Counter<T extends string = string> = Record<T, number>
 
 /**
  * Adds `n` to the value of `key` in `counter`. If `key` doesn't exist, it is added with value `n`.
