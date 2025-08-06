@@ -30,7 +30,7 @@ export function firstMissingNum(numbers: number[]) {
   if (numbers.length === 0) return 1
 
   const numSet = new Set(numbers)
-  const potentialMissing = new Set([1, ...numbers.map(n => n + 1)])
+  const potentialMissing = new Set([1, ...numbers.map((n) => n + 1)])
 
   for (const num of potentialMissing) {
     if (!numSet.has(num)) {

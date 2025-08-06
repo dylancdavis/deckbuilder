@@ -4,6 +4,6 @@ import { cards } from './utils/cards.ts'
 export const startingDeck: Deck = {
   name: 'Starter Deck',
   cards: {},
-  rulesCard: cards.starterRules,
+  rulesCard: cards['starter-rules'],
   editable: false,
 }

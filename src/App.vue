@@ -7,7 +7,7 @@ import RunView from './components/RunView.vue'
 const gameStore = useGameStore()
 const view = computed(() => gameStore.view)
 
-function getView(viewName) {
+function getView(viewName: string[]) {
   switch (viewName[0]) {
     case 'collection':
       return CollectionView

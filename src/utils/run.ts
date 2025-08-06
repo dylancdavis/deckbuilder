@@ -2,12 +2,15 @@
  * Game run utility functions
  */
 
+import type { Run } from '@/stores/game.ts'
 import { moveItems } from './utils.ts'
+
+export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
 /**
  * Move amount cards from fromLocation to toLocation.
  */
-export function moveCards(run, fromLocation, toLocation, amount) {
+export function moveCards(run: Run, fromLocation: Location, toLocation: Location, amount: number) {
   const runCards = run.cards
   const [newFrom, newTo] = moveItems(runCards[fromLocation], runCards[toLocation], amount)
 
@@ -16,16 +19,16 @@ export function moveCards(run, fromLocation, toLocation, amount) {
     cards: {
       ...runCards,
       [fromLocation]: newFrom,
-      [toLocation]: newTo
-    }
+      [toLocation]: newTo,
+    },
   }
 }
 
 /**
  * Populates a run's draw pile with cards from the deck's counter.
  */
-export function populateDrawPile(run, shuffleFn = arr => [...arr].sort(() => Math.random() - 0.5)) {
-  const cards = run.deckInfo.cards
+export function populateDrawPile(run: Run) {
+  const cards = run.deck.cards
   const cardArray = []
 
   // Convert counter to array
@@ -39,16 +42,17 @@ export function populateDrawPile(run, shuffleFn = arr => [...arr].sort(() => Mat
     ...run,
     cards: {
       ...run.cards,
-      drawPile: shuffleFn(cardArray)
-    }
+      // TODO: Use a proper shuffle function
+      drawPile: cardArray.sort(() => Math.random() - 0.5),
+    },
   }
 }
 
 /**
  * Process the game-start effects of the rules card, if any.
  */
-export function processStartOfGame(run, shuffleFn = arr => [...arr].sort(() => Math.random() - 0.5)) {
-  const gameStartEffects = run.deckInfo.rulesCard?.effects?.gameStart
+export function processStartOfGame(run: Run) {
+  const gameStartEffects = run.deck.rulesCard?.effects?.gameStart
 
   if (!gameStartEffects) {
     return run
@@ -61,23 +65,23 @@ export function processStartOfGame(run, shuffleFn = arr => [...arr].sort(() => M
 
     if (effectType === 'add-cards') {
       const [addLocation, cardsToAdd] = effectArgs
-      const cardsArray = []
+      const cards = []
 
       // Convert counter to array
       for (const [cardKey, count] of Object.entries(cardsToAdd)) {
         for (let i = 0; i < count; i++) {
-          cardsArray.push(cardKey)
+          cards.push(cardKey)
         }
       }
 
-      const shuffledCards = shuffleFn(cardsArray)
+      const shuffledCards = [...cards].sort(() => Math.random() - 0.5)
 
       updatedRun = {
         ...updatedRun,
         cards: {
           ...updatedRun.cards,
-          [addLocation]: [...updatedRun.cards[addLocation], ...shuffledCards]
-        }
+          [addLocation]: [...updatedRun.cards[addLocation], ...shuffledCards],
+        },
       }
     }
   }
@@ -88,7 +92,7 @@ export function processStartOfGame(run, shuffleFn = arr => [...arr].sort(() => M
 /**
  * Move cards from the draw pile to the hand according to the rules card.
  */
-export function drawFirstHand(run) {
-  const drawAmount = run.deckInfo.rulesCard?.turnStructure?.drawAmount || 0
+export function drawFirstHand(run: Run) {
+  const drawAmount = run.deck.rulesCard?.turnStructure?.drawAmount || 0
   return moveCards(run, 'drawPile', 'hand', drawAmount)
 }
