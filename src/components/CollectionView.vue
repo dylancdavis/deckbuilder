@@ -5,7 +5,7 @@ import CardItem from './CardItem.vue'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
-const selectedDeck = computed(() => gameStore.selectedDeck)
+const selectedDeck = computed(() => gameStore.selectedDeck as Deck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
 function deckSize(deck: Deck) {
@@ -25,8 +25,9 @@ function onAddNewDeck() {
   // TODO: Implement add new deck
 }
 
-function onChangeDeckName(event) {
-  gameStore.changeDeckName(selectedDeckKey.value, event.target.value)
+function onChangeDeckName(value: string) {
+  if (!selectedDeckKey.value || !value) return
+  gameStore.changeDeckName(selectedDeckKey.value, value)
 }
 
 function onBackToDecks() {
@@ -34,23 +35,33 @@ function onBackToDecks() {
 }
 
 function onStartRun() {
+  if (!selectedDeck.value)
+    throw new Error('No deck selected to start run')
   gameStore.startRun(selectedDeck.value)
 }
 
-function onAddCardToSelectedDeck(card) {
+function onAddCardToSelectedDeck(card: string) {
   // TODO: Implement add card to selected deck
+  console.log('Adding card to selected deck:', card)
+  throw new Error('Not implemented: onAddCardToSelectedDeck')
 }
 
-function onRemoveCardFromSelectedDeck(card) {
+function onRemoveCardFromSelectedDeck(card: string) {
   // TODO: Implement remove card from selected deck
+  console.log('Removing card from selected deck:', card)
+  throw new Error('Not implemented: onRemoveCardFromSelectedDeck')
 }
 
-function onSetSelectedDeckRulesCard(card) {
+function onSetSelectedDeckRulesCard(card: string) {
   // TODO: Implement set rules card
+  console.log('Setting rules card for selected deck:', card)
+  throw new Error('Not implemented: onSetSelectedDeckRulesCard')
 }
 
 function onClearSelectedDeckRulesCard() {
   // TODO: Implement clear rules card
+  console.log('Clearing rules card for selected deck')
+  throw new Error('Not implemented: onClearSelectedDeckRulesCard')
 }
 
 const deckEntries = computed(() => {
@@ -68,7 +79,7 @@ const collectionCardsEntries = computed(() => {
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
-const requiredDeckSize = computed(() => selectedDeck.value?.rulesCard?.deckLimits?.size)
+const requiredDeckSize = computed(() => selectedDeck.value.rulesCard.deckLimits.size)
 const isDeckValid = computed(() => true) // TODO: Implement deck validity check
 
 function deckSizeText(currentSize: number, requiredSize: [number, number]) {
@@ -107,7 +118,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           <span class="back-to-decks" @click="onBackToDecks">←</span>
           <input
             :value="selectedDeck?.name || ''"
-            @change="onChangeDeckName"
+            @input="onChangeDeckName(($event.target as HTMLInputElement).value)"
           />
         </h2>
 

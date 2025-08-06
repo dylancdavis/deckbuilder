@@ -2,7 +2,7 @@ import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
-import type { PlayableCard } from '@/utils/cards.ts'
+import type { PlayableCard, RulesCard } from '@/utils/cards.ts'
 
 export enum Resource {
   POINTS = 'points',
@@ -10,8 +10,9 @@ export enum Resource {
 
 export type Deck = {
   name: string
-  rulesCard: string
+  rulesCard: RulesCard
   cards: Counter
+  editable: boolean
 }
 
 export type Run = {
@@ -23,6 +24,7 @@ export type Run = {
     discardPile: PlayableCard[]
   }
   resources: { points: number }
+  stats: Record<string, number>
 }
 
 type GameState = {
@@ -95,7 +97,7 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function selectDeck(key: string) {
+  function selectDeck(key: string | null) {
     gameState.value.ui.collection.selectedDeck = key
   }
 
@@ -149,6 +151,7 @@ export const useGameStore = defineStore('game', () => {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
+      stats: { turns: 0, score: 0 },
     }
   }
 
