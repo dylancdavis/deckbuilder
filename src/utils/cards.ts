@@ -1,16 +1,19 @@
 export interface Card {
-  id: string
+  id: CardID
   name: string
+  type: 'rules' | 'playable'
 }
 
 export interface PlayableCard extends Card {
-  description: string,
-  cost: number,
-  effects: any[],
+  type: 'playable'
+  description: string
+  cost: number
+  effects: (string | number)[]
   deckLimit?: number
 }
 
 export interface RulesCard extends Card {
+  type: 'rules'
   deckLimits: {
     size: [number, number]
   }
@@ -23,119 +26,129 @@ export interface RulesCard extends Card {
     rounds: number
   }
   effects: {
-    gameStart: any[][]
+    gameStart: string[]
   }
 }
 
-
 export const score: PlayableCard = {
-  id: "score",
-  name: "Score",
-  description: "Gain 1 Point.",
-  effects: ["gain-resource", "points", 1],
-  cost: 0
+  type: 'playable',
+  id: 'score',
+  name: 'Score',
+  description: 'Gain 1 Point.',
+  effects: ['gain-resource', 'points', 1],
+  cost: 0,
 }
 
 export const buyBasic: PlayableCard = {
-  id: "buy-basic",
-  name: "Buy Basic",
-  description: "Buy a Basic Card.",
-  effects: ["buy-basic"],
-  cost: 2
+  type: 'playable',
+  id: 'buy-basic',
+  name: 'Buy Basic',
+  description: 'Buy a Basic Card.',
+  effects: ['buy-basic'],
+  cost: 2,
 }
 
 export const starterRules: RulesCard = {
-  id: "starter-rules",
-  name: "Starter Rules",
-  type: "rules",
+  type: 'rules',
+  id: 'starter-rules',
+  name: 'Starter Rules',
   deckLimits: { size: [0, 4] },
   turnStructure: {
     drawAmount: 2,
-    playAmount: "any",
-    discardAmount: "all"
+    playAmount: 'any',
+    discardAmount: 'all',
   },
   endConditions: { rounds: 1 },
   effects: {
-    gameStart: [["add-cards", "draw-pile", { score: 7, buyBasic: 1 }]]
+    gameStart: [['add-cards', 'draw-pile', { score: 7, buyBasic: 1 }]],
   },
-  permanent: true
+  permanent: true,
 }
 
 export const dualScore: PlayableCard = {
-  id: "dual-score",
-  name: "Dual Score",
-  description: "Gain 2 Points. Deck Limit 2.",
+  type: 'playable',
+  id: 'dual-score',
+  name: 'Dual Score',
+  description: 'Gain 2 Points. Deck Limit 2.',
   deckLimit: 2,
-  effects: ["gain-resource", "points", 2],
-  cost: 4
+  effects: ['gain-resource', 'points', 2],
+  cost: 4,
 }
 
 export const saveReward: PlayableCard = {
-  id: "save-reward",
-  name: "A Penny Saved",
+  type: 'playable',
+  id: 'save-reward',
+  name: 'A Penny Saved',
   description: "If you haven't purchased a card this round, gain 2 points.",
   effects: [],
-  cost: 4
+  cost: 4,
 }
 
 export const zeroReward: PlayableCard = {
-  id: "zero-reward",
-  name: "Starting Surge",
-  description: "If you have 0 points, gain 6 points.",
+  type: 'playable',
+  id: 'zero-reward',
+  name: 'Starting Surge',
+  description: 'If you have 0 points, gain 6 points.',
   effects: [],
-  cost: 4
+  cost: 4,
 }
 
 export const pointReset: PlayableCard = {
-  id: "point-reset",
-  name: "Point Reboot",
-  description: "Lose all points, then gain 4 points.",
+  type: 'playable',
+  id: 'point-reset',
+  name: 'Point Reboot',
+  description: 'Lose all points, then gain 4 points.',
   effects: [],
-  cost: 6
+  cost: 6,
 }
 
 export const pointMultiply: PlayableCard = {
-  id: "point-multiply",
-  name: "Point Multiplication",
-  description: "If you have 4 or less points, double them.",
+  type: 'playable',
+  id: 'point-multiply',
+  name: 'Point Multiplication',
+  description: 'If you have 4 or less points, double them.',
   effects: [],
-  cost: 0
+  cost: 0,
 }
 
 export const scoreSurge: PlayableCard = {
-  id: "score-surge",
-  name: "Score Surge",
-  description: "Gain 2 points for each \"Score\" played this round (up to 4).",
+  type: 'playable',
+  id: 'score-surge',
+  name: 'Score Surge',
+  description: 'Gain 2 points for each "Score" played this round (up to 4).',
   effects: [],
-  cost: 10
+  cost: 10,
 }
 
 export const scoreSynergy: PlayableCard = {
-  id: "score-synergy",
-  name: "Score Synergy",
-  description: "Gain 1 point for each \"Score\" in your deck (up to 6).",
+  type: 'playable',
+  id: 'score-synergy',
+  name: 'Score Synergy',
+  description: 'Gain 1 point for each "Score" in your deck (up to 6).',
   effects: [],
-  cost: 10
+  cost: 10,
 }
 
 export const borrowPoints: PlayableCard = {
-  id: "borrow-points",
-  name: "Borrowed Points",
-  description: "Gain 6 points. In 2 turns, lose 6 points (down to zero)",
+  type: 'playable',
+  id: 'borrow-points',
+  name: 'Borrowed Points',
+  description: 'Gain 6 points. In 2 turns, lose 6 points (down to zero)',
   effects: [],
-  cost: 10
+  cost: 10,
 }
 
 export const lastResort: PlayableCard = {
-  id: "last-resort",
-  name: "Last Resort",
-  description: "Gain 8 Points, then destroy this card",
+  type: 'playable',
+  id: 'last-resort',
+  name: 'Last Resort',
+  description: 'Gain 8 Points, then destroy this card',
   effects: [],
-  cost: 12
+  cost: 12,
 }
 
-export const cards: Record<string, Card> = {
-  'score': score,
+export const cards = {
+  score: score,
   'buy-basic': buyBasic,
   'starter-rules': starterRules,
   'dual-score': dualScore,
@@ -146,5 +159,7 @@ export const cards: Record<string, Card> = {
   'score-surge': scoreSurge,
   'score-synergy': scoreSynergy,
   'borrow-points': borrowPoints,
-  'last-resort': lastResort
-}
+  'last-resort': lastResort,
+} as const
+
+export type CardID = keyof typeof cards

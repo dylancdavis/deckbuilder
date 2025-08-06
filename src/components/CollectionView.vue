@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
+import { cards, type Card, type CardID } from '@/utils/cards'
+import { entries } from '@/utils/utils'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
@@ -40,19 +42,19 @@ function onStartRun() {
   gameStore.startRun(selectedDeck.value)
 }
 
-function onAddCardToSelectedDeck(card: string) {
+function onAddCardToSelectedDeck(card: CardID) {
   // TODO: Implement add card to selected deck
   console.log('Adding card to selected deck:', card)
   throw new Error('Not implemented: onAddCardToSelectedDeck')
 }
 
-function onRemoveCardFromSelectedDeck(card: string) {
+function onRemoveCardFromSelectedDeck(card: CardID) {
   // TODO: Implement remove card from selected deck
   console.log('Removing card from selected deck:', card)
   throw new Error('Not implemented: onRemoveCardFromSelectedDeck')
 }
 
-function onSetSelectedDeckRulesCard(card: string) {
+function onSetSelectedDeckRulesCard(card: CardID) {
   // TODO: Implement set rules card
   console.log('Setting rules card for selected deck:', card)
   throw new Error('Not implemented: onSetSelectedDeckRulesCard')
@@ -69,13 +71,15 @@ const deckEntries = computed(() => {
 })
 
 const selectedDeckCardsEntries = computed(() => {
-  if (!selectedDeck.value || !selectedDeck.value.cards) return []
-  return Object.entries(selectedDeck.value.cards)
+  if (!selectedDeck.value) return []
+  const idCounter = selectedDeck.value.cards
+  const deckCards = entries(idCounter)
+  return deckCards.map(([id, amount]) => ([cards[id], amount] as [Card, number]))
 })
 
 const collectionCardsEntries = computed(() => {
-  if (!collection.value || !collection.value.cards) return []
-  return Object.entries(collection.value.cards)
+  const collectionCards: [CardID, number][] = entries(collection.value.cards)
+  return collectionCards.map(([id, amount]) => ([cards[id], amount] as [Card, number]))
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
@@ -151,7 +155,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
                 class="deck-card-count-item"
               >
                 <span>{{ card.name }} x{{ amount }}</span>
-                <button @click="onRemoveCardFromSelectedDeck(card)">X</button>
+                <button @click="onRemoveCardFromSelectedDeck(card.id)">X</button>
               </li>
             </ul>
           </div>
@@ -178,7 +182,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           :key="card.name"
           class="card-collection-item"
           :class="selectedDeck ? 'clickable' : ''"
-          @click="selectedDeck && card.type === 'rules' ? onSetSelectedDeckRulesCard(card) : selectedDeck ? onAddCardToSelectedDeck(card) : null"
+          @click="selectedDeck && card.type === 'rules' ? onSetSelectedDeckRulesCard(card.id) : selectedDeck ? onAddCardToSelectedDeck(card.id) : null"
         >
           <CardItem :card="card" />
           <div class="card-interaction-row">

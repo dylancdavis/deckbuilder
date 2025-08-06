@@ -2,7 +2,7 @@ import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
-import type { PlayableCard, RulesCard } from '@/utils/cards.ts'
+import type { CardID, PlayableCard, RulesCard } from '@/utils/cards.ts'
 
 export enum Resource {
   POINTS = 'points',
@@ -11,7 +11,7 @@ export enum Resource {
 export type Deck = {
   name: string
   rulesCard: RulesCard
-  cards: Counter
+  cards: Counter<CardID>
   editable: boolean
 }
 
@@ -30,7 +30,7 @@ export type Run = {
 type GameState = {
   game: {
     collection: {
-      cards: Counter
+      cards: Counter<CardID>
       decks: Record<string, Deck>
     }
     run: Run | null
@@ -50,7 +50,7 @@ export const useGameStore = defineStore('game', () => {
   const gameState: Ref<GameState> = ref({
     game: {
       collection: {
-        cards: { Score: 9, 'Starter Rules': 1 },
+        cards: { score: 9, 'starter-rules': 1 },
         decks: { startingDeck: startingDeck },
       },
       run: null,
@@ -82,7 +82,7 @@ export const useGameStore = defineStore('game', () => {
     gameState.value = {
       game: {
         collection: {
-          cards: { Score: 9, 'Starter Rules': 1 },
+          cards: { score: 9, 'starter-rules': 1 },
           decks: { startingDeck: startingDeck },
         },
         run: null,
