@@ -15,6 +15,11 @@ export type Deck = {
   editable: boolean
 }
 
+export type Collection = {
+  cards: Counter<CardID>
+  decks: Record<string, Deck>
+}
+
 export type Run = {
   deck: Deck
   cards: {
@@ -29,10 +34,7 @@ export type Run = {
 
 type GameState = {
   game: {
-    collection: {
-      cards: Counter<CardID>
-      decks: Record<string, Deck>
-    }
+    collection: Collection
     run: Run | null
   }
   ui: {

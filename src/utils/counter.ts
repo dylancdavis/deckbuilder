@@ -2,7 +2,7 @@
  * Counter utility functions for managing counts of items
  */
 
-import { entries, values } from "./utils"
+import { entries, values } from './utils'
 
 export type Counter<T extends string = string> = Record<T, number>
 
@@ -12,7 +12,7 @@ export type Counter<T extends string = string> = Record<T, number>
 export function add<T extends string>(counter: Counter<T>, key: T, n = 1): Counter<T> {
   return {
     ...counter,
-    [key]: (counter[key] || 0) + n
+    [key]: (counter[key] || 0) + n,
   }
 }
 
@@ -34,7 +34,7 @@ export function sub<T extends string>(counter: Counter<T>, key: T, n = 1): Count
   }
   return {
     ...counter,
-    [key]: currentCount - n
+    [key]: currentCount - n,
   }
 }
 
@@ -48,7 +48,10 @@ export function total<T extends string>(counter: Counter<T>): number {
 /**
  * Merges two counters by adding their values together.
  */
-export function mergeCounters<T extends string>(counter1: Counter<T>, counter2: Counter<T>): Counter<T> {
+export function mergeCounters<T extends string>(
+  counter1: Counter<T>,
+  counter2: Counter<T>,
+): Counter<T> {
   const result = { ...counter1 }
   for (const [key, value] of entries(counter2)) {
     result[key] = (result[key] || 0) + value
@@ -60,7 +63,10 @@ export function mergeCounters<T extends string>(counter1: Counter<T>, counter2: 
  * Returns a counter tracking for each key the value within `counter1` minus the value within `counter2`,
  * with non-positive values omitted.
  */
-export function missingCounts<T extends string>(counter1: Counter<T>, counter2: Counter<T>): Counter<T> {
+export function missingCounts<T extends string>(
+  counter1: Counter<T>,
+  counter2: Counter<T>,
+): Counter<T> {
   const result: Counter<T> = {} as Counter<T>
   for (const [key, value1] of entries(counter1)) {
     const value2 = counter2[key] || 0
