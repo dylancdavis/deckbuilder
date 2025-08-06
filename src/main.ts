@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
-import { useGameStore } from './stores/counter'
+import { useGameStore } from './stores/game'
 
 // Import CSS files
 import './assets/css/reset.css'

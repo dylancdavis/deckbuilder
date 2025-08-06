@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useGameStore } from './stores/counter'
+import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
 

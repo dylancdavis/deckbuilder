@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useGameStore } from '../stores/counter'
+import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 
 const gameStore = useGameStore()
