@@ -78,7 +78,7 @@ const selectedDeckCardsEntries = computed(() => {
 })
 
 const collectionCardsEntries = computed(() => {
-  const collectionCards: [CardID, number][] = entries(collection.value.cards)
+  const collectionCards = entries(collection.value.cards)
   return collectionCards.map(([id, amount]) => ([cards[id], amount] as [Card, number]))
 })
 

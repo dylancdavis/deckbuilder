@@ -8,15 +8,17 @@ export enum Resource {
   POINTS = 'points',
 }
 
+export type CardCounter = Partial<Counter<CardID>>
+
 export type Deck = {
   name: string
   rulesCard: RulesCard
-  cards: Counter<CardID>
+  cards: CardCounter
   editable: boolean
 }
 
 export type Collection = {
-  cards: Counter<CardID>
+  cards: CardCounter
   decks: Record<string, Deck>
 }
 
