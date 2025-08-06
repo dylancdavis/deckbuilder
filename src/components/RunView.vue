@@ -14,20 +14,20 @@ function CardBack() {
   }
 }
 
-function drawPile(cardList) {
-  const pileSize = Math.min(cardList.length, MAX_DRAW_PILE_SIZE)
+function drawPile(cards) {
+  const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
     isEmpty: pileSize === 0
   }
 }
 
-function discardPile(cardList) {
-  const pileSize = Math.min(cardList.length, MAX_DRAW_PILE_SIZE)
+function discardPile(cards) {
+  const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
     isEmpty: pileSize === 0,
-    cards: cardList.slice(0, pileSize)
+    cards: cards.slice(0, pileSize)
   }
 }
 
