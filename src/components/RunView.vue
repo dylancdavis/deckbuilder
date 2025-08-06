@@ -2,19 +2,14 @@
 import { computed } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
+import type { Card } from '@/utils/cards'
 
 const gameStore = useGameStore()
 const run = computed(() => gameStore.run)
 
 const MAX_DRAW_PILE_SIZE = 3
 
-function CardBack() {
-  return {
-    key: Math.random()
-  }
-}
-
-function drawPile(cards) {
+function drawPile(cards: Card[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
@@ -22,7 +17,7 @@ function drawPile(cards) {
   }
 }
 
-function discardPile(cards) {
+function discardPile(cards: Card[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
@@ -52,7 +47,7 @@ const resourceItems = computed(() => {
   <div v-if="run" class="run-view">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
-      <CardItem v-if="run.deckInfo?.rulesCard" :card="run.deckInfo.rulesCard" />
+      <CardItem v-if="run.deck?.rulesCard" :card="run.deck.rulesCard" />
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.isEmpty" class="empty-pile">draw</div>

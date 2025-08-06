@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useGameStore } from '../stores/game'
+import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
 
 const gameStore = useGameStore()
@@ -8,20 +8,16 @@ const collection = computed(() => gameStore.collection)
 const selectedDeck = computed(() => gameStore.selectedDeck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
-function deckSize(decklist) {
-  if (!decklist || !decklist.cards) return 0
-  return Object.values(decklist.cards).reduce((sum, count) => sum + count, 0)
+function deckSize(deck: Deck) {
+  if (!deck || !deck.cards) return 0
+  return Object.values(deck.cards).reduce((sum, count) => sum + count, 0)
 }
 
-function deckListEntry([deckKey, decklist]) {
-  return {
-    key: decklist.name,
-    deckKey,
-    name: decklist.name
-  }
+function deckEntry([key, {name}]: [string, Deck]) {
+  return {key, name}
 }
 
-function onSelectDeck(deckKey) {
+function onSelectDeck(deckKey: string) {
   gameStore.selectDeck(deckKey)
 }
 
@@ -57,8 +53,8 @@ function onClearSelectedDeckRulesCard() {
   // TODO: Implement clear rules card
 }
 
-const deckListEntries = computed(() => {
-  return Object.entries(collection.value.decklists || {}).map(deckListEntry)
+const deckEntries = computed(() => {
+  return Object.entries(collection.value.decks || {}).map(deckEntry)
 })
 
 const selectedDeckCardsEntries = computed(() => {
@@ -75,7 +71,7 @@ const currentDeckSize = computed(() => deckSize(selectedDeck.value))
 const requiredDeckSize = computed(() => selectedDeck.value?.rulesCard?.deckLimits?.size)
 const isDeckValid = computed(() => true) // TODO: Implement deck validity check
 
-function deckSizeText(currentSize, requiredSize) {
+function deckSizeText(currentSize: number, requiredSize: [number, number]) {
   if (!requiredSize || requiredSize[1] === 0) {
     return "No Cards Allowed"
   }
@@ -95,10 +91,10 @@ function deckSizeText(currentSize, requiredSize) {
       <!-- Deck List View -->
       <div v-if="!selectedDeckKey" class="decks-container">
         <div
-          v-for="entry in deckListEntries"
+          v-for="entry in deckEntries"
           :key="entry.key"
           class="decklist-item"
-          @click="onSelectDeck(entry.deckKey)"
+          @click="onSelectDeck(entry.key)"
         >
           {{ entry.name }}
         </div>
