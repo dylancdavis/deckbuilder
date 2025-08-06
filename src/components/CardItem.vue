@@ -8,47 +8,6 @@ defineProps({
   }
 })
 
-function playableCardContent(card) {
-  return {
-    template: `
-      <div class="card-image">
-        <LightningSvg />
-      </div>
-      <div class="card-description">${card.description}</div>
-    `
-  }
-}
-
-function rulesCardContent(card) {
-  const deckLimits = card.deckLimits
-  const [minSize, maxSize] = deckLimits.size
-  const deckText = minSize === maxSize ? minSize.toString() : `${minSize}-${maxSize}`
-
-  return {
-    template: `
-      <div class="rules-info">
-        <div class="section deck-limit">
-          <div class="deck-size">
-            <span>Deck Size:</span>
-            <span>${deckText} Cards</span>
-          </div>
-        </div>
-        <div class="section turn-structure">
-          <div class="turn-structure">
-            <span>Turn:</span>
-            <span>Draw 1, Play 1</span>
-          </div>
-        </div>
-        <div class="section end-conditions">
-          <div class="end-conditions">
-            <span>Game End:</span>
-            <span>1 Round</span>
-          </div>
-        </div>
-      </div>
-    `
-  }
-}
 </script>
 
 <template>
