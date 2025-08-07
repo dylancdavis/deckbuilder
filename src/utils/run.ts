@@ -4,6 +4,7 @@
 
 import type { Run } from '@/stores/game.ts'
 import { moveItems } from './utils.ts'
+import { toArray } from './counter.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -28,15 +29,7 @@ export function moveCards(run: Run, fromLocation: Location, toLocation: Location
  * Populates a run's draw pile with cards from the deck's counter.
  */
 export function populateDrawPile(run: Run) {
-  const cards = run.deck.cards
-  const cardArray = []
-
-  // Convert counter to array
-  for (const [cardKey, count] of Object.entries(cards)) {
-    for (let i = 0; i < count; i++) {
-      cardArray.push(cardKey)
-    }
-  }
+  const cardArray = toArray(run.deck.cards)
 
   return {
     ...run,
@@ -51,27 +44,20 @@ export function populateDrawPile(run: Run) {
 /**
  * Process the game-start effects of the rules card, if any.
  */
-export function processStartOfGame(run: Run) {
+export function processStartOfGame(run: Run): Run {
   const gameStartEffects = run.deck.rulesCard.effects.gameStart
 
   if (!gameStartEffects) return run
 
   let updatedRun = run
 
+  // TODO: Apply effects with reduce
   for (const { type, params } of gameStartEffects) {
     switch (type) {
       case 'add-cards': {
         const { location, cards, mode } = params
-        const cardsToAdd = []
+        const shuffledCards = [toArray(cards)].sort(() => Math.random() - 0.5)
 
-        // Convert counter to array
-        for (const [key, count] of Object.entries(cards)) {
-          for (let i = 0; i < count; i++) {
-            cardsToAdd.push(key)
-          }
-        }
-
-        const shuffledCards = [...cardsToAdd].sort(() => Math.random() - 0.5)
         updatedRun = {
           ...updatedRun,
           cards: {
@@ -87,8 +73,12 @@ export function processStartOfGame(run: Run) {
       case 'gain-resource': {
         throw new Error('Not implemented: gain-resource effect')
       }
+      default:
+        throw new Error(`Unknown effect type: ${type}`)
     }
   }
+
+  return updatedRun
 }
 
 /**

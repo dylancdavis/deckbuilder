@@ -2,7 +2,7 @@
  * Counter utility functions for managing counts of items
  */
 
-import { entries, values } from './utils'
+import { entries, push, values } from './utils'
 
 export type Counter<T extends string = string> = Partial<Record<T, number>>
 
@@ -43,6 +43,18 @@ export function sub<T extends string>(counter: Counter<T>, key: T, n = 1): Count
  */
 export function total<T extends string>(counter: Counter<T>) {
   return values(counter).reduce((sum: number, count) => sum + (count ?? 0), 0)
+}
+
+/**
+ * Converts a counter to an array, where each key is repeated according to its count.
+ * For example, { a: 2, b: 1 } becomes ['a', 'a', 'b'].
+ */
+export function toArray<T extends string>(counter: Counter<T>): T[] {
+  const result: T[] = []
+  for (const [key, count] of entries(counter)) {
+    push(result, key, count ?? 0)
+  }
+  return result
 }
 
 /**

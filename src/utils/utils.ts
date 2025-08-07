@@ -64,3 +64,12 @@ export function moveItems<T>(fromArray: T[], toArray: T[], amount: number) {
 
   return [remainingItems, updatedToArray]
 }
+
+/**
+ * Pushes an item onto an array `n` times.
+ */
+export function push<T>(array: T[], item: T, n: number = 1) {
+  for (let i = 0; i < n; i++) {
+    array.push(item)
+  }
+}
