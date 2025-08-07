@@ -35,12 +35,12 @@ defineProps({
             </div>
           </div>
         </div>
-        <div v-else>
+        <template v-else>
           <div class="card-image">
             <LightningSvg />
           </div>
           <div class="card-description">{{ card.description }}</div>
-        </div>
+        </template>
       </div>
     </div>
   </div>
