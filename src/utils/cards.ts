@@ -1,3 +1,4 @@
+import type { Resource } from '@/stores/game'
 import type { Counter } from './counter'
 
 // Game locations where cards can be placed
@@ -6,13 +7,24 @@ export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
 // Card placement modes when adding cards to locations
 export type PlacementMode = 'top' | 'bottom' | 'shuffle'
 
-// Game event types with discriminated union
-export type GameEvent =
-  | {
-      type: 'add-cards'
-      params: { location: GameLocation; cards: Counter<CardID>; mode?: PlacementMode }
-    }
-  | { type: 'gain-resource'; params: { resource: string; amount: number } }
+export type AddCardsEffect = {
+  type: 'add-cards'
+  params: {
+    location: GameLocation
+    cards: Counter<CardID>
+    mode?: PlacementMode
+  }
+}
+
+export type GainResourceEffect = {
+  type: 'gain-resource'
+  params: {
+    resource: Resource
+    amount: number
+  }
+}
+
+export type Effect = AddCardsEffect | GainResourceEffect
 
 export interface Card {
   id: CardID
@@ -42,7 +54,7 @@ export interface RulesCard extends Card {
     rounds: number
   }
   effects: {
-    gameStart: GameEvent[]
+    gameStart: Effect[]
   }
 }
 

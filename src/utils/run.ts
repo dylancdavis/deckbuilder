@@ -52,41 +52,43 @@ export function populateDrawPile(run: Run) {
  * Process the game-start effects of the rules card, if any.
  */
 export function processStartOfGame(run: Run) {
-  const gameStartEffects = run.deck.rulesCard?.effects?.gameStart
+  const gameStartEffects = run.deck.rulesCard.effects.gameStart
 
-  if (!gameStartEffects) {
-    return run
-  }
+  if (!gameStartEffects) return run
 
   let updatedRun = run
 
-  for (const effect of gameStartEffects) {
-    const [effectType, ...effectArgs] = effect
+  for (const { type, params } of gameStartEffects) {
+    switch (type) {
+      case 'add-cards': {
+        const { location, cards, mode } = params
+        const cardsToAdd = []
 
-    if (effectType === 'add-cards') {
-      const [addLocation, cardsToAdd] = effectArgs
-      const cards = []
-
-      // Convert counter to array
-      for (const [cardKey, count] of Object.entries(cardsToAdd)) {
-        for (let i = 0; i < count; i++) {
-          cards.push(cardKey)
+        // Convert counter to array
+        for (const [key, count] of Object.entries(cards)) {
+          for (let i = 0; i < count; i++) {
+            cardsToAdd.push(key)
+          }
         }
+
+        const shuffledCards = [...cardsToAdd].sort(() => Math.random() - 0.5)
+        updatedRun = {
+          ...updatedRun,
+          cards: {
+            ...updatedRun.cards,
+            [location]:
+              mode === 'top'
+                ? [...shuffledCards, ...updatedRun.cards[location]]
+                : [...updatedRun.cards[location], ...shuffledCards],
+          },
+        }
+        break
       }
-
-      const shuffledCards = [...cards].sort(() => Math.random() - 0.5)
-
-      updatedRun = {
-        ...updatedRun,
-        cards: {
-          ...updatedRun.cards,
-          [addLocation]: [...updatedRun.cards[addLocation], ...shuffledCards],
-        },
+      case 'gain-resource': {
+        throw new Error('Not implemented: gain-resource effect')
       }
     }
   }
-
-  return updatedRun
 }
 
 /**
