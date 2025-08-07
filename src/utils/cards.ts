@@ -1,3 +1,19 @@
+import type { Counter } from './counter'
+
+// Game locations where cards can be placed
+export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
+
+// Card placement modes when adding cards to locations
+export type PlacementMode = 'top' | 'bottom' | 'shuffle'
+
+// Game event types with discriminated union
+export type GameEvent =
+  | {
+      type: 'add-cards'
+      params: { location: GameLocation; cards: Counter<CardID>; mode?: PlacementMode }
+    }
+  | { type: 'gain-resource'; params: { resource: string; amount: number } }
+
 export interface Card {
   id: CardID
   name: string
@@ -26,7 +42,7 @@ export interface RulesCard extends Card {
     rounds: number
   }
   effects: {
-    gameStart: string[]
+    gameStart: GameEvent[]
   }
 }
 
@@ -60,9 +76,13 @@ export const starterRules: RulesCard = {
   },
   endConditions: { rounds: 1 },
   effects: {
-    gameStart: [['add-cards', 'draw-pile', { score: 7, buyBasic: 1 }]],
+    gameStart: [
+      {
+        type: 'add-cards',
+        params: { location: 'drawPile', cards: { score: 7, 'buy-basic': 1 } },
+      },
+    ],
   },
-  permanent: true,
 }
 
 export const dualScore: PlayableCard = {

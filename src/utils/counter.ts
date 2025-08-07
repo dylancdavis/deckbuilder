@@ -4,7 +4,7 @@
 
 import { entries, values } from './utils'
 
-export type Counter<T extends string = string> = Record<T, number>
+export type Counter<T extends string = string> = Partial<Record<T, number>>
 
 /**
  * Adds `n` to the value of `key` in `counter`. If `key` doesn't exist, it is added with value `n`.
@@ -41,8 +41,8 @@ export function sub<T extends string>(counter: Counter<T>, key: T, n = 1): Count
 /**
  * Returns the total of all count values in `counter`.
  */
-export function total<T extends string>(counter: Counter<T>): number {
-  return values(counter).reduce((sum, count) => sum + count, 0)
+export function total<T extends string>(counter: Counter<T>) {
+  return values(counter).reduce((sum: number, count) => sum + (count ?? 0), 0)
 }
 
 /**
@@ -54,7 +54,7 @@ export function mergeCounters<T extends string>(
 ): Counter<T> {
   const result = { ...counter1 }
   for (const [key, value] of entries(counter2)) {
-    result[key] = (result[key] || 0) + value
+    result[key] = (result[key] ?? 0) + (value ?? 0)
   }
   return result
 }
@@ -63,14 +63,11 @@ export function mergeCounters<T extends string>(
  * Returns a counter tracking for each key the value within `counter1` minus the value within `counter2`,
  * with non-positive values omitted.
  */
-export function missingCounts<T extends string>(
-  counter1: Counter<T>,
-  counter2: Counter<T>,
-): Counter<T> {
-  const result: Counter<T> = {} as Counter<T>
-  for (const [key, value1] of entries(counter1)) {
-    const value2 = counter2[key] || 0
-    const diff = value1 - value2
+export function missingCounts<T extends string>(c1: Counter<T>, c2: Counter<T>) {
+  const result = {} as Counter<T>
+  for (const [key, value1] of entries(c1)) {
+    const value2 = c2[key] ?? 0
+    const diff = (value1 ?? 0) - value2
     if (diff > 0) {
       result[key] = diff
     }
