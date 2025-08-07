@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import type { Card } from '@/utils/cards'
+import { entries } from '@/utils/utils'
 
 const gameStore = useGameStore()
 const run = computed(() => gameStore.run)
@@ -121,11 +122,11 @@ const resourceItems = computed(() => {
       <!-- Stats -->
       <div v-if="run.stats">
         <div
-          v-for="stat in Object.values(run.stats)"
-          :key="stat.display"
+          v-for="[name, value] in entries(run.stats)"
+          :key="name"
           class="resource"
         >
-          • {{ stat.display }}: {{ stat.value }}
+          • {{ name }}: {{ value }}
         </div>
       </div>
     </div>
