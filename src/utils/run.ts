@@ -5,6 +5,7 @@
 import type { Run } from '@/stores/game.ts'
 import { moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
+import { playableCards, type PlayableCardID } from './cards.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -29,15 +30,17 @@ export function moveCards(run: Run, fromLocation: Location, toLocation: Location
 /**
  * Populates a run's draw pile with cards from the deck's counter.
  */
-export function populateDrawPile(run: Run) {
-  const cardArray = toArray(run.deck.cards)
+export function populateDrawPile(run: Run): Run {
+  const idsToAdd: PlayableCardID[] = toArray(run.deck.cards)
+  idsToAdd.sort(() => Math.random() - 0.5) // shuffle
+  const cardsToAdd = idsToAdd.map(id => playableCards[id])
 
   return {
     ...run,
     cards: {
       ...run.cards,
       // TODO: Use a proper shuffle function
-      drawPile: cardArray.sort(() => Math.random() - 0.5),
+      drawPile: cardsToAdd,
     },
   }
 }
@@ -50,16 +53,18 @@ export function processStartOfGame(run: Run): Run {
 
   if (!gameStartEffects) return run
 
-  let updatedRun = run
+  let updatedRun = populateDrawPile(run)
 
+  // Add cards specified in deck to draw pile then shuffle
+
+  // Process all start-of-game effects from rules card
   // TODO: Apply effects with reduce
   for (const { type, params } of gameStartEffects) {
     switch (type) {
       case 'add-cards': {
         const { location, cards, mode } = params
-        const shuffledCards = toArray(cards).sort(() => Math.random() - 0.5)
-
-        debugger;
+        const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
+        const cardsToAdd = shuffledIDs.map(id => playableCards[id])
 
         // TODO: Use lodash for object updating?
         updatedRun = {
@@ -68,8 +73,8 @@ export function processStartOfGame(run: Run): Run {
             ...updatedRun.cards,
             [location]:
               mode === 'top'
-                ? [...shuffledCards, ...updatedRun.cards[location]]
-                : [...updatedRun.cards[location], ...shuffledCards],
+                ? [...cardsToAdd, ...updatedRun.cards[location]]
+                : [...updatedRun.cards[location], ...cardsToAdd],
           },
         }
         break

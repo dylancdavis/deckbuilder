@@ -12,7 +12,7 @@ export type AddCardsEffect = {
   type: 'add-cards'
   params: {
     location: GameLocation
-    cards: Counter<CardID>
+    cards: Counter<PlayableCardID>
     mode?: PlacementMode
   }
 }
