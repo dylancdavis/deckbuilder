@@ -4,6 +4,7 @@ import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
 import { cards, type Card, type CardID } from '@/utils/cards'
 import { entries } from '@/utils/utils'
+import { total } from '@/utils/counter'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
@@ -12,7 +13,7 @@ const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
 function deckSize(deck: Deck) {
   if (!deck || !deck.cards) return 0
-  return Object.values(deck.cards).reduce((sum, count) => sum + count, 0)
+  return total(deck.cards)
 }
 
 function deckEntry([key, {name}]: [string, Deck]) {
