@@ -158,25 +158,18 @@ export const useGameStore = defineStore('game', () => {
     if (!deck) return
     if (!collection.cards[cardId] || collection.cards[cardId]! <= 0) return
 
-    // Add card to deck
+    // Add card to deck configuration (collection still owns the card)
     deck.cards = add(deck.cards, cardId)
-
-    // Remove card from collection
-    collection.cards = sub(collection.cards, cardId)
   }
 
   function removeCardFromDeck(deckKey: string, cardId: PlayableCardID) {
     const deck = gameState.value.game.collection.decks[deckKey]
-    const collection = gameState.value.game.collection
 
     if (!deck) return
     if (!deck.cards[cardId] || deck.cards[cardId]! <= 0) return
 
-    // Remove card from deck
+    // Remove card from deck configuration (card remains in collection)
     deck.cards = sub(deck.cards, cardId)
-
-    // Add card back to collection
-    collection.cards = add(collection.cards, cardId)
   }
 
   function setDeckRulesCard(deckKey: string, rulesCardId: RulesCardID) {
