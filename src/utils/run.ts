@@ -65,16 +65,17 @@ export function processStartOfGame(run: Run): Run {
         const { location, cards, mode } = params
         const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
         const cardsToAdd = shuffledIDs.map(id => playableCards[id])
+        const existingCards = updatedRun.cards[location]
+        const newCardArr = mode === 'top'
+                ? [...cardsToAdd, ...existingCards]
+                : [...existingCards, ...cardsToAdd]
 
         // TODO: Use lodash for object updating?
         updatedRun = {
           ...updatedRun,
           cards: {
             ...updatedRun.cards,
-            [location]:
-              mode === 'top'
-                ? [...cardsToAdd, ...updatedRun.cards[location]]
-                : [...updatedRun.cards[location], ...cardsToAdd],
+            [location]: newCardArr
           },
         }
         break
