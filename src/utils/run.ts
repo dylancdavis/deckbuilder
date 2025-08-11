@@ -49,6 +49,10 @@ export function populateDrawPile(run: Run): Run {
  * Process the game-start effects of the rules card, if any.
  */
 export function processStartOfGame(run: Run): Run {
+  if (run.deck.rulesCard == null) {
+    throw new Error('Tried to process a run without a rules card.')
+  }
+
   const gameStartEffects = run.deck.rulesCard.effects.gameStart
 
   if (!gameStartEffects) return run

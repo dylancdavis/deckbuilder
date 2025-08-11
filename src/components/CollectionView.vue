@@ -65,15 +65,13 @@ function onRemoveCardFromSelectedDeck(card: PlayableCardID) {
 }
 
 function onSetSelectedDeckRulesCard(card: RulesCardID) {
-  // TODO: Implement set rules card
-  console.log('Setting rules card for selected deck:', card)
-  throw new Error('Not implemented: onSetSelectedDeckRulesCard')
+  if (!selectedDeckKey.value) return
+  gameStore.setDeckRulesCard(selectedDeckKey.value, card)
 }
 
 function onClearSelectedDeckRulesCard() {
-  // TODO: Implement clear rules card
-  console.log('Clearing rules card for selected deck')
-  throw new Error('Not implemented: onClearSelectedDeckRulesCard')
+  if (!selectedDeckKey.value) return
+  gameStore.clearDeckRulesCard(selectedDeckKey.value)
 }
 
 const deckEntries = computed(() => {
@@ -93,7 +91,7 @@ const collectionCardsEntries = computed(() => {
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
-const requiredDeckSize = computed(() => selectedDeck.value.rulesCard.deckLimits.size)
+const requiredDeckSize = computed(() => selectedDeck.value.rulesCard?.deckLimits.size)
 const isDeckValid = computed(() => true) // TODO: Implement deck validity check
 
 function deckSizeText(currentSize: number, requiredSize: [number, number]) {
@@ -156,7 +154,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           <!-- Selected Deck Cards Display -->
           <div class="card-list-block">
             <div class="card-list-header">
-              {{ deckSizeText(currentDeckSize, requiredDeckSize) }}
+              {{ deckSizeText(currentDeckSize, (requiredDeckSize || [0,0])) }}
             </div>
             <ul v-if="selectedDeckCardsEntries.length > 0">
               <li

@@ -2,7 +2,8 @@ import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
-import type { PlayableCardID, PlayableCard, RulesCard, CardID } from '@/utils/cards.ts'
+import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
+import { cards } from '@/utils/cards.ts'
 import { processStartOfGame } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 
@@ -12,7 +13,7 @@ export enum Resource {
 
 export type Deck = {
   name: string
-  rulesCard: RulesCard
+  rulesCard: RulesCard | null
   cards: Counter<PlayableCardID>
   editable: boolean
 }
@@ -178,6 +179,23 @@ export const useGameStore = defineStore('game', () => {
     collection.cards = add(collection.cards, cardId)
   }
 
+  function setDeckRulesCard(deckKey: string, rulesCardId: RulesCardID) {
+    const deck = gameState.value.game.collection.decks[deckKey]
+    if (!deck) return
+
+    // Set rules card (just reference from cards collection)
+    deck.rulesCard = cards[rulesCardId] as RulesCard
+  }
+
+  function clearDeckRulesCard(deckKey: string) {
+    const deck = gameState.value.game.collection.decks[deckKey]
+    if (!deck) return
+
+    // Clear rules card - need to handle this based on deck structure requirements
+    // For now, setting to starter rules as fallback
+    deck.rulesCard = null
+  }
+
   function makeRun(deck: Deck): Run {
 
     const baseRun: Run = {
@@ -213,5 +231,7 @@ export const useGameStore = defineStore('game', () => {
     changeDeckName,
     addCardToDeck,
     removeCardFromDeck,
+    setDeckRulesCard,
+    clearDeckRulesCard,
   }
 })
