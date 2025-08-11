@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
-import { cards, type Card, type CardID } from '@/utils/cards'
+import { cards, cardType, type Card, type CardID, type PlayableCard, type PlayableCardID, type RulesCardID } from '@/utils/cards'
 import { entries } from '@/utils/utils'
 import { total } from '@/utils/counter'
 
@@ -43,19 +43,28 @@ function onStartRun() {
   gameStore.startRun(selectedDeck.value)
 }
 
-function onAddCardToSelectedDeck(card: CardID) {
-  // TODO: Implement add card to selected deck
-  console.log('Adding card to selected deck:', card)
-  throw new Error('Not implemented: onAddCardToSelectedDeck')
+function handleCardClick(id: CardID) {
+  switch (cardType(id)) {
+    case 'rules':
+      onSetSelectedDeckRulesCard(id as RulesCardID);
+      break;
+    case 'playable':
+      onAddCardToSelectedDeck(id as PlayableCardID)
+      break;
+  }
 }
 
-function onRemoveCardFromSelectedDeck(card: CardID) {
-  // TODO: Implement remove card from selected deck
-  console.log('Removing card from selected deck:', card)
-  throw new Error('Not implemented: onRemoveCardFromSelectedDeck')
+function onAddCardToSelectedDeck(card: PlayableCardID) {
+  if (!selectedDeckKey.value) return
+  gameStore.addCardToDeck(selectedDeckKey.value, card)
 }
 
-function onSetSelectedDeckRulesCard(card: CardID) {
+function onRemoveCardFromSelectedDeck(card: PlayableCardID) {
+  if (!selectedDeckKey.value) return
+  gameStore.removeCardFromDeck(selectedDeckKey.value, card)
+}
+
+function onSetSelectedDeckRulesCard(card: RulesCardID) {
   // TODO: Implement set rules card
   console.log('Setting rules card for selected deck:', card)
   throw new Error('Not implemented: onSetSelectedDeckRulesCard')
@@ -75,7 +84,7 @@ const selectedDeckCardsEntries = computed(() => {
   if (!selectedDeck.value) return []
   const idCounter = selectedDeck.value.cards
   const deckCards = entries(idCounter)
-  return deckCards.map(([id, amount]) => ([cards[id], amount] as [Card, number]))
+  return deckCards.map(([id, amount]) => ([cards[id], amount] as [PlayableCard, number]))
 })
 
 const collectionCardsEntries = computed(() => {
@@ -183,7 +192,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           :key="card.name"
           class="card-collection-item"
           :class="selectedDeck ? 'clickable' : ''"
-          @click="selectedDeck && card.type === 'rules' ? onSetSelectedDeckRulesCard(card.id) : selectedDeck ? onAddCardToSelectedDeck(card.id) : null"
+          @click="handleCardClick(card.id)"
         >
           <CardItem :card="card" />
           <div class="card-interaction-row">

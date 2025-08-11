@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { moveCards, populateDrawPile, processStartOfGame } from '../../utils/run.js'
-import type { AddCardsEffect, CardID, RulesCard } from '../../utils/cards.ts'
+import type { AddCardsEffect, PlayableCardID, RulesCard } from '../../utils/cards.ts'
 import type { Run } from '../../stores/game.ts'
 import { Counter } from '../../utils/counter.js'
 
@@ -81,7 +81,7 @@ const emptyHandRun: Run = {
 describe('populateDrawPile', () => {
   it('adds cards to draw-pile from deck', () => {
     const result = populateDrawPile(emptyHandRun)
-    const drawPileCounter = {} as Counter<CardID>
+    const drawPileCounter = {} as Counter<PlayableCardID>
     result.cards.drawPile.forEach(card => {
       drawPileCounter[card] = (drawPileCounter[card] || 0) + 1
     })

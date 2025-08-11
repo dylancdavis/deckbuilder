@@ -2,8 +2,9 @@ import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
-import type { CardID, PlayableCard, RulesCard } from '@/utils/cards.ts'
+import type { PlayableCardID, PlayableCard, RulesCard, CardID } from '@/utils/cards.ts'
 import { processStartOfGame } from '@/utils/run.ts'
+import { add, sub } from '@/utils/counter.ts'
 
 export enum Resource {
   POINTS = 'points',
@@ -12,7 +13,7 @@ export enum Resource {
 export type Deck = {
   name: string
   rulesCard: RulesCard
-  cards: Counter<CardID>
+  cards: Counter<PlayableCardID>
   editable: boolean
 }
 
@@ -149,9 +150,37 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  function addCardToDeck(deckKey: string, cardId: PlayableCardID) {
+    const deck = gameState.value.game.collection.decks[deckKey]
+    const collection = gameState.value.game.collection
+
+    if (!deck) return
+    if (!collection.cards[cardId] || collection.cards[cardId]! <= 0) return
+
+    // Add card to deck
+    deck.cards = add(deck.cards, cardId)
+
+    // Remove card from collection
+    collection.cards = sub(collection.cards, cardId)
+  }
+
+  function removeCardFromDeck(deckKey: string, cardId: PlayableCardID) {
+    const deck = gameState.value.game.collection.decks[deckKey]
+    const collection = gameState.value.game.collection
+
+    if (!deck) return
+    if (!deck.cards[cardId] || deck.cards[cardId]! <= 0) return
+
+    // Remove card from deck
+    deck.cards = sub(deck.cards, cardId)
+
+    // Add card back to collection
+    collection.cards = add(collection.cards, cardId)
+  }
+
   function makeRun(deck: Deck): Run {
 
-    const baseRun = {
+    const baseRun: Run = {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
@@ -182,5 +211,7 @@ export const useGameStore = defineStore('game', () => {
     buyBasic,
     drawCards,
     changeDeckName,
+    addCardToDeck,
+    removeCardFromDeck,
   }
 })

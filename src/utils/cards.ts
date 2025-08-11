@@ -1,5 +1,6 @@
 import type { Resource } from '@/stores/game'
 import type { Counter } from './counter'
+import { keys } from './utils'
 
 // Game locations where cards can be placed
 export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
@@ -33,6 +34,7 @@ export interface Card {
 }
 
 export interface PlayableCard extends Card {
+  id: PlayableCardID,
   type: 'playable'
   description: string
   cost: number
@@ -41,6 +43,7 @@ export interface PlayableCard extends Card {
 }
 
 export interface RulesCard extends Card {
+  id: RulesCardID,
   type: 'rules'
   deckLimits: {
     size: [number, number]
@@ -179,10 +182,13 @@ export const lastResort: PlayableCard = {
   cost: 12,
 }
 
-export const cards = {
+export const rulesCards = {
+  'starter-rules': starterRules
+} as const
+
+export const playableCards = {
   score: score,
   'buy-basic': buyBasic,
-  'starter-rules': starterRules,
   'dual-score': dualScore,
   'save-reward': saveReward,
   'zero-reward': zeroReward,
@@ -194,4 +200,14 @@ export const cards = {
   'last-resort': lastResort,
 } as const
 
-export type CardID = keyof typeof cards
+export const cards = {...rulesCards, ...playableCards}
+
+export type RulesCardID = keyof typeof rulesCards
+export type PlayableCardID = keyof typeof playableCards
+export type CardID = RulesCardID | PlayableCardID
+
+export const cardIds: CardID[] = keys(cards)
+export const rulesCardIds: RulesCardID[] = keys(rulesCards)
+export const playableCardIds: PlayableCardID[] = keys(playableCards)
+
+export const cardType = (id: CardID) => cards[id].type;
