@@ -10,6 +10,7 @@ export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
 /**
  * Move amount cards from fromLocation to toLocation.
+ * Cards are taken from the front, and added to the back of arrays.
  */
 export function moveCards(run: Run, fromLocation: Location, toLocation: Location, amount: number) {
   const runCards = run.cards
@@ -56,8 +57,11 @@ export function processStartOfGame(run: Run): Run {
     switch (type) {
       case 'add-cards': {
         const { location, cards, mode } = params
-        const shuffledCards = [toArray(cards)].sort(() => Math.random() - 0.5)
+        const shuffledCards = toArray(cards).sort(() => Math.random() - 0.5)
 
+        debugger;
+
+        // TODO: Use lodash for object updating?
         updatedRun = {
           ...updatedRun,
           cards: {
