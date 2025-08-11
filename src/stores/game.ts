@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { CardID, PlayableCard, RulesCard } from '@/utils/cards.ts'
+import { processStartOfGame } from '@/utils/run.ts'
 
 export enum Resource {
   POINTS = 'points',
@@ -149,12 +150,15 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function makeRun(deck: Deck): Run {
-    return {
+
+    const baseRun = {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
       stats: { turns: 0, score: 0 },
     }
+
+    return processStartOfGame(baseRun)
   }
 
   // Initialize the store on creation
