@@ -157,6 +157,9 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  // Initialize the store on creation
+  initializeDb()
+
   return {
     gameState,
     run,
