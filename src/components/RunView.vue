@@ -62,7 +62,7 @@ const resourceItems = computed(() => {
     </div>
 
     <!-- Board Hand Panel -->
-    <div class="panel board-hand-panel">
+    <div class="panel board-hand">
       <!-- Board Display -->
       <div class="hand-group">
         <div class="empty-pile">
@@ -108,7 +108,7 @@ const resourceItems = computed(() => {
     </div>
 
     <!-- Discard Stats Panel -->
-    <div class="panel discard-stats-panel">
+    <div class="panel discard-stats">
       <!-- Discard Pile -->
       <div v-if="discardPileData.isEmpty" class="empty-pile">discard</div>
       <div v-else>
