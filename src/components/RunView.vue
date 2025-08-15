@@ -18,7 +18,6 @@ function drawPile(cards: Card[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
-    isEmpty: pileSize === 0
   }
 }
 
@@ -26,7 +25,6 @@ function discardPile(cards: Card[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
-    isEmpty: pileSize === 0,
     cards: cards.slice(0, pileSize)
   }
 }
@@ -54,7 +52,7 @@ const resourceItems = computed(() => {
       <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" />
 
       <!-- Draw Pile -->
-      <div v-if="drawPileData.isEmpty" class="empty-pile">draw</div>
+      <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
       <div v-else class="draw-pile">
         <div
           v-for="i in drawPileData.pileSize"
@@ -113,7 +111,7 @@ const resourceItems = computed(() => {
     <!-- Discard Stats Panel -->
     <div class="panel discard-stats">
       <!-- Discard Pile -->
-      <div v-if="discardPileData.isEmpty" class="empty-pile">discard</div>
+      <div v-if="discardPileData.pileSize === 0" class="empty-pile">discard</div>
       <div v-else>
         <CardItem
           v-for="card in discardPileData.cards"
