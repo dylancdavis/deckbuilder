@@ -12,6 +12,9 @@
 	background-color: white;
 	border-radius: 14px;
 	padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 
 .run-view .panel:first-child {

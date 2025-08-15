@@ -132,3 +132,11 @@ const resourceItems = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+
+.panel.board-hand {
+  flex: 1
+}
+
+</style>
