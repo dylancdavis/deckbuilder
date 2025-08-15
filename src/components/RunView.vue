@@ -6,7 +6,11 @@ import type { Card } from '@/utils/cards'
 import { entries } from '@/utils/utils'
 
 const gameStore = useGameStore()
-const run = computed(() => gameStore.run)
+const run = computed(() => {
+  if (!gameStore.run)
+    throw new Error('Called RunView when Run is null.')
+  return gameStore.run
+})
 
 const MAX_DRAW_PILE_SIZE = 3
 
@@ -28,16 +32,15 @@ function discardPile(cards: Card[]) {
 }
 
 const drawPileData = computed(() =>
-  drawPile(run.value?.cards?.drawPile || [])
+  drawPile(run.value.cards.drawPile)
 )
 
 const discardPileData = computed(() =>
-  discardPile(run.value?.cards?.discardPile || [])
+  discardPile(run.value.cards.discardPile)
 )
 
 const resourceItems = computed(() => {
-  if (!run.value?.resources) return []
-  return Object.entries(run.value.resources).map(([key, value]) => ({
+  return entries(run.value.resources).map(([key, value]) => ({
     display: key,
     value: value
   }))
@@ -48,7 +51,7 @@ const resourceItems = computed(() => {
   <div v-if="run" class="run-view">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
-      <CardItem v-if="run.deck?.rulesCard" :card="run.deck.rulesCard" />
+      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" />
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.isEmpty" class="empty-pile">draw</div>
@@ -67,7 +70,7 @@ const resourceItems = computed(() => {
       <div class="hand-group">
         <div class="empty-pile">
           <CardItem
-            v-for="card in (run.cards?.board || [])"
+            v-for="card in (run.cards.board)"
             :key="card.name"
             :card="card"
           />
@@ -78,7 +81,7 @@ const resourceItems = computed(() => {
       <div class="hand-group">
         <div class="empty-pile">
           <div
-            v-for="card in (run.cards?.hand || [])"
+            v-for="card in (run.cards.hand)"
             :key="card.name"
             class="flip-card"
           >
