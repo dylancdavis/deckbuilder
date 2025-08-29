@@ -92,7 +92,37 @@ const collectionCardsEntries = computed(() => {
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
 const requiredDeckSize = computed(() => selectedDeck.value.rulesCard?.deckLimits.size)
-const isDeckValid = computed(() => true) // TODO: Implement deck validity check
+const isDeckValid = computed(() => {
+  if (!selectedDeck.value) return false
+
+  // Check if deck has a rules card
+  if (!selectedDeck.value.rulesCard) return false
+
+  const rulesCard = selectedDeck.value.rulesCard
+  const deckCards = selectedDeck.value.cards
+
+  // Check deck size against rules card limits
+  const currentSize = deckSize(selectedDeck.value)
+  const [minSize, maxSize] = rulesCard.deckLimits.size
+  if (currentSize < minSize || currentSize > maxSize) return false
+
+  // Check individual card limits and collection availability
+  for (const [cardId, deckAmount] of entries(deckCards)) {
+    if (!deckAmount) continue
+
+    // Check if we have enough cards in collection
+    const collectionAmount = collection.value.cards[cardId] || 0
+    if (deckAmount > collectionAmount) return false
+
+    // Check individual card deck limits
+    const card = cards[cardId]
+    if (card.type === 'playable' && card.deckLimit) {
+      if (deckAmount > card.deckLimit) return false
+    }
+  }
+
+  return true
+})
 
 function deckSizeText(currentSize: number, requiredSize: [number, number]) {
   if (!requiredSize || requiredSize[1] === 0) {
