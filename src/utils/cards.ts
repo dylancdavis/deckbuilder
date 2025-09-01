@@ -34,7 +34,7 @@ export interface Card {
 }
 
 export interface PlayableCard extends Card {
-  id: PlayableCardID,
+  id: PlayableCardID
   type: 'playable'
   description: string
   cost: number
@@ -43,7 +43,7 @@ export interface PlayableCard extends Card {
 }
 
 export interface RulesCard extends Card {
-  id: RulesCardID,
+  id: RulesCardID
   type: 'rules'
   deckLimits: {
     size: [number, number]
@@ -85,7 +85,7 @@ export const starterRules: RulesCard = {
   name: 'Starter Rules',
   deckLimits: { size: [0, 4] },
   turnStructure: {
-    drawAmount: 2,
+    drawAmount: 1,
     playAmount: 'any',
     discardAmount: 'all',
   },
@@ -183,7 +183,7 @@ export const lastResort: PlayableCard = {
 }
 
 export const rulesCards = {
-  'starter-rules': starterRules
+  'starter-rules': starterRules,
 } as const
 
 export const playableCards = {
@@ -200,7 +200,7 @@ export const playableCards = {
   'last-resort': lastResort,
 } as const
 
-export const cards = {...rulesCards, ...playableCards}
+export const cards = { ...rulesCards, ...playableCards }
 
 export type RulesCardID = keyof typeof rulesCards
 export type PlayableCardID = keyof typeof playableCards
@@ -210,4 +210,4 @@ export const cardIds: CardID[] = keys(cards)
 export const rulesCardIds: RulesCardID[] = keys(rulesCards)
 export const playableCardIds: PlayableCardID[] = keys(playableCards)
 
-export const cardType = (id: CardID) => cards[id].type;
+export const cardType = (id: CardID) => cards[id].type
