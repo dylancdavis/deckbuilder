@@ -117,6 +117,8 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function gainResource(resourceName: Resource, amount: number) {
+    debugger
+
     if (gameState.value.game.run) {
       gameState.value.game.run.resources[resourceName] =
         (gameState.value.game.run.resources[resourceName] || 0) + amount
@@ -200,6 +202,25 @@ export const useGameStore = defineStore('game', () => {
     return processStartOfGame(baseRun)
   }
 
+  function playCard(cardIndex: number) {
+    const run = gameState.value.game.run
+    if (!run) return
+
+    const card = run.cards.hand[cardIndex]
+    if (!card) return
+
+    // Process card effects
+    if (card.effects.length >= 3 && card.effects[0] === 'gain-resource') {
+      const resource = card.effects[1] as Resource
+      const amount = card.effects[2] as number
+      gainResource(resource, amount)
+    }
+
+    // Remove card from hand and add to discard pile
+    run.cards.hand.splice(cardIndex, 1)
+    run.cards.discardPile.push(card)
+  }
+
   function nextTurn() {
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) return
@@ -251,6 +272,7 @@ export const useGameStore = defineStore('game', () => {
     initializeDb,
     selectDeck,
     startRun,
+    playCard,
     nextTurn,
     endRun,
     gainResource,

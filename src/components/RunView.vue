@@ -33,6 +33,10 @@ function nextTurn() {
   gameStore.nextTurn()
 }
 
+function playCard(cardIndex: number) {
+  gameStore.playCard(cardIndex)
+}
+
 const drawPileData = computed(() =>
   drawPile(run.value.cards.drawPile)
 )
@@ -76,9 +80,10 @@ const discardPileData = computed(() =>
       <div class="hand-group">
         <div class="empty-pile">
           <div
-            v-for="card in (run.cards.hand)"
+            v-for="(card, index) in (run.cards.hand)"
             :key="card.name"
             class="flip-card"
+            @click="playCard(index)"
           >
             <div class="flip-card-inner">
               <div class="flip-card-front">
