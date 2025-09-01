@@ -32,7 +32,7 @@ export type Run = {
     discardPile: PlayableCard[]
   }
   resources: { points: number }
-  stats: Record<string, number>
+  stats: { turns: number; rounds: number }
 }
 
 type GameState = {
@@ -190,15 +190,49 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function makeRun(deck: Deck): Run {
-
     const baseRun: Run = {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
-      stats: { turns: 0, score: 0 },
+      stats: { turns: 0, rounds: 0 },
     }
 
     return processStartOfGame(baseRun)
+  }
+
+  function nextTurn() {
+    const run = gameState.value.game.run
+    if (!run || !run.deck.rulesCard) return
+
+    // Increment turn counter
+    run.stats.turns += 1
+
+    const turnStructure = run.deck.rulesCard.turnStructure
+
+    // Handle discarding cards from hand to discard pile
+    const discardAmount = turnStructure.discardAmount
+    if (discardAmount === 'all') {
+      // Move all cards from hand to discard pile
+      const cardsToDiscard = run.cards.hand.length
+      if (cardsToDiscard > 0) {
+        run.cards.discardPile.push(...run.cards.hand)
+        run.cards.hand = []
+      }
+    } else if (typeof discardAmount === 'number' && discardAmount > 0) {
+      // Move specified number of cards from hand to discard pile
+      const cardsToDiscard = Math.min(discardAmount, run.cards.hand.length)
+      for (let i = 0; i < cardsToDiscard; i++) {
+        const card = run.cards.hand.shift()
+        if (card) {
+          run.cards.discardPile.push(card)
+        }
+      }
+    }
+
+    debugger
+
+    // Draw new cards from draw pile to hand
+    drawCards(turnStructure.drawAmount)
   }
 
   // Initialize the store on creation
@@ -217,6 +251,7 @@ export const useGameStore = defineStore('game', () => {
     initializeDb,
     selectDeck,
     startRun,
+    nextTurn,
     endRun,
     gainResource,
     buyBasic,

@@ -29,6 +29,10 @@ function discardPile(cards: Card[]) {
   }
 }
 
+function nextTurn() {
+  gameStore.nextTurn()
+}
+
 const drawPileData = computed(() =>
   drawPile(run.value.cards.drawPile)
 )
@@ -36,13 +40,6 @@ const drawPileData = computed(() =>
 const discardPileData = computed(() =>
   discardPile(run.value.cards.discardPile)
 )
-
-const resourceItems = computed(() => {
-  return entries(run.value.resources).map(([key, value]) => ({
-    display: key,
-    value: value
-  }))
-})
 </script>
 
 <template>
@@ -94,18 +91,6 @@ const resourceItems = computed(() => {
           </div>
         </div>
       </div>
-
-      <!-- Resource Panel -->
-      <div class="resource-list">
-        <h2>Resources</h2>
-        <div
-          v-for="resource in resourceItems"
-          :key="resource.display"
-          class="resource"
-        >
-          • {{ resource.display }}: {{ resource.value }}
-        </div>
-      </div>
     </div>
 
     <!-- Discard Stats Panel -->
@@ -129,6 +114,12 @@ const resourceItems = computed(() => {
         >
           • {{ name }}: {{ value }}
         </div>
+            <div
+          class="resource"
+        >
+          • points: {{ run.resources.points }}
+        </div>
+        <div @click="nextTurn">Next Turn</div>
       </div>
     </div>
   </div>
