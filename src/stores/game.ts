@@ -117,8 +117,6 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function gainResource(resourceName: Resource, amount: number) {
-    debugger
-
     if (gameState.value.game.run) {
       gameState.value.game.run.resources[resourceName] =
         (gameState.value.game.run.resources[resourceName] || 0) + amount
@@ -249,8 +247,6 @@ export const useGameStore = defineStore('game', () => {
         }
       }
     }
-
-    debugger
 
     // Draw new cards from draw pile to hand
     drawCards(turnStructure.drawAmount)
