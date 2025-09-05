@@ -87,7 +87,7 @@
 	background: linear-gradient(0deg, #093153ff 0%, 	#1077d2 100%);
 }
 
-.lightning-svg {
+.card-svg {
 	filter: drop-shadow(-4px 4px 0px rgba(0, 0, 0, 0.25));
 }
 

@@ -1,6 +1,6 @@
 <template>
-  <svg 
-    class="lightning-svg"
+  <svg
+    class="card-svg"
     xmlns="http://www.w3.org/2000/svg"
     xml:space="preserve"
     viewBox="-1 -1.4 127 177.8"
