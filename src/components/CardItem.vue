@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import LightningSvg from './LightningSvg.vue'
+import ScarabSvg from './ScarabSvg.vue';
+
 
 defineProps({
   card: {
@@ -37,7 +38,7 @@ defineProps({
         </div>
         <template v-else>
           <div class="card-image">
-            <LightningSvg />
+            <ScarabSvg />
           </div>
           <div class="card-description">{{ card.description }}</div>
         </template>
