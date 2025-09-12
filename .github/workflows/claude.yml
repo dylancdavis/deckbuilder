@@ -49,5 +49,5 @@ jobs:
             Now perform the task specified in the comment that tagged me.
 
           # Configure custom branch naming, auto-PR creation, and commit format
-          claude_args: '--allowed-tools "Bash(gh pr:*),Bash(gh issue:*),Bash(gh repo:*)" --commit-prefix "[Claude]"'
+          claude_args: '--allowed-tools "Bash(gh pr:*),Bash(gh issue:*),Bash(gh repo:*)"'
 
