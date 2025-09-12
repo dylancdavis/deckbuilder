@@ -19,8 +19,8 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
+      contents: write
+      pull-requests: write
       issues: read
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
@@ -40,11 +40,14 @@ jobs:
           additional_permissions: |
             actions: read
 
-          # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
-          # prompt: 'Update the pull request description to include a summary of changes.'
+          # Custom prompt to ensure proper branch naming and PR creation
+          prompt: |
+            Follow the branch naming convention from CLAUDE.md: {issue type}/{issue number}-short-form-description
+            Make commits with [Claude] prefix and keep them to one line only as specified in CLAUDE.md.
+            After completing your work, automatically create a pull request with a clear title and description.
+            
+            Now perform the task specified in the comment that tagged me.
 
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://docs.anthropic.com/en/docs/claude-code/sdk#command-line for available options
-          # claude_args: '--model claude-opus-4-1-20250805 --allowed-tools Bash(gh pr:*)'
+          # Configure custom branch naming, auto-PR creation, and commit format
+          claude_args: '--auto-pr --allowed-tools "Bash(gh pr:*),Bash(gh issue:*),Bash(gh repo:*)" --commit-prefix "[Claude]"'
 
