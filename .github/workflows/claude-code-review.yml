@@ -14,9 +14,6 @@ jobs:
   claude-review:
     # Trigger review for Claude-created PRs (identified by branch prefix or commit messages)
     if: |
-      startsWith(github.event.pull_request.head.ref, 'feature/') ||
-      startsWith(github.event.pull_request.head.ref, 'bugfix/') ||
-      startsWith(github.event.pull_request.head.ref, 'enhancement/') ||
       contains(github.event.pull_request.title, '[Claude]')
     
     runs-on: ubuntu-latest
