@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Commits made by Claude should be prefixed with [Claude], and should be one line only.
+Branches should take the structure {issue type}/{issue number}-short-form-description.
+
 ## Commands
 
 ### Development
