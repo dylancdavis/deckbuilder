@@ -25,7 +25,7 @@ function discardPile(cards: Card[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
-    cards: cards.slice(0, pileSize)
+    cards: cards.slice(-pileSize)
   }
 }
 
@@ -102,7 +102,7 @@ const discardPileData = computed(() =>
     <div class="panel discard-stats">
       <!-- Discard Pile -->
       <div v-if="discardPileData.pileSize === 0" class="empty-pile">discard</div>
-      <div v-else>
+      <div v-else class="discard-pile">
         <CardItem
           v-for="card in discardPileData.cards"
           :key="card.name"
