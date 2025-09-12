@@ -12,14 +12,16 @@ on:
 
 jobs:
   claude-review:
-    # Trigger review for Claude-created PRs (identified by branch prefix or commit messages)
-    if: |
-      contains(github.event.pull_request.title, '[Claude]')
+    # Optional: Filter by PR author
+    # if: |
+    #   github.event.pull_request.user.login == 'external-contributor' ||
+    #   github.event.pull_request.user.login == 'new-developer' ||
+    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
     
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: read
       issues: read
       id-token: write
     
@@ -35,22 +37,18 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
-            You are reviewing a pull request created by Claude. Please provide a thorough code review with feedback on:
+            Please review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
             
-            - Code quality and adherence to repository conventions (check CLAUDE.md)
-            - Potential bugs, edge cases, or logic issues
-            - Performance implications
-            - Security considerations
-            - Test coverage and missing tests
-            - TypeScript/Vue 3 best practices
-            - Game logic correctness (this is a deckbuilding game)
-            
-            Be constructive and specific in your feedback. If the code looks good, approve it. If there are issues, request changes with clear explanations.
-            
-            Use `gh pr review` to submit your review with either APPROVE, REQUEST_CHANGES, or COMMENT status.
-            For individual line comments, use `gh pr comment` with the --body flag.
+            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+
+            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
           
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.anthropic.com/en/docs/claude-code/sdk#command-line for available options
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr review:*)" --model claude-sonnet-4-20250514'
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
 
