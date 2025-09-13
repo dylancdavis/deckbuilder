@@ -7,6 +7,9 @@ import '../src/assets/css/cards.css'
 import '../src/assets/css/collection.css'
 import '../src/assets/css/run.css'
 
+// Apply Lexend font globally to Storybook
+import './storybook.css'
+
 const preview: Preview = {
   parameters: {
     controls: {

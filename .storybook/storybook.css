@@ -1,0 +1,9 @@
+/* Apply Lexend font globally to Storybook */
+body, #storybook-root {
+  font-family: 'Lexend', sans-serif !important;
+}
+
+/* Ensure all story content uses the correct font */
+.sb-show-main {
+  font-family: 'Lexend', sans-serif !important;
+}
