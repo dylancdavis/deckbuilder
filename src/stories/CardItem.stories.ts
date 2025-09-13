@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import CardItem from '@/components/CardItem.vue'
-import { score, dualScore, starterRules } from '@/utils/cards'
+import { cards } from '@/utils/cards'
 
 const meta = {
   title: 'Components/CardItem',
@@ -11,7 +11,10 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     card: {
-      control: { type: 'object' }
+      control: { type: 'select' },
+      options: Object.keys(cards),
+      mapping: cards,
+      description: 'Select a card to display'
     }
   },
 } satisfies Meta<typeof CardItem>
@@ -19,20 +22,32 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+export const Default: Story = {
+  args: {
+    card: cards.score
+  }
+}
+
 export const PlayableCard: Story = {
   args: {
-    card: score
+    card: cards.score
   }
 }
 
 export const PlayableCardWithDeckLimit: Story = {
   args: {
-    card: dualScore
+    card: cards['dual-score']
   }
 }
 
 export const RulesCard: Story = {
   args: {
-    card: starterRules
+    card: cards['starter-rules']
+  }
+}
+
+export const HighCostCard: Story = {
+  args: {
+    card: cards['last-resort']
   }
 }
