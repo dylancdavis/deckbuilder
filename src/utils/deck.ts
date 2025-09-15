@@ -4,6 +4,8 @@
 
 import type { Collection, Deck } from '@/stores/game.ts'
 import { total, missingCounts } from './counter.ts'
+import { cards, type CardID } from './cards.ts'
+import { entries, keys } from './utils.ts'
 
 /**
  * Returns true if a deck has a rules card.
@@ -38,8 +40,63 @@ export function checkDeckValidity(deck: Deck, collection: Collection) {
   const missingCards = cardsNotInCollection(deck, collection)
 
   return {
-    hasCardsInCollection: Object.keys(missingCards).length === 0,
+    hasCardsInCollection: keys(missingCards).length === 0,
     hasRulesCard: hasRulesCard(deck),
     inSizeRange: deckInSizeRange(deck),
   }
+}
+
+/**
+ * Given a deck and collection, returns an array of validation error messages.
+ * Returns an empty array if the deck is valid.
+ */
+export function getDeckValidationErrors(deck: Deck, collection: Collection): string[] {
+  const errors: string[] = []
+
+  // Check if deck has a rules card
+  if (!hasRulesCard(deck)) {
+    errors.push('Deck must have a rules card')
+  }
+
+  // Check deck size against rules card limits
+  if (deck.rulesCard && !deckInSizeRange(deck)) {
+    const deckSize = total(deck.cards)
+    const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
+
+    if (deckSize < minSize) {
+      errors.push(`Too few cards in deck (${deckSize}/${minSize})`)
+    } else if (deckSize > maxSize) {
+      errors.push(`Too many cards in deck (${deckSize}/${maxSize})`)
+    }
+  }
+
+  // Check if player has enough cards in collection
+  const missingCards = cardsNotInCollection(deck, collection)
+  const missingCardEntries = entries(missingCards)
+
+  if (missingCardEntries.length === 1) {
+    const [cardId, missingCount] = missingCardEntries[0]
+    const cardName = cards[cardId as CardID].name
+    errors.push(`Missing ${cardName} from collection (${missingCount})`)
+  } else if (missingCardEntries.length > 1) {
+    errors.push('Missing cards from collection:')
+    for (const [cardId, missingCount] of missingCardEntries) {
+      const cardName = cards[cardId as CardID].name
+      errors.push(`${cardName} (${missingCount})`)
+    }
+  }
+
+  // Check individual card deck limits
+  for (const [cardId, deckAmount] of entries(deck.cards)) {
+    if (!deckAmount) continue
+
+    const card = cards[cardId]
+    if (card.type === 'playable' && card.deckLimit) {
+      if (deckAmount > card.deckLimit) {
+        errors.push(`"${card.name}" exceeds deck limit (${deckAmount}/${card.deckLimit})`)
+      }
+    }
+  }
+
+  return errors
 }

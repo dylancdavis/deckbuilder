@@ -5,6 +5,7 @@ import CardItem from './CardItem.vue'
 import { cards, cardType, type Card, type CardID, type PlayableCard, type PlayableCardID, type RulesCardID } from '@/utils/cards'
 import { entries } from '@/utils/utils'
 import { total } from '@/utils/counter'
+import { getDeckValidationErrors } from '@/utils/deck'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
@@ -92,37 +93,11 @@ const collectionCardsEntries = computed(() => {
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
 const requiredDeckSize = computed(() => selectedDeck.value.rulesCard?.deckLimits.size)
-const isDeckValid = computed(() => {
-  if (!selectedDeck.value) return false
-
-  // Check if deck has a rules card
-  if (!selectedDeck.value.rulesCard) return false
-
-  const rulesCard = selectedDeck.value.rulesCard
-  const deckCards = selectedDeck.value.cards
-
-  // Check deck size against rules card limits
-  const currentSize = deckSize(selectedDeck.value)
-  const [minSize, maxSize] = rulesCard.deckLimits.size
-  if (currentSize < minSize || currentSize > maxSize) return false
-
-  // Check individual card limits and collection availability
-  for (const [cardId, deckAmount] of entries(deckCards)) {
-    if (!deckAmount) continue
-
-    // Check if we have enough cards in collection
-    const collectionAmount = collection.value.cards[cardId] || 0
-    if (deckAmount > collectionAmount) return false
-
-    // Check individual card deck limits
-    const card = cards[cardId]
-    if (card.type === 'playable' && card.deckLimit) {
-      if (deckAmount > card.deckLimit) return false
-    }
-  }
-
-  return true
+const deckValidationErrors = computed(() => {
+  if (!selectedDeck.value) return []
+  return getDeckValidationErrors(selectedDeck.value, collection.value)
 })
+const isDeckValid = computed(() => deckValidationErrors.value.length === 0)
 
 function deckSizeText(currentSize: number, requiredSize: [number, number]) {
   if (!requiredSize || requiredSize[1] === 0) {
@@ -205,6 +180,13 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           >
             Run This Deck
           </button>
+          
+          <!-- Validation Errors Display -->
+          <div v-if="!isDeckValid && deckValidationErrors.length > 0" class="validation-errors">
+            <div class="validation-error" v-for="(error, index) in deckValidationErrors" :key="index">
+              • {{ error }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
