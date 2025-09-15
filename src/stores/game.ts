@@ -4,7 +4,7 @@ import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
-import { processStartOfGame } from '@/utils/run.ts'
+import { processStartOfGame, drawFirstHand } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 
 export enum Resource {
@@ -232,7 +232,8 @@ export const useGameStore = defineStore('game', () => {
       stats: { turns: 0, rounds: 0 },
     }
 
-    return processStartOfGame(baseRun)
+    const runWithCards = processStartOfGame(baseRun)
+    return drawFirstHand(runWithCards)
   }
 
   function playCard(cardIndex: number) {
@@ -289,7 +290,46 @@ export const useGameStore = defineStore('game', () => {
       }
     }
 
-    // Draw new cards from draw pile to hand
+    // Check if round should end (draw pile empty after trying to draw)
+    const shouldEndRound = run.cards.drawPile.length === 0
+
+    if (shouldEndRound) {
+      // End of round: reshuffle all cards into new draw pile and start new round
+      startNewRound()
+    } else {
+      // Draw new cards from draw pile to hand
+      drawCards(turnStructure.drawAmount)
+    }
+  }
+
+  function startNewRound() {
+    const run = gameState.value.game.run
+    if (!run || !run.deck.rulesCard) return
+
+    // Increment round counter
+    run.stats.rounds += 1
+
+    // Collect all cards from hand, board, and discard pile
+    const allCards = [
+      ...run.cards.hand,
+      ...run.cards.board,
+      ...run.cards.discardPile
+    ]
+
+    // Shuffle the collected cards
+    allCards.sort(() => Math.random() - 0.5)
+
+    // Create new draw pile and clear other locations
+    run.cards.drawPile = allCards
+    run.cards.hand = []
+    run.cards.board = []
+    run.cards.discardPile = []
+
+    // Reset turns to 0 for the new round
+    run.stats.turns = 0
+
+    // Draw starting hand for new round
+    const turnStructure = run.deck.rulesCard.turnStructure
     drawCards(turnStructure.drawAmount)
   }
 
@@ -313,6 +353,7 @@ export const useGameStore = defineStore('game', () => {
     startRun,
     playCard,
     nextTurn,
+    startNewRound,
     endRun,
     gainResource,
     buyCard,
