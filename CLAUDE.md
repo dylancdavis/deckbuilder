@@ -61,3 +61,7 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 - Uses path alias `@` for `./src` directory
 - Vite configuration includes Vue DevTools plugin for development
 - TypeScript configuration uses Vue-specific TSC compilation
+
+## Additional Instructions
+- The `utils/utils.ts` contains functional, typed variants of common JS object methods, such as `keys`, `values`, and `entries`. Use these instead of object methods, and add additional functions if necessary
+- Keep Claude.md and README.md up-to-date if making relevant changes
