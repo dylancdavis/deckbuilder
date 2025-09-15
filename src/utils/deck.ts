@@ -5,6 +5,7 @@
 import type { Collection, Deck } from '@/stores/game.ts'
 import { total, missingCounts } from './counter.ts'
 import { cards, type CardID, type PlayableCardID } from './cards.ts'
+import { entries, keys } from './utils.ts'
 
 /**
  * Returns true if a deck has a rules card.
@@ -39,7 +40,7 @@ export function checkDeckValidity(deck: Deck, collection: Collection) {
   const missingCards = cardsNotInCollection(deck, collection)
 
   return {
-    hasCardsInCollection: Object.keys(missingCards).length === 0,
+    hasCardsInCollection: keys(missingCards).length === 0,
     hasRulesCard: hasRulesCard(deck),
     inSizeRange: deckInSizeRange(deck),
   }
@@ -61,7 +62,7 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
   if (deck.rulesCard && !deckInSizeRange(deck)) {
     const deckSize = total(deck.cards)
     const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
-    
+
     if (deckSize < minSize) {
       errors.push(`Deck has ${deckSize} cards, minimum required is ${minSize}`)
     } else if (deckSize > maxSize) {
@@ -71,7 +72,7 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
 
   // Check if player has enough cards in collection
   const missingCards = cardsNotInCollection(deck, collection)
-  for (const [cardId, missingAmount] of Object.entries(missingCards)) {
+  for (const [cardId, _] of entries(missingCards)) {
     const cardName = cards[cardId as CardID].name
     const deckAmount = deck.cards[cardId as PlayableCardID] || 0
     const collectionAmount = collection.cards[cardId as PlayableCardID] || 0
@@ -79,10 +80,10 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
   }
 
   // Check individual card deck limits
-  for (const [cardId, deckAmount] of Object.entries(deck.cards)) {
+  for (const [cardId, deckAmount] of entries(deck.cards)) {
     if (!deckAmount) continue
-    
-    const card = cards[cardId as CardID]
+
+    const card = cards[cardId]
     if (card.type === 'playable' && card.deckLimit) {
       if (deckAmount > card.deckLimit) {
         errors.push(`"${card.name}" deck limit is ${card.deckLimit} (have ${deckAmount})`)
