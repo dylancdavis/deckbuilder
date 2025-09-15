@@ -309,6 +309,14 @@ export const useGameStore = defineStore('game', () => {
     // Increment round counter
     run.stats.rounds += 1
 
+    // Check if run should end based on rules card end conditions
+    const endConditions = run.deck.rulesCard.endConditions
+    if (endConditions.rounds && run.stats.rounds >= endConditions.rounds) {
+      // End the run
+      endRun()
+      return
+    }
+
     // Collect all cards from hand, board, and discard pile
     const allCards = [
       ...run.cards.hand,
