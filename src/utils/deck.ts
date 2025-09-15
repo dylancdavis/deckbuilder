@@ -64,9 +64,9 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
     const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
 
     if (deckSize < minSize) {
-      errors.push(`Deck has ${deckSize} cards, minimum required is ${minSize}`)
+      errors.push(`Too few cards in deck (${deckSize}/${minSize})`)
     } else if (deckSize > maxSize) {
-      errors.push(`Deck has ${deckSize} cards, maximum allowed is ${maxSize}`)
+      errors.push(`Too many cards in deck (${deckSize}/${maxSize})`)
     }
   }
 
@@ -76,7 +76,7 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
     const cardName = cards[cardId as CardID].name
     const deckAmount = deck.cards[cardId as PlayableCardID] || 0
     const collectionAmount = collection.cards[cardId as PlayableCardID] || 0
-    errors.push(`Not enough "${cardName}" in collection (have ${collectionAmount}, need ${deckAmount})`)
+    errors.push(`Not enough "${cardName}" in collection (${collectionAmount}/${deckAmount})`)
   }
 
   // Check individual card deck limits
@@ -86,7 +86,7 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
     const card = cards[cardId]
     if (card.type === 'playable' && card.deckLimit) {
       if (deckAmount > card.deckLimit) {
-        errors.push(`"${card.name}" deck limit is ${card.deckLimit} (have ${deckAmount})`)
+        errors.push(`"${card.name}" exceeds deck limit (${deckAmount}/${card.deckLimit})`)
       }
     }
   }
