@@ -25,12 +25,21 @@ export type GainResourceEffect = {
   }
 }
 
-export type Effect = AddCardsEffect | GainResourceEffect
+export type BuyCardEffect = {
+  type: 'buy-card'
+  params: {
+    options: number
+    tags: string[]
+  }
+}
+
+export type Effect = AddCardsEffect | GainResourceEffect | BuyCardEffect
 
 export interface Card {
   id: CardID
   name: string
   type: 'rules' | 'playable'
+  tags?: string[]
 }
 
 export interface PlayableCard extends Card {
@@ -68,6 +77,7 @@ export const score: PlayableCard = {
   description: 'Gain 1 Point.',
   effects: ['gain-resource', 'points', 1],
   cost: 0,
+  tags: ['basic'],
 }
 
 export const buyBasic: PlayableCard = {
@@ -75,8 +85,9 @@ export const buyBasic: PlayableCard = {
   id: 'buy-basic',
   name: 'Buy Basic',
   description: 'Buy a Basic Card.',
-  effects: ['buy-basic'],
+  effects: ['buy-card', 5, 'basic'],
   cost: 2,
+  tags: ['basic'],
 }
 
 export const starterRules: RulesCard = {
@@ -108,6 +119,7 @@ export const dualScore: PlayableCard = {
   deckLimit: 2,
   effects: ['gain-resource', 'points', 2],
   cost: 4,
+  tags: ['basic'],
 }
 
 export const saveReward: PlayableCard = {
@@ -117,6 +129,7 @@ export const saveReward: PlayableCard = {
   description: "If you haven't purchased a card this round, gain 2 points.",
   effects: [],
   cost: 4,
+  tags: ['basic'],
 }
 
 export const zeroReward: PlayableCard = {
@@ -126,6 +139,7 @@ export const zeroReward: PlayableCard = {
   description: 'If you have 0 points, gain 6 points.',
   effects: [],
   cost: 4,
+  tags: ['basic'],
 }
 
 export const pointReset: PlayableCard = {
@@ -135,6 +149,7 @@ export const pointReset: PlayableCard = {
   description: 'Lose all points, then gain 4 points.',
   effects: [],
   cost: 6,
+  tags: ['basic'],
 }
 
 export const pointMultiply: PlayableCard = {
@@ -144,6 +159,7 @@ export const pointMultiply: PlayableCard = {
   description: 'If you have 4 or less points, double them.',
   effects: [],
   cost: 0,
+  tags: ['basic'],
 }
 
 export const scoreSurge: PlayableCard = {
@@ -153,6 +169,7 @@ export const scoreSurge: PlayableCard = {
   description: 'Gain 2 points for each "Score" played this round (up to 4).',
   effects: [],
   cost: 10,
+  tags: ['basic'],
 }
 
 export const scoreSynergy: PlayableCard = {
@@ -162,6 +179,7 @@ export const scoreSynergy: PlayableCard = {
   description: 'Gain 1 point for each "Score" in your deck (up to 6).',
   effects: [],
   cost: 10,
+  tags: ['basic'],
 }
 
 export const borrowPoints: PlayableCard = {
@@ -171,6 +189,7 @@ export const borrowPoints: PlayableCard = {
   description: 'Gain 6 points. In 2 turns, lose 6 points (down to zero)',
   effects: [],
   cost: 10,
+  tags: ['basic'],
 }
 
 export const lastResort: PlayableCard = {
@@ -180,6 +199,7 @@ export const lastResort: PlayableCard = {
   description: 'Gain 8 Points, then destroy this card',
   effects: [],
   cost: 12,
+  tags: ['basic'],
 }
 
 export const rulesCards = {

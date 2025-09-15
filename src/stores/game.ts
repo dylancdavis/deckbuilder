@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
-import { cards, playableCardIds } from '@/utils/cards.ts'
+import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
 import { processStartOfGame } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 
@@ -48,7 +48,7 @@ type GameState = {
   }
   viewData: {
     modalView: string | null
-    buyBasicOptions: PlayableCardID[]
+    cardOptions: PlayableCardID[]
   }
 }
 
@@ -67,7 +67,7 @@ export const useGameStore = defineStore('game', () => {
     },
     viewData: {
       modalView: null,
-      buyBasicOptions: [],
+      cardOptions: [],
     },
   })
 
@@ -84,7 +84,7 @@ export const useGameStore = defineStore('game', () => {
     return key ? gameState.value.game.collection.decks[key] : null
   })
   const modalView = computed(() => gameState.value.viewData.modalView)
-  const buyBasicOptions = computed(() => gameState.value.viewData.buyBasicOptions)
+  const cardOptions = computed(() => gameState.value.viewData.cardOptions)
 
   // Actions
   function initializeDb() {
@@ -102,7 +102,7 @@ export const useGameStore = defineStore('game', () => {
       },
       viewData: {
         modalView: null,
-        buyBasicOptions: [],
+        cardOptions: [],
       },
     }
   }
@@ -128,33 +128,37 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function buyBasic() {
-    // Get 3 random basic cards (excluding buy-basic itself)
-    const availableCards = playableCardIds.filter(id => id !== 'buy-basic')
+  function buyCard(options: number, tag: string) {
+    // Get available cards with the specified tag (excluding buy-basic itself)
+    const availableCards = playableCardIds.filter(id => {
+      const card = playableCards[id]
+      return id !== 'buy-basic' && card.tags?.includes(tag)
+    })
+
     const shuffled = [...availableCards].sort(() => Math.random() - 0.5)
-    const options = shuffled.slice(0, 3)
+    const selectedOptions = shuffled.slice(0, options)
 
     gameState.value.viewData = {
-      modalView: 'buy-basic',
-      buyBasicOptions: options
+      modalView: 'buy-card',
+      cardOptions: selectedOptions
     }
   }
 
-  function selectBasicCard(cardId: PlayableCardID) {
+  function selectCard(cardId: PlayableCardID) {
     // Add the selected card to the collection
     gameState.value.game.collection.cards = add(gameState.value.game.collection.cards, cardId)
 
     // Close the modal
     gameState.value.viewData = {
       modalView: null,
-      buyBasicOptions: []
+      cardOptions: []
     }
   }
 
   function closeModal() {
     gameState.value.viewData = {
       modalView: null,
-      buyBasicOptions: []
+      cardOptions: []
     }
   }
 
@@ -245,8 +249,10 @@ export const useGameStore = defineStore('game', () => {
       const resource = card.effects[1] as Resource
       const amount = card.effects[2] as number
       gainResource(resource, amount)
-    } else if (card.effects.length >= 1 && card.effects[0] === 'buy-basic') {
-      buyBasic()
+    } else if (card.effects.length >= 3 && card.effects[0] === 'buy-card') {
+      const options = card.effects[1] as number
+      const tag = card.effects[2] as string
+      buyCard(options, tag)
     }
 
     // Remove card from hand and add to discard pile
@@ -301,7 +307,7 @@ export const useGameStore = defineStore('game', () => {
     selectedDeck,
     selectedDeckKey,
     modalView,
-    buyBasicOptions,
+    cardOptions,
     initializeDb,
     selectDeck,
     startRun,
@@ -309,8 +315,8 @@ export const useGameStore = defineStore('game', () => {
     nextTurn,
     endRun,
     gainResource,
-    buyBasic,
-    selectBasicCard,
+    buyCard,
+    selectCard,
     closeModal,
     drawCards,
     changeDeckName,

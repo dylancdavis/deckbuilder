@@ -6,7 +6,7 @@ import CardItem from './CardItem.vue'
 const gameStore = useGameStore()
 
 function selectCard(cardId: PlayableCardID) {
-  gameStore.selectBasicCard(cardId)
+  gameStore.selectCard(cardId)
 }
 
 function closeModal() {
@@ -18,12 +18,12 @@ function closeModal() {
   <div class="modal-overlay" @click="closeModal">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
-        <h2>Choose a Basic Card</h2>
+        <h2>Choose a Card</h2>
         <button class="close-button" @click="closeModal">×</button>
       </div>
       <div class="card-options">
         <div
-          v-for="cardId in gameStore.buyBasicOptions"
+          v-for="cardId in gameStore.cardOptions"
           :key="cardId"
           class="card-option"
           @click="selectCard(cardId)"
