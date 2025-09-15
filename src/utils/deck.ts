@@ -4,7 +4,7 @@
 
 import type { Collection, Deck } from '@/stores/game.ts'
 import { total, missingCounts } from './counter.ts'
-import { cards, type CardID, type PlayableCardID } from './cards.ts'
+import { cards, type CardID } from './cards.ts'
 import { entries, keys } from './utils.ts'
 
 /**
@@ -72,11 +72,18 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
 
   // Check if player has enough cards in collection
   const missingCards = cardsNotInCollection(deck, collection)
-  for (const [cardId, _] of entries(missingCards)) {
+  const missingCardEntries = entries(missingCards)
+
+  if (missingCardEntries.length === 1) {
+    const [cardId, missingCount] = missingCardEntries[0]
     const cardName = cards[cardId as CardID].name
-    const deckAmount = deck.cards[cardId as PlayableCardID] || 0
-    const collectionAmount = collection.cards[cardId as PlayableCardID] || 0
-    errors.push(`Not enough "${cardName}" in collection (${collectionAmount}/${deckAmount})`)
+    errors.push(`Missing ${cardName} from collection (${missingCount})`)
+  } else if (missingCardEntries.length > 1) {
+    errors.push('Missing cards from collection:')
+    for (const [cardId, missingCount] of missingCardEntries) {
+      const cardName = cards[cardId as CardID].name
+      errors.push(`${cardName} (${missingCount})`)
+    }
   }
 
   // Check individual card deck limits
