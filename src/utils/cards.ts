@@ -85,7 +85,7 @@ export const buyBasic: PlayableCard = {
   id: 'buy-basic',
   name: 'Buy Basic',
   description: 'Buy a Basic Card.',
-  effects: ['buy-card', 5, 'basic'],
+  effects: ['buy-card', 3, 'basic'],
   cost: 2,
   tags: ['basic'],
 }
