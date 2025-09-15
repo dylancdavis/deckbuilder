@@ -3,9 +3,11 @@ import { computed } from 'vue'
 import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
+import BuyBasicModal from './components/BuyBasicModal.vue'
 
 const gameStore = useGameStore()
 const view = computed(() => gameStore.view)
+const modalView = computed(() => gameStore.modalView)
 
 function getView(viewName: string[]) {
   switch (viewName[0]) {
@@ -32,5 +34,8 @@ function getView(viewName: string[]) {
         <component :is="getView(view)" />
       </div>
     </div>
+
+    <!-- Modals -->
+    <BuyBasicModal v-if="modalView === 'buy-basic'" />
   </div>
 </template>
