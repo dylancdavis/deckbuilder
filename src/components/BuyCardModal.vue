@@ -53,7 +53,7 @@ function closeModal() {
   background: white;
   border-radius: 8px;
   padding: 20px;
-  max-width: 800px;
+  max-width: 90vw;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -92,9 +92,15 @@ function closeModal() {
 }
 
 .card-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+  justify-content: center;
+}
+
+.card-options > * {
+  flex: 1 1 200px;
+  max-width: 250px;
 }
 
 .card-option {
