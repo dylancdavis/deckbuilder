@@ -154,6 +154,20 @@ button.run-deck.disabled {
 	filter: brightness(0.5);
 }
 
+.validation-errors {
+	margin-top: 0.5em;
+	padding: 0.5em;
+	background-color: #ffeeee;
+	border: 1px solid #cc0000;
+	border-radius: 4px;
+	font-size: 14px;
+}
+
+.validation-error {
+	color: #cc0000;
+	padding: 0.25em 0;
+}
+
 .card-collection-item .card-container {
 	position: relative;
 	z-index: 1;

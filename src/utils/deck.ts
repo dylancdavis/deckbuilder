@@ -4,6 +4,7 @@
 
 import type { Collection, Deck } from '@/stores/game.ts'
 import { total, missingCounts } from './counter.ts'
+import { cards, type CardID, type PlayableCardID } from './cards.ts'
 
 /**
  * Returns true if a deck has a rules card.
@@ -42,4 +43,52 @@ export function checkDeckValidity(deck: Deck, collection: Collection) {
     hasRulesCard: hasRulesCard(deck),
     inSizeRange: deckInSizeRange(deck),
   }
+}
+
+/**
+ * Given a deck and collection, returns an array of validation error messages.
+ * Returns an empty array if the deck is valid.
+ */
+export function getDeckValidationErrors(deck: Deck, collection: Collection): string[] {
+  const errors: string[] = []
+
+  // Check if deck has a rules card
+  if (!hasRulesCard(deck)) {
+    errors.push('Deck must have a rules card')
+  }
+
+  // Check deck size against rules card limits
+  if (deck.rulesCard && !deckInSizeRange(deck)) {
+    const deckSize = total(deck.cards)
+    const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
+    
+    if (deckSize < minSize) {
+      errors.push(`Deck has ${deckSize} cards, minimum required is ${minSize}`)
+    } else if (deckSize > maxSize) {
+      errors.push(`Deck has ${deckSize} cards, maximum allowed is ${maxSize}`)
+    }
+  }
+
+  // Check if player has enough cards in collection
+  const missingCards = cardsNotInCollection(deck, collection)
+  for (const [cardId, missingAmount] of Object.entries(missingCards)) {
+    const cardName = cards[cardId as CardID].name
+    const deckAmount = deck.cards[cardId as PlayableCardID] || 0
+    const collectionAmount = collection.cards[cardId as PlayableCardID] || 0
+    errors.push(`Not enough "${cardName}" in collection (have ${collectionAmount}, need ${deckAmount})`)
+  }
+
+  // Check individual card deck limits
+  for (const [cardId, deckAmount] of Object.entries(deck.cards)) {
+    if (!deckAmount) continue
+    
+    const card = cards[cardId as CardID]
+    if (card.type === 'playable' && card.deckLimit) {
+      if (deckAmount > card.deckLimit) {
+        errors.push(`"${card.name}" deck limit is ${card.deckLimit} (have ${deckAmount})`)
+      }
+    }
+  }
+
+  return errors
 }
