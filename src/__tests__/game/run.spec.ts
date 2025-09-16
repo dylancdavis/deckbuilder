@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { moveCards, populateDrawPile, processStartOfGame } from '../../utils/run.js'
-import type { AddCardsEffect, PlayableCardID, RulesCard } from '../../utils/cards.ts'
+import { pileToIdCounter } from '../../utils/deck.ts'
+import type { AddCardsEffect, PlayableCard, RulesCard } from '../../utils/cards.ts'
 import type { Run } from '../../stores/game.ts'
-import { Counter } from '../../utils/counter.js'
 
 const baseRules: RulesCard = {
   id: 'starter-rules',
@@ -75,32 +75,34 @@ const emptyHandRun: Run = {
   resources: { points: 0 },
   cards: { drawPile: [], hand: [], discardPile: [], board: [] },
   deck: { name: '', editable: true, cards: exampleCounter, rulesCard: rulesWithAddedCards },
-  stats: {}
+  stats: {turns: 1, rounds: 1}
 }
 
 describe('populateDrawPile', () => {
   it('adds cards to draw-pile from deck', () => {
     const result = populateDrawPile(emptyHandRun)
-    const drawPileCounter = {} as Counter<PlayableCardID>
-    result.cards.drawPile.forEach(card => {
-      drawPileCounter[card] = (drawPileCounter[card] || 0) + 1
-    })
-    expect(drawPileCounter).toEqual(exampleCounter)
+    const idCounter = pileToIdCounter(result.cards.drawPile)
+    expect(idCounter).toEqual(exampleCounter)
   })
 })
 
+const a = {id: 'a'}
+const b = {id: 'b'}
+const c = {id: 'c'}
+const examplePile = [a, a, a, b, b, c]
+
 const populatedHandRun: Run = {
   resources: { points: 0 },
-  cards: { drawPile: ['a', 'a', 'a', 'b', 'b', 'c'], hand: [], discardPile: [], board: [] },
+  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
   deck: {  name: '', editable: false, cards: exampleCounter, rulesCard: rulesWithAddedCards },
-  stats: {}
+  stats: {turns: 1, rounds: 1}
 }
 
 const populatedHandRunNoAdded: Run = {
   resources: { points: 0 },
-  cards: { drawPile: ['a', 'a', 'a', 'b', 'b', 'c'], hand: [], discardPile: [], board: [] },
+  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
   deck: { name: '', editable: false, cards: exampleCounter, rulesCard: baseRules },
-  stats: {}
+  stats: {turns: 1, rounds: 1}
 }
 
 describe('processStartOfGame', () => {
@@ -111,16 +113,13 @@ describe('processStartOfGame', () => {
 
   it('adds cards to draw-pile from rules card', () => {
     const result = processStartOfGame(populatedHandRun)
-    const drawPileCounter = {}
-    result.cards.drawPile.forEach(card => {
-      drawPileCounter[card] = (drawPileCounter[card] || 0) + 1
-    })
-    expect(drawPileCounter).toEqual({ a: 3, b: 2, c: 1, score: 3 })
+    const idCounter = pileToIdCounter(result.cards.drawPile)
+    expect(idCounter).toEqual({ a: 3, b: 2, c: 1, score: 3 })
   })
 
   it('preserves original draw order when cards are added', () => {
     const result = processStartOfGame(populatedHandRun)
-    const originalCards = result.cards.drawPile.filter(card => !['score'].includes(card))
+    const originalCards = result.cards.drawPile.filter(card => !(card.id === 'score'))
     expect(originalCards).toEqual(populatedHandRun.cards.drawPile)
   })
 })

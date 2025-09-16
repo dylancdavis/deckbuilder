@@ -3,8 +3,8 @@
  */
 
 import type { Collection, Deck } from '@/stores/game.ts'
-import { total, missingCounts } from './counter.ts'
-import { cards, type CardID } from './cards.ts'
+import { total, missingCounts, type Counter } from './counter.ts'
+import { cards, type CardID, type PlayableCard, type PlayableCardID } from './cards.ts'
 import { entries, keys } from './utils.ts'
 
 /**
@@ -99,4 +99,15 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
   }
 
   return errors
+}
+
+/**
+ * Given an array of cards, returns a counter of their IDs.
+ */
+export function pileToIdCounter(pile: PlayableCard[]): Counter<PlayableCardID> {
+  const counter: Counter<PlayableCardID> = {}
+  for (const card of pile) {
+    counter[card.id] = (counter[card.id] || 0) + 1
+  }
+  return counter
 }
