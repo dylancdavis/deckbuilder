@@ -57,7 +57,7 @@ export function processStartOfGame(run: Run): Run {
 
   if (!gameStartEffects) return run
 
-  let updatedRun = populateDrawPile(run)
+  let updatedRun = { ...run }
 
   // Add cards specified in deck to draw pile then shuffle
 

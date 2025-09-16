@@ -4,7 +4,7 @@ import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
-import { processStartOfGame, drawFirstHand } from '@/utils/run.ts'
+import { processStartOfGame, drawFirstHand, populateDrawPile } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 
 export enum Resource {
@@ -232,8 +232,9 @@ export const useGameStore = defineStore('game', () => {
       stats: { turns: 0, rounds: 0 },
     }
 
-    const runWithCards = processStartOfGame(baseRun)
-    return drawFirstHand(runWithCards)
+    const runWithDrawPile = populateDrawPile(baseRun)
+    const runWithStartEffects = processStartOfGame(runWithDrawPile)
+    return drawFirstHand(runWithStartEffects)
   }
 
   function playCard(cardIndex: number) {
