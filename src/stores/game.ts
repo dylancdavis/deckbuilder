@@ -4,7 +4,7 @@ import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
-import { processStartOfGame, drawFirstHand, populateDrawPile } from '@/utils/run.ts'
+import { processStartOfGame, populateDrawPile } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 
 export enum Resource {
@@ -229,12 +229,13 @@ export const useGameStore = defineStore('game', () => {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
-      stats: { turns: 1, rounds: 1 },
+      stats: { turns: 0, rounds: 1 },
     }
 
     const runWithDrawPile = populateDrawPile(baseRun)
     const runWithStartEffects = processStartOfGame(runWithDrawPile)
-    return drawFirstHand(runWithStartEffects)
+    // Use nextTurn to draw the initial hand (turn 0 → turn 1)
+    return nextTurnInternal(runWithStartEffects)
   }
 
   function playCard(cardIndex: number) {
@@ -262,84 +263,98 @@ export const useGameStore = defineStore('game', () => {
     run.cards.discardPile.push(card)
   }
 
+  function nextTurnInternal(run: Run): Run {
+    if (!run.deck.rulesCard) return run
+
+    const turnStructure = run.deck.rulesCard.turnStructure
+    const isFirstTurn = run.stats.turns === 0
+
+    // Create a mutable copy of the run to modify
+    let updatedRun = {
+      ...run,
+      cards: { ...run.cards },
+      stats: { ...run.stats },
+      resources: { ...run.resources }
+    }
+
+    // Increment turn counter
+    updatedRun.stats.turns += 1
+
+    // Skip discarding on the very first turn (initialization)
+    if (!isFirstTurn) {
+      // Handle discarding cards from hand to discard pile
+      const discardAmount = turnStructure.discardAmount
+      if (discardAmount === 'all') {
+        // Move all cards from hand to discard pile
+        updatedRun.cards.discardPile = [...updatedRun.cards.discardPile, ...updatedRun.cards.hand]
+        updatedRun.cards.hand = []
+      } else if (typeof discardAmount === 'number' && discardAmount > 0) {
+        // Move specified number of cards from hand to discard pile
+        const cardsToDiscard = Math.min(discardAmount, updatedRun.cards.hand.length)
+        const discardedCards = updatedRun.cards.hand.slice(0, cardsToDiscard)
+        updatedRun.cards.hand = updatedRun.cards.hand.slice(cardsToDiscard)
+        updatedRun.cards.discardPile = [...updatedRun.cards.discardPile, ...discardedCards]
+      }
+    }
+
+    // Check if we need to start a new round (draw pile empty)
+    const needsNewRound = updatedRun.cards.drawPile.length === 0 && !isFirstTurn
+
+    if (needsNewRound) {
+      // Increment round counter
+      updatedRun.stats.rounds += 1
+
+      // Check if run should end based on rules card end conditions
+      const endConditions = updatedRun.deck.rulesCard.endConditions
+      if (endConditions.rounds && updatedRun.stats.rounds > endConditions.rounds) {
+        // Return the run as-is, the caller will handle ending it
+        return updatedRun
+      }
+
+      // Collect all cards from hand, board, and discard pile
+      const allCards = [
+        ...updatedRun.cards.hand,
+        ...updatedRun.cards.board,
+        ...updatedRun.cards.discardPile
+      ]
+
+      // Shuffle the collected cards
+      allCards.sort(() => Math.random() - 0.5)
+
+      // Create new draw pile and clear other locations
+      updatedRun.cards.drawPile = allCards
+      updatedRun.cards.hand = []
+      updatedRun.cards.board = []
+      updatedRun.cards.discardPile = []
+
+      // Reset turns to 1 for the new round
+      updatedRun.stats.turns = 1
+    }
+
+    // Draw new cards from draw pile to hand
+    const cardsToDraw = Math.min(turnStructure.drawAmount, updatedRun.cards.drawPile.length)
+    const drawnCards = updatedRun.cards.drawPile.slice(-cardsToDraw)
+    updatedRun.cards.drawPile = updatedRun.cards.drawPile.slice(0, -cardsToDraw)
+    updatedRun.cards.hand = [...updatedRun.cards.hand, ...drawnCards.reverse()]
+
+    return updatedRun
+  }
+
   function nextTurn() {
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) return
 
-    // Increment turn counter
-    run.stats.turns += 1
+    const updatedRun = nextTurnInternal(run)
 
-    const turnStructure = run.deck.rulesCard.turnStructure
-
-    // Handle discarding cards from hand to discard pile
-    const discardAmount = turnStructure.discardAmount
-    if (discardAmount === 'all') {
-      // Move all cards from hand to discard pile
-      const cardsToDiscard = run.cards.hand.length
-      if (cardsToDiscard > 0) {
-        run.cards.discardPile.push(...run.cards.hand)
-        run.cards.hand = []
-      }
-    } else if (typeof discardAmount === 'number' && discardAmount > 0) {
-      // Move specified number of cards from hand to discard pile
-      const cardsToDiscard = Math.min(discardAmount, run.cards.hand.length)
-      for (let i = 0; i < cardsToDiscard; i++) {
-        const card = run.cards.hand.shift()
-        if (card) {
-          run.cards.discardPile.push(card)
-        }
-      }
-    }
-
-    // Check if round should end (draw pile empty after trying to draw)
-    const shouldEndRound = run.cards.drawPile.length === 0
-
-    if (shouldEndRound) {
-      // End of round: reshuffle all cards into new draw pile and start new round
-      startNewRound()
-    } else {
-      // Draw new cards from draw pile to hand
-      drawCards(turnStructure.drawAmount)
-    }
-  }
-
-  function startNewRound() {
-    const run = gameState.value.game.run
-    if (!run || !run.deck.rulesCard) return
-
-    // Increment round counter
-    run.stats.rounds += 1
-
-    // Check if run should end based on rules card end conditions
-    const endConditions = run.deck.rulesCard.endConditions
-    if (endConditions.rounds && run.stats.rounds >= endConditions.rounds) {
-      // End the run
+    // Check if run should end
+    const endConditions = updatedRun.deck.rulesCard.endConditions
+    if (endConditions.rounds && updatedRun.stats.rounds > endConditions.rounds) {
       endRun()
       return
     }
 
-    // Collect all cards from hand, board, and discard pile
-    const allCards = [
-      ...run.cards.hand,
-      ...run.cards.board,
-      ...run.cards.discardPile
-    ]
-
-    // Shuffle the collected cards
-    allCards.sort(() => Math.random() - 0.5)
-
-    // Create new draw pile and clear other locations
-    run.cards.drawPile = allCards
-    run.cards.hand = []
-    run.cards.board = []
-    run.cards.discardPile = []
-
-    // Reset turns to 1 for the new round
-    run.stats.turns = 1
-
-    // Draw starting hand for new round
-    const turnStructure = run.deck.rulesCard.turnStructure
-    drawCards(turnStructure.drawAmount)
+    // Update the game state with the new run
+    gameState.value.game.run = updatedRun
   }
 
   // Initialize the store on creation
@@ -362,7 +377,6 @@ export const useGameStore = defineStore('game', () => {
     startRun,
     playCard,
     nextTurn,
-    startNewRound,
     endRun,
     gainResource,
     buyCard,
