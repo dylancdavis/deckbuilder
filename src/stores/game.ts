@@ -234,7 +234,14 @@ export const useGameStore = defineStore('game', () => {
 
     const runWithDrawPile = populateDrawPile(baseRun)
     const runWithStartEffects = processStartOfGame(runWithDrawPile)
-    return drawFirstHand(runWithStartEffects)
+    const runWithFirstHand = drawFirstHand(runWithStartEffects)
+
+    // Increment turn counter for the first turn
+    runWithFirstHand.stats.turns = 1
+    // Increment round counter for the first round
+    runWithFirstHand.stats.rounds = 1
+
+    return runWithFirstHand
   }
 
   function playCard(cardIndex: number) {
@@ -334,8 +341,8 @@ export const useGameStore = defineStore('game', () => {
     run.cards.board = []
     run.cards.discardPile = []
 
-    // Reset turns to 0 for the new round
-    run.stats.turns = 0
+    // Reset turns to 1 for the new round (since we start counting from 1)
+    run.stats.turns = 1
 
     // Draw starting hand for new round
     const turnStructure = run.deck.rulesCard.turnStructure
