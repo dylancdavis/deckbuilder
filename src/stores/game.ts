@@ -229,7 +229,7 @@ export const useGameStore = defineStore('game', () => {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
-      stats: { turns: 0, rounds: 0 },
+      stats: { turns: 1, rounds: 1 },
     }
 
     const runWithDrawPile = populateDrawPile(baseRun)
@@ -334,8 +334,8 @@ export const useGameStore = defineStore('game', () => {
     run.cards.board = []
     run.cards.discardPile = []
 
-    // Reset turns to 0 for the new round
-    run.stats.turns = 0
+    // Reset turns to 1 for the new round
+    run.stats.turns = 1
 
     // Draw starting hand for new round
     const turnStructure = run.deck.rulesCard.turnStructure
