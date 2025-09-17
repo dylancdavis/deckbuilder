@@ -234,7 +234,13 @@ export const useGameStore = defineStore('game', () => {
 
     const runWithDrawPile = populateDrawPile(baseRun)
     const runWithStartEffects = processStartOfGame(runWithDrawPile)
-    return drawFirstHand(runWithStartEffects)
+    const runWithHand = drawFirstHand(runWithStartEffects)
+
+    // Start the first turn and round
+    runWithHand.stats.turns = 1
+    runWithHand.stats.rounds = 1
+
+    return runWithHand
   }
 
   function playCard(cardIndex: number) {
