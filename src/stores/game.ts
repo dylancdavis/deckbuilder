@@ -229,18 +229,12 @@ export const useGameStore = defineStore('game', () => {
       deck: deck,
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
-      stats: { turns: 0, rounds: 0 },
+      stats: { turns: 1, rounds: 1 },
     }
 
     const runWithDrawPile = populateDrawPile(baseRun)
     const runWithStartEffects = processStartOfGame(runWithDrawPile)
-    const runWithHand = drawFirstHand(runWithStartEffects)
-
-    // Start the first turn and round
-    runWithHand.stats.turns = 1
-    runWithHand.stats.rounds = 1
-
-    return runWithHand
+    return drawFirstHand(runWithStartEffects)
   }
 
   function playCard(cardIndex: number) {
