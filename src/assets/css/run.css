@@ -135,6 +135,7 @@ button.advance:active {
 
 .empty-pile {
 	width: 100%;
+  min-width: var(--collection-card-width);
 	height: calc(350px + 8px + 8px);
 	border: 4px solid var(--card-grey);
 	background-color: #eee;
