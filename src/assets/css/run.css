@@ -162,6 +162,21 @@ button.advance:active {
 	position: relative;
 }
 
+.hand-group .card-container {
+	transition: 0.1s transform ease, 0.1s filter ease, 0.15s box-shadow ease;
+	cursor: pointer;
+}
+
+.hand-group .card-container:hover {
+	transform: scale(1.02);
+	box-shadow: 0 0 20px rgba(135, 206, 250, 0.8), 0px 0px 8px rgba(0, 0, 0, 0.7);
+}
+
+.hand-group .card-container:active {
+	transform: scale(1.0);
+	filter: brightness(1.2);
+}
+
 .round-panel {
 	display: flex;
 	flex-direction: column;
