@@ -30,6 +30,7 @@
 	flex-direction: column;
 	background-color: #eee;
 	box-shadow: inset 0px 0px 4px black;
+  border-bottom-right-radius: 12px;
 }
 
 .cards-panel .panel-header {
