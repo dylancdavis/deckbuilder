@@ -45,6 +45,10 @@ function onStartRun() {
 }
 
 function handleCardClick(id: CardID) {
+  if (cardType(id) === 'rules' && selectedDeck.value?.rulesCard) {
+    return;
+  }
+
   switch (cardType(id)) {
     case 'rules':
       onSetSelectedDeckRulesCard(id as RulesCardID);
@@ -201,7 +205,10 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           v-for="[card, amountInCollection] in collectionCardsEntries"
           :key="card.name"
           class="card-collection-item"
-          :class="selectedDeck ? 'clickable' : ''"
+          :class="{
+            clickable: selectedDeck && !(card.type === 'rules' && selectedDeck.rulesCard),
+            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard
+          }"
           @click="handleCardClick(card.id)"
         >
           <CardItem :card="card" />
