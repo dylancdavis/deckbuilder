@@ -25,7 +25,7 @@ function discardPile(cards: Card[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
-    cards: cards.slice(-pileSize)
+    cards: cards.slice(-pileSize).reverse()
   }
 }
 
