@@ -171,7 +171,7 @@ button.run-deck.disabled {
 .card-collection-item .card-container {
 	position: relative;
 	z-index: 1;
-	transition: 0.1s transform ease, 0.2s filter;
+	transition: 0.1s transform ease, 0.1s filter ease, 0.15s box-shadow ease;
 }
 
 .card-collection-item.clickable .card-container {
@@ -180,10 +180,16 @@ button.run-deck.disabled {
 
 .card-collection-item:not(.disabled) .card-container:hover {
 	transform: scale(1.02);
+	box-shadow: 0 0 20px rgba(135, 206, 250, 0.8), 0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 
 .card-collection-item.disabled .card-container {
 	filter: brightness(0.5);
+}
+
+.card-collection-item.clickable .card-container:active {
+	transform: scale(1.0);
+	filter: brightness(1.2);
 }
 
 .card-interaction-row {
