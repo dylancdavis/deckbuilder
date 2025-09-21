@@ -238,7 +238,6 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function playCard(cardIndex: number) {
-    debugger;
 
     const run = gameState.value.game.run
     if (!run) return
