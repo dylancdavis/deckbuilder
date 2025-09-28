@@ -37,20 +37,20 @@ function discardPile(cards: PlayableCard[]) {
 }
 
 async function nextTurn() {
-  // Capture state of draw pile and hand cards before next turn
-  const state = Flip.getState('.draw-pile [data-flip-id], .flip-card')
+  // Capture state of all cards before next turn (hand, discard, draw pile)
+  const state = Flip.getState('.flip-card, .discard-pile [data-flip-id], .draw-pile [data-flip-id]')
 
-  // Execute next turn logic (which includes drawing cards)
+  // Execute next turn logic (discards hand cards, then draws new cards)
   gameStore.nextTurn()
 
   // Wait for Vue to re-render
   await nextTick()
 
-  // Animate cards from draw pile to hand
+  // Animate all card movements (hand to discard, draw pile to hand)
   Flip.from(state, {
-    targets: '.draw-pile [data-flip-id], .flip-card',
+    targets: '.flip-card, .discard-pile [data-flip-id], .draw-pile [data-flip-id]',
     duration: 0.2,
-    ease: "power2.inOut",
+    ease: "power2.inOut"
   })
 }
 
