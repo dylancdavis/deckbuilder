@@ -49,6 +49,7 @@ export interface PlayableCard extends Card {
   cost: number
   effects: (string | number)[]
   deckLimit?: number
+  instanceId?: string
 }
 
 export interface RulesCard extends Card {

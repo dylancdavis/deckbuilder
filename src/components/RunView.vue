@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
-import type { Card } from '@/utils/cards'
+import type { Card, PlayableCard } from '@/utils/cards'
 import { entries } from '@/utils/utils'
+import { gsap } from 'gsap'
+import { Flip } from 'gsap/Flip'
+
+gsap.registerPlugin(Flip)
 
 const gameStore = useGameStore()
 const run = computed(() => {
@@ -21,7 +25,7 @@ function drawPile(cards: Card[]) {
   }
 }
 
-function discardPile(cards: Card[]) {
+function discardPile(cards: PlayableCard[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
@@ -33,8 +37,22 @@ function nextTurn() {
   gameStore.nextTurn()
 }
 
-function playCard(cardIndex: number) {
+async function playCard(cardIndex: number) {
+  // Capture state of all cards in hand and discard pile
+  const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
+
+  // Make the state change
   gameStore.playCard(cardIndex)
+
+  // Wait for Vue to re-render
+  await nextTick()
+
+  // Animate from previous state to current state
+  Flip.from(state, {
+    targets: '.flip-card, .discard-pile [data-flip-id]',
+    duration: 0.2,
+    ease: "power2",
+  })
 }
 
 const drawPileData = computed(() =>
@@ -81,7 +99,8 @@ const discardPileData = computed(() =>
         <div class="empty-pile">
           <div
             v-for="(card, index) in (run.cards.hand)"
-            :key="card.name"
+            :key="card.instanceId || card.name"
+            :data-flip-id="card.instanceId"
             class="flip-card"
             @click="playCard(index)"
           >
@@ -105,7 +124,8 @@ const discardPileData = computed(() =>
       <div v-else class="discard-pile">
         <CardItem
           v-for="card in discardPileData.cards"
-          :key="card.name"
+          :key="card.instanceId || card.name"
+          :data-flip-id="card.instanceId"
           :card="card"
         />
       </div>
