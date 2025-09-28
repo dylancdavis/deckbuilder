@@ -79,14 +79,12 @@
 }
 
 .discard-pile .card-container:nth-child(1) {
-	animation: card-sliding var(--animation-time) ease 0s forwards;
 	position: relative;
 	z-index: 2;
 
 }
 
 .discard-pile .card-container:not(:nth-child(1)) {
-	animation: card-shifting var(--animation-time) ease 0s forwards;
 	position: absolute;
 	top: 0;
 }
@@ -99,7 +97,6 @@
 .discard-pile .card-container:nth-child(3) {
 	left: 1em;
 	z-index: 0;
-	animation: none;
 }
 
 .button-wrapper {
