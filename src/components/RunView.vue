@@ -2,7 +2,7 @@
 import { computed, nextTick } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
-import type { Card, PlayableCard } from '@/utils/cards'
+import type { PlayableCard } from '@/utils/cards'
 import { entries } from '@/utils/utils'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
@@ -18,10 +18,13 @@ const run = computed(() => {
 
 const MAX_DRAW_PILE_SIZE = 3
 
-function drawPile(cards: Card[]) {
+function drawPile(cards: PlayableCard[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
+  // Show the top cards from the draw pile (the ones that would be drawn next)
+  const visibleCards = cards.slice(-pileSize).reverse()
   return {
     pileSize,
+    cards: visibleCards
   }
 }
 
@@ -33,8 +36,22 @@ function discardPile(cards: PlayableCard[]) {
   }
 }
 
-function nextTurn() {
+async function nextTurn() {
+  // Capture state of draw pile and hand cards before next turn
+  const state = Flip.getState('.draw-pile [data-flip-id], .flip-card')
+
+  // Execute next turn logic (which includes drawing cards)
   gameStore.nextTurn()
+
+  // Wait for Vue to re-render
+  await nextTick()
+
+  // Animate cards from draw pile to hand
+  Flip.from(state, {
+    targets: '.draw-pile [data-flip-id], .flip-card',
+    duration: 0.2,
+    ease: "power2.inOut",
+  })
 }
 
 async function playCard(cardIndex: number) {
@@ -74,8 +91,9 @@ const discardPileData = computed(() =>
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
       <div v-else class="draw-pile">
         <div
-          v-for="i in drawPileData.pileSize"
-          :key="i"
+          v-for="card in drawPileData.cards"
+          :key="card.instanceId || card.name"
+          :data-flip-id="card.instanceId"
           class="card-container card-back"
         />
       </div>
