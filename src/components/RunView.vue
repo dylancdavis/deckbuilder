@@ -16,6 +16,23 @@ const run = computed(() => {
   return gameStore.run
 })
 
+const nextTurnButtonText = computed(() => {
+  if (!run.value.deck.rulesCard) return 'Next Turn'
+
+  const { rounds: maxRounds } = run.value.deck.rulesCard.endConditions
+  const currentRound = run.value.stats.rounds
+  const isLastRound = maxRounds && currentRound > maxRounds
+  const hasCardsInHand = run.value.cards.hand.length > 0
+
+  if (isLastRound) {
+    return 'End Run'
+  } else if (hasCardsInHand) {
+    return 'Discard and start next turn'
+  }
+
+  return 'Next Turn'
+})
+
 const MAX_DRAW_PILE_SIZE = 3
 
 function drawPile(cards: PlayableCard[]) {
@@ -148,21 +165,23 @@ const discardPileData = computed(() =>
         />
       </div>
 
-      <!-- Stats -->
-      <div v-if="run.stats">
-        <div
-          v-for="[name, value] in entries(run.stats)"
-          :key="name"
-          class="resource"
-        >
-          • {{ name }}: {{ value }}
+      <!-- Round Info Panel -->
+      <div class="round-info-panel">
+        <div class="stats-chips">
+          <div
+            v-for="[name, value] in entries(run.stats)"
+            :key="name"
+            class="chip chip-counter"
+          >
+            {{ name === 'rounds' ? `Round ${value}` : name === 'turns' ? `Turn ${value}` : `${name} ${value}` }}
+          </div>
+          <div class="chip chip-resource">
+            Points {{ run.resources.points }}
+          </div>
         </div>
-            <div
-          class="resource"
-        >
-          • points: {{ run.resources.points }}
-        </div>
-        <div @click="nextTurn">Next Turn</div>
+        <button class="next-turn-btn" @click="nextTurn">
+          {{ nextTurnButtonText }}
+        </button>
       </div>
     </div>
   </div>
@@ -172,6 +191,73 @@ const discardPileData = computed(() =>
 
 .panel.board-hand {
   flex: 1
+}
+
+/* Round info panel styling - match empty pile background */
+.round-info-panel {
+  background-color: #eee;
+  border: 4px solid var(--card-grey);
+  box-shadow: inset 0px 1px 0px 1px grey;
+  border-radius: 8px;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: center;
+}
+
+/* Chip styling */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25em 0.75em;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.chip-counter {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+.chip-resource {
+  background-color: #e8f5e8;
+  color: #2d5a2d;
+  border: 1px solid #a5d6a5;
+}
+
+.stats-chips {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Next turn button styling - match start run button */
+.next-turn-btn {
+  padding: 0.5em 1.5em;
+  font-size: 16px;
+  color: white;
+  background-color: rgb(46, 46, 46);
+  border: 0px;
+  border-radius: 4px;
+  border-bottom: 4px solid #272727;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.next-turn-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.01);
+}
+
+.next-turn-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
 }
 
 </style>
