@@ -12,6 +12,13 @@ npm install
 npm run dev
 ```
 
+### Run Storybook
+
+> Note: Currently incompatible with Vue Devtools; disable in `vite.config.ts` to prevent errors.
+```sh
+npm run storybook
+```
+
 ### Type-Check, Compile and Minify for Production
 
 ```sh
@@ -29,3 +36,4 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
