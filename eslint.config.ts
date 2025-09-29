@@ -24,10 +24,11 @@ export default defineConfigWithVueTs(
     },
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/storybook-static/**']),
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
+  storybook.configs['flat/recommended'],
 
   {
     ...pluginVitest.configs.recommended,
