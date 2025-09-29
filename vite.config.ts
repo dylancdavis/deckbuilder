@@ -9,7 +9,7 @@ export default defineConfig({
   base: '/deckbuilder/',
   // vueDevTools() is currently incompatibile with Storybook.
   // Comment it out if Storybook is crashing.
-  plugins: [vue()],
+  plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
