@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import CardItem from '@/components/CardItem.vue'
 import { cards } from '@/utils/cards'
 
