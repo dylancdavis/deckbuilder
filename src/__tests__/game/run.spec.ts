@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { moveCards, populateDrawPile, processStartOfGame } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
-import type { AddCardsEffect, PlayableCard, RulesCard } from '../../utils/cards.ts'
+import type { AddCardsEffect, RulesCard } from '../../utils/cards.ts'
 import type { Run } from '../../stores/game.ts'
 
 const baseRules: RulesCard = {
