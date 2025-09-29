@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import ScarabSvg from './ScarabSvg.vue';
+import ScarabSvg from './ScarabSvg.vue'
+import type { Card, PlayableCard, RulesCard } from '@/utils/cards'
 
+interface Props {
+  /** The card to display - can be either a playable card or rules card */
+  card: Card
+}
 
-defineProps({
-  card: {
-    type: Object,
-    required: true
-  }
-})
+defineProps<Props>()
 
+// Type guards to safely access card-type-specific properties
+function isRulesCard(card: Card): card is RulesCard {
+  return card.type === 'rules'
+}
+
+function isPlayableCard(card: Card): card is PlayableCard {
+  return card.type === 'playable'
+}
 </script>
 
 <template>
@@ -16,11 +24,11 @@ defineProps({
     <div class="card-background">
       <div class="card-name">{{ card.name }}</div>
       <div class="card-content">
-        <div v-if="card.type === 'rules'" class="rules-info">
+        <div v-if="isRulesCard(card)" class="rules-info">
           <div class="section deck-limit">
             <div class="deck-size">
               <span>Deck Size:</span>
-              <span>{{ card.deckLimits?.size?.[0] === card.deckLimits?.size?.[1] ? card.deckLimits.size[0] : `${card.deckLimits?.size?.[0]}-${card.deckLimits?.size?.[1]}` }} Cards</span>
+              <span>{{ card.deckLimits.size[0] === card.deckLimits.size[1] ? card.deckLimits.size[0] : `${card.deckLimits.size[0]}-${card.deckLimits.size[1]}` }} Cards</span>
             </div>
           </div>
           <div class="section turn-structure">
@@ -40,7 +48,7 @@ defineProps({
           <div class="card-image">
             <ScarabSvg />
           </div>
-          <div class="card-description">{{ card.description }}</div>
+          <div v-if="isPlayableCard(card)" class="card-description">{{ card.description }}</div>
         </template>
       </div>
     </div>
