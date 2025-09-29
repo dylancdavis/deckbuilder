@@ -7,7 +7,6 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  argTypes: {}
 } satisfies Meta<typeof ScarabSvg>
 
 export default meta
