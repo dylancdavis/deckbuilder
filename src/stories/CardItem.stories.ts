@@ -27,27 +27,3 @@ export const Default: Story = {
     card: cards.score
   }
 }
-
-export const PlayableCard: Story = {
-  args: {
-    card: cards.score
-  }
-}
-
-export const PlayableCardWithDeckLimit: Story = {
-  args: {
-    card: cards['dual-score']
-  }
-}
-
-export const RulesCard: Story = {
-  args: {
-    card: cards['starter-rules']
-  }
-}
-
-export const HighCostCard: Story = {
-  args: {
-    card: cards['last-resort']
-  }
-}
