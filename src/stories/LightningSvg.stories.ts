@@ -7,21 +7,18 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
   argTypes: {}
 } satisfies Meta<typeof LightningSvg>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
-
-export const Large: Story = {
+export const Default: Story = {
   decorators: [
     (story) => ({
       components: { story },
       template: `
-        <div style="width: 200px; height: 200px;">
+        <div style="width: 128px; height: 128px;">
           <story />
         </div>
       `
@@ -29,28 +26,3 @@ export const Large: Story = {
   ]
 }
 
-export const Small: Story = {
-  decorators: [
-    (story) => ({
-      components: { story },
-      template: `
-        <div style="width: 32px; height: 32px;">
-          <story />
-        </div>
-      `
-    })
-  ]
-}
-
-export const ColorVariations: Story = {
-  decorators: [
-    (story) => ({
-      components: { story },
-      template: `
-        <div style="width: 64px; height: 64px; color: #fbbf24;">
-          <story />
-        </div>
-      `
-    })
-  ]
-}
