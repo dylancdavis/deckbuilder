@@ -1,18 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import ScarabSvg from '@/components/ScarabSvg.vue'
 
-const meta = {
+const meta: Meta<typeof ScarabSvg> = {
   title: 'Components/ScarabSvg',
   component: ScarabSvg,
   parameters: {
     layout: 'centered',
   },
-} satisfies Meta<typeof ScarabSvg>
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Default: Story = {
   decorators: [
     (story) => ({
       components: { story },
@@ -24,4 +18,9 @@ export const Default: Story = {
     })
   ]
 }
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {}
 
