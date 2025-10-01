@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import FlashValue from './FlashValue.vue'
 import type { PlayableCard } from '@/utils/cards'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
+import VanillaTilt from 'vanilla-tilt'
 
 gsap.registerPlugin(Flip)
 
@@ -108,17 +109,36 @@ const drawPileData = computed(() =>
 const discardPileData = computed(() =>
   discardPile(run.value.cards.discardPile)
 )
+
+const drawPileRef = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  // Initialize tilt on draw pile cards
+  if (drawPileRef.value) {
+    const drawCards = drawPileRef.value.querySelectorAll('.card-back')
+    drawCards.forEach(card => {
+      VanillaTilt.init(card as HTMLElement, {
+        reverse: true,
+        max: 3,
+        scale: 1.01,
+        speed: 300,
+        glare: true,
+        'max-glare': 0.15
+      })
+    })
+  }
+})
 </script>
 
 <template>
   <div v-if="run" class="run-view">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
-      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" />
+      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" enable-tilt="subtle" />
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
-      <div v-else class="draw-pile">
+      <div v-else ref="drawPileRef" class="draw-pile">
         <div
           v-for="card in drawPileData.cards"
           :key="card.instanceId || card.name"
@@ -137,6 +157,7 @@ const discardPileData = computed(() =>
             v-for="card in (run.cards.board)"
             :key="card.name"
             :card="card"
+            :enable-tilt="false"
           />
         </div>
       </div>
@@ -174,6 +195,7 @@ const discardPileData = computed(() =>
           :key="card.instanceId || card.name"
           :data-flip-id="card.instanceId"
           :card="card"
+          enable-tilt="subtle"
         />
       </div>
 
