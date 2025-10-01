@@ -210,6 +210,7 @@ const discardPileData = computed(() =>
   align-items: center;
   height: 100%;
   flex: 1;
+  max-width: var(--collection-card-width);
 }
 
 /* Chip styling */
