@@ -25,8 +25,6 @@ const nextTurnButtonText = computed(() => {
   const deckIsEmpty = run.value.cards.drawPile.length === 0
   const hasCardsInHand = run.value.cards.hand.length > 0
 
-  debugger;
-
   let text = isLastRound && deckIsEmpty
     ? 'End Run'
     : 'Next Turn'
