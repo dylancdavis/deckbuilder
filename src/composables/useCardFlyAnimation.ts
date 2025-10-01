@@ -81,9 +81,17 @@ export function useCardFlyAnimation() {
     // Wait for next frame to ensure clone is rendered, then another frame to apply transition
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        // Calculate the translation needed
-        const deltaX = targetRect.left - sourceRect.left
-        const deltaY = targetRect.top - sourceRect.top
+        // Calculate the center of the target element
+        const targetCenterX = targetRect.left + targetRect.width / 2
+        const targetCenterY = targetRect.top + targetRect.height / 2
+
+        // Calculate the center of the source element
+        const sourceCenterX = sourceRect.left + sourceRect.width / 2
+        const sourceCenterY = sourceRect.top + sourceRect.height / 2
+
+        // Calculate the translation needed to center on target
+        const deltaX = targetCenterX - sourceCenterX
+        const deltaY = targetCenterY - sourceCenterY
 
         // Apply transition
         clone.style.transition = `transform ${opts.duration}ms ${opts.easing}, opacity ${opts.duration}ms ${opts.easing}`

@@ -76,24 +76,32 @@ function handleCardClick(id: CardID, event: MouseEvent) {
 async function onAddCardToSelectedDeck(cardId: PlayableCardID, event?: MouseEvent) {
   if (!selectedDeckKey.value) return
 
-  // Trigger animation if we have the source element
+  // Capture animation elements before state update
+  let sourceElement: HTMLElement | undefined
+  let cardElement: HTMLElement | undefined
+
   if (event) {
-    const sourceElement = (event.currentTarget as HTMLElement)
-    const cardElement = sourceElement.querySelector('.card-container') as HTMLElement
-
-    // Find the target element in the deck list
-    const targetElement = document.querySelector(`[data-deck-card-id="${cardId}"]`) as HTMLElement
-
-    if (cardElement) {
-      await flyCard({
-        sourceElement,
-        targetElement,
-        cardElement
-      })
-    }
+    sourceElement = (event.currentTarget as HTMLElement)
+    cardElement = sourceElement.querySelector('.card-container') as HTMLElement || undefined
   }
 
+  // Add card to deck first
   gameStore.addCardToDeck(selectedDeckKey.value, cardId)
+
+  // Trigger animation after DOM updates
+  if (sourceElement && cardElement) {
+    // Wait for Vue to update the DOM
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    // Target the deck cards list (not the rules card list)
+    const targetElement = document.querySelector('.deck-cards-list ul') as HTMLElement
+
+    await flyCard({
+      sourceElement,
+      targetElement,
+      cardElement
+    })
+  }
 }
 
 function onRemoveCardFromSelectedDeck(card: PlayableCardID) {
@@ -193,7 +201,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           </div>
 
           <!-- Selected Deck Cards Display -->
-          <div class="card-list-block">
+          <div class="card-list-block deck-cards-list">
             <div class="card-list-header">
               {{ deckSizeText(currentDeckSize, (requiredDeckSize || [0,0])) }}
             </div>
