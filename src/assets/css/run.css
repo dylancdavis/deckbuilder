@@ -135,7 +135,8 @@ button.advance:active {
   min-width: var(--collection-card-width);
 	height: calc(350px + 8px + 8px);
 	border: 4px solid var(--card-grey);
-	background: linear-gradient(135deg, #fafafa 0%, #e0e0e0 100%);
+	background-color: #e8e8e8;
+	background-image: linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(224, 224, 224, 0.3) 100%), url(http://www.transparenttextures.com/patterns/axiom-pattern.png);
 	box-shadow: inset 0px 1px 0px 1px grey;
 	border-radius: 8px;
 	display: grid;

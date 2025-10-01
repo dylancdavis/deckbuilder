@@ -217,7 +217,8 @@ const discardPileData = computed(() =>
 
 /* Round info panel styling - match empty pile background */
 .round-info-panel {
-  background: linear-gradient(135deg, #fafafa 0%, #e0e0e0 100%);
+  background-color: #e8e8e8;
+  background-image: linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(224, 224, 224, 0.3) 100%), url(http://www.transparenttextures.com/patterns/axiom-pattern.png);
   border: 4px solid var(--card-grey);
   box-shadow: inset 0px 1px 0px 1px grey;
   border-radius: 8px;
