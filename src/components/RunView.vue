@@ -168,15 +168,15 @@ const discardPileData = computed(() =>
       <!-- Round Info Panel -->
       <div class="round-info-panel">
         <div class="stats-chips">
-          <div
-            v-for="[name, value] in entries(run.stats)"
-            :key="name"
-            class="chip chip-counter"
-          >
-            {{ name === 'rounds' ? `Round ${value}` : name === 'turns' ? `Turn ${value}` : `${name} ${value}` }}
+          <div class="chip chip-counter chip-wide">
+            <span>Round {{ run.stats.rounds }}</span>
+            <span>Turn {{ run.stats.turns }}</span>
           </div>
-          <div class="chip chip-resource">
-            Points {{ run.resources.points }}
+          <div class="resources-grid">
+            <div class="chip chip-resource chip-wide">
+              <span>Points</span>
+              <span>{{ run.resources.points }}</span>
+            </div>
           </div>
         </div>
         <button class="next-turn-btn" @click="nextTurn">
@@ -202,8 +202,10 @@ const discardPileData = computed(() =>
   padding: 1em;
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  justify-content: space-between;
   align-items: center;
+  height: 100%;
+  flex: 1;
 }
 
 /* Chip styling */
@@ -212,28 +214,40 @@ const discardPileData = computed(() =>
   align-items: center;
   padding: 0.25em 0.75em;
   border-radius: 16px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .chip-counter {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border: 1px solid #90caf9;
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #666;
+}
+
+.chip-wide {
+  width: 100%;
+  justify-content: space-between;
 }
 
 .chip-resource {
-  background-color: #e8f5e8;
-  color: #2d5a2d;
-  border: 1px solid #a5d6a5;
+  background-color: #ddd;
+  color: #666;
+  border: 1px solid #bbb;
 }
 
 .stats-chips {
   display: flex;
+  flex-direction: column;
   gap: 0.5em;
-  flex-wrap: wrap;
-  justify-content: center;
+  width: 100%;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5em;
+  width: 100%;
 }
 
 /* Next turn button styling - match start run button */
