@@ -49,6 +49,7 @@
 .draw-pile {
 	position: relative;
 	transform: translateX(10px);
+	--card-stack-offset: 0.375em;
 }
 
 .draw-pile .card-back {
@@ -57,7 +58,7 @@
 
 .draw-pile .card-back:nth-child(1) {
 	position: relative;
-	z-index: 2;
+	z-index: 3;
 }
 
 .draw-pile .card-back:not(:nth-child(1)) {
@@ -66,22 +67,23 @@
 }
 
 .draw-pile .card-back:nth-child(2) {
-	right: 0.5em;
-	z-index: 1;
+	right: calc(var(--card-stack-offset) * 1);
+	z-index: 2;
 }
 
 .draw-pile .card-back:nth-child(3) {
-	right: 1em;
+	right: calc(var(--card-stack-offset) * 2);
+	z-index: 1;
 }
 
 .discard-pile {
 	position: relative;
+	--card-stack-offset: 0.375em;
 }
 
 .discard-pile .card-container:nth-child(1) {
 	position: relative;
-	z-index: 2;
-
+	z-index: 3;
 }
 
 .discard-pile .card-container:not(:nth-child(1)) {
@@ -90,13 +92,13 @@
 }
 
 .discard-pile .card-container:nth-child(2) {
-	left: 0.5em;
-	z-index: 1;
+	left: calc(var(--card-stack-offset) * 1);
+	z-index: 2;
 }
 
 .discard-pile .card-container:nth-child(3) {
-	left: 1em;
-	z-index: 0;
+	left: calc(var(--card-stack-offset) * 2);
+	z-index: 1;
 }
 
 .button-wrapper {
