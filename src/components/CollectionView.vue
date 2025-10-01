@@ -93,8 +93,8 @@ async function onAddCardToSelectedDeck(cardId: PlayableCardID, event?: MouseEven
     // Wait for Vue to update the DOM
     await new Promise(resolve => setTimeout(resolve, 0))
 
-    // Target the deck cards list (not the rules card list)
-    const targetElement = document.querySelector('.deck-cards-list ul') as HTMLElement
+    // Target the specific deck list item for this card
+    const targetElement = document.querySelector(`.deck-cards-list [data-deck-card-id="${cardId}"]`) as HTMLElement
 
     await flyCard({
       sourceElement,
