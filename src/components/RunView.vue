@@ -16,23 +16,33 @@ const run = computed(() => {
   return gameStore.run
 })
 
-const nextTurnButtonText = computed(() => {
-  if (!run.value.deck.rulesCard) return 'Next Turn'
+const isEndOfRun = computed(() => {
+  if (!run.value.deck.rulesCard) return false
 
   const { rounds: maxRounds } = run.value.deck.rulesCard.endConditions
   const currentRound = run.value.stats.rounds
   const isLastRound = currentRound >= maxRounds
   const deckIsEmpty = run.value.cards.drawPile.length === 0
+
+  return isLastRound && deckIsEmpty
+})
+
+const noActionsLeft = computed(() => {
+  return run.value.cards.hand.length === 0
+})
+
+const nextTurnButtonText = computed(() => {
+  if (!run.value.deck.rulesCard) return { main: 'Next Turn', subtitle: null }
+
   const hasCardsInHand = run.value.cards.hand.length > 0
 
-  let text = isLastRound && deckIsEmpty
+  const main = isEndOfRun.value
     ? 'End Run'
     : 'Next Turn'
 
-  if (hasCardsInHand)
-    text += ' (Discard Hand)'
+  const subtitle = hasCardsInHand ? '(Discard Hand)' : null
 
-  return text
+  return { main, subtitle }
 })
 
 const MAX_DRAW_PILE_SIZE = 3
@@ -181,8 +191,18 @@ const discardPileData = computed(() =>
             </div>
           </div>
         </div>
-        <button class="next-turn-btn" @click="nextTurn">
-          {{ nextTurnButtonText }}
+        <button
+          class="next-turn-btn"
+          :class="{
+            'next-turn-btn--highlighted': noActionsLeft && !isEndOfRun,
+            'next-turn-btn--end-run': isEndOfRun
+          }"
+          @click="nextTurn"
+        >
+          <div class="button-text-main">{{ nextTurnButtonText.main }}</div>
+          <div v-if="nextTurnButtonText.subtitle" class="button-text-subtitle">
+            {{ nextTurnButtonText.subtitle }}
+          </div>
         </button>
       </div>
     </div>
@@ -260,21 +280,45 @@ const discardPileData = computed(() =>
   color: white;
   background-color: rgb(46, 46, 46);
   border: 0px;
-  border-radius: 4px;
-  border-bottom: 4px solid #272727;
+  border-radius: 12px;
+  border-bottom: 6px solid #272727;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25em;
+  width: 100%;
 }
 
 .next-turn-btn:hover {
   filter: brightness(1.1);
-  transform: scale(1.01);
 }
 
 .next-turn-btn:active {
-  transform: translateY(2px);
-  border-bottom-width: 2px;
+  border-bottom-width: 0px;
+}
+
+.button-text-main {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.button-text-subtitle {
+  font-size: 12px;
+  font-weight: normal;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.next-turn-btn--highlighted {
+  background-color: var(--standard-blue);
+  border-bottom-color: #003350;
+}
+
+.next-turn-btn--end-run {
+  background-color: var(--standard-orange);
+  border-bottom-color: #cc4400;
 }
 
 </style>
