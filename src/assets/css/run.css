@@ -135,7 +135,7 @@ button.advance:active {
   min-width: var(--collection-card-width);
 	height: calc(350px + 8px + 8px);
 	border: 4px solid var(--card-grey);
-	background-color: #eee;
+	background: linear-gradient(135deg, #fafafa 0%, #e0e0e0 100%);
 	box-shadow: inset 0px 1px 0px 1px grey;
 	border-radius: 8px;
 	display: grid;

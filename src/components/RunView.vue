@@ -217,7 +217,7 @@ const discardPileData = computed(() =>
 
 /* Round info panel styling - match empty pile background */
 .round-info-panel {
-  background-color: #eee;
+  background: linear-gradient(135deg, #fafafa 0%, #e0e0e0 100%);
   border: 4px solid var(--card-grey);
   box-shadow: inset 0px 1px 0px 1px grey;
   border-radius: 8px;
