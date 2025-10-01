@@ -21,16 +21,20 @@ const nextTurnButtonText = computed(() => {
 
   const { rounds: maxRounds } = run.value.deck.rulesCard.endConditions
   const currentRound = run.value.stats.rounds
-  const isLastRound = maxRounds && currentRound > maxRounds
+  const isLastRound = currentRound >= maxRounds
+  const deckIsEmpty = run.value.cards.drawPile.length === 0
   const hasCardsInHand = run.value.cards.hand.length > 0
 
-  if (isLastRound) {
-    return 'End Run'
-  } else if (hasCardsInHand) {
-    return 'Discard and start next turn'
-  }
+  debugger;
 
-  return 'Next Turn'
+  let text = isLastRound && deckIsEmpty
+    ? 'End Run'
+    : 'Next Turn'
+
+  if (hasCardsInHand)
+    text += ' (Discard Hand)'
+
+  return text
 })
 
 const MAX_DRAW_PILE_SIZE = 3
