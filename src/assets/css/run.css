@@ -76,6 +76,10 @@
 	z-index: 1;
 }
 
+.draw-pile .card-back:hover {
+	z-index: 10;
+}
+
 .discard-pile {
 	position: relative;
 	--card-stack-offset: 0.375em;
@@ -99,6 +103,10 @@
 .discard-pile .card-container:nth-child(3) {
 	left: calc(var(--card-stack-offset) * 2);
 	z-index: 1;
+}
+
+.discard-pile .card-container:hover {
+	z-index: 10;
 }
 
 .button-wrapper {
