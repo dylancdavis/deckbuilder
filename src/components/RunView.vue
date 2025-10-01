@@ -168,13 +168,16 @@ const discardPileData = computed(() =>
     <div class="panel discard-stats">
       <!-- Discard Pile -->
       <div v-if="discardPileData.pileSize === 0" class="empty-pile">discard</div>
-      <div v-else class="discard-pile">
-        <CardItem
-          v-for="card in discardPileData.cards"
-          :key="card.instanceId || card.name"
-          :data-flip-id="card.instanceId"
-          :card="card"
-        />
+      <div v-else class="discard-pile-container">
+        <div class="empty-pile discard-pile-base">discard</div>
+        <div class="discard-pile">
+          <CardItem
+            v-for="card in discardPileData.cards"
+            :key="card.instanceId || card.name"
+            :data-flip-id="card.instanceId"
+            :card="card"
+          />
+        </div>
       </div>
 
       <!-- Round Info Panel -->
@@ -213,6 +216,25 @@ const discardPileData = computed(() =>
 
 .panel.board-hand {
   flex: 1
+}
+
+/* Discard pile container and base */
+.discard-pile-container {
+  position: relative;
+  width: var(--collection-card-width);
+  height: var(--collection-card-height);
+}
+
+.discard-pile-base {
+  position: relative;
+  z-index: 0;
+}
+
+.discard-pile {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Round info panel styling - match empty pile background */
