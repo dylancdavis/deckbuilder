@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
+import FlashValue from './FlashValue.vue'
 import type { PlayableCard } from '@/utils/cards'
-import { entries } from '@/utils/utils'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
 
 gsap.registerPlugin(Flip)
 
 const gameStore = useGameStore()
-const flashTurn = ref(false)
-const flashRound = ref(false)
 const run = computed(() => {
   if (!gameStore.run)
     throw new Error('Called RunView when Run is null.')
@@ -110,22 +108,6 @@ const drawPileData = computed(() =>
 const discardPileData = computed(() =>
   discardPile(run.value.cards.discardPile)
 )
-
-// Watch for changes in turn and trigger flash animation
-watch(() => run.value.stats.turns, () => {
-  flashTurn.value = true
-  setTimeout(() => {
-    flashTurn.value = false
-  }, 600)
-})
-
-// Watch for changes in round and trigger flash animation
-watch(() => run.value.stats.rounds, () => {
-  flashRound.value = true
-  setTimeout(() => {
-    flashRound.value = false
-  }, 600)
-})
 </script>
 
 <template>
@@ -199,13 +181,13 @@ watch(() => run.value.stats.rounds, () => {
       <div class="round-info-panel">
         <div class="stats-chips">
           <div class="chip chip-counter chip-wide">
-            <span>Round <span :class="{ 'flash-orange': flashRound }">{{ run.stats.rounds }}</span></span>
-            <span>Turn <span :class="{ 'flash-orange': flashTurn }">{{ run.stats.turns }}</span></span>
+            <span>Round <FlashValue :value="run.stats.rounds" /></span>
+            <span>Turn <FlashValue :value="run.stats.turns" /></span>
           </div>
           <div class="resources-grid">
             <div class="chip chip-resource chip-wide">
               <span>Points</span>
-              <span>{{ run.resources.points }}</span>
+              <FlashValue :value="run.resources.points" flash-color="var(--standard-blue)" base-color="#666" />
             </div>
           </div>
         </div>
@@ -338,20 +320,6 @@ watch(() => run.value.stats.rounds, () => {
 .next-turn-btn--end-run {
   background-color: var(--standard-orange);
   border-bottom-color: #cc4400;
-}
-
-/* Flash animation for counter updates */
-@keyframes flash-orange {
-  0% {
-    color: var(--standard-orange);
-  }
-  100% {
-    color: #fff;
-  }
-}
-
-.flash-orange {
-  animation: flash-orange 0.6s ease-out;
 }
 
 </style>
