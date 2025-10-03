@@ -6,14 +6,14 @@ import { cards, cardType, type Card, type CardID, type PlayableCard, type Playab
 import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { getDeckValidationErrors } from '@/utils/deck'
-import { useCardFlyAnimation } from '@/composables/useCardFlyAnimation'
+import { useFlyAnimation } from '@/composables/useCardFlyAnimation'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
 const selectedDeck = computed(() => gameStore.selectedDeck as Deck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
-const { flyCard } = useCardFlyAnimation()
+const { flyElement } = useFlyAnimation()
 
 function deckSize(deck: Deck) {
   if (!deck || !deck.cards) return 0
@@ -75,31 +75,28 @@ function handleCardClick(id: CardID, event: MouseEvent) {
 async function onAddCardToSelectedDeck(cardId: PlayableCardID, event?: MouseEvent) {
   if (!selectedDeckKey.value) return
 
-  // Capture animation elements before state update
-  let sourceElement: HTMLElement | undefined
-  let cardElement: HTMLElement | undefined
-
-  if (event) {
-    sourceElement = (event.currentTarget as HTMLElement)
-    cardElement = sourceElement.querySelector('.card-container') as HTMLElement || undefined
-  }
-
   // Add card to deck first
   gameStore.addCardToDeck(selectedDeckKey.value, cardId)
 
+  // Capture animation elements before state update
+  let cardElement: HTMLElement | undefined
+
+  if (event) {
+    const sourceElement = (event.currentTarget as HTMLElement)
+    cardElement = sourceElement.querySelector('.card-container') as HTMLElement || undefined
+  }
+
   // Trigger animation after DOM updates
-  if (sourceElement && cardElement) {
+  if (cardElement) {
     // Wait for Vue to update the DOM
     await new Promise(resolve => setTimeout(resolve, 0))
 
     // Target the specific deck list item for this card
     const targetElement = document.querySelector(`.deck-cards-list [data-deck-card-id="${cardId}"]`) as HTMLElement
 
-    await flyCard({
-      sourceElement,
-      targetElement,
-      cardElement
-    })
+    if (targetElement) {
+      await flyElement(cardElement, targetElement)
+    }
   }
 }
 

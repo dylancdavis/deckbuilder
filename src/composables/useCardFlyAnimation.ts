@@ -1,72 +1,27 @@
-import { nextTick } from 'vue'
-
-interface AnimationOptions {
-  /** Duration of the animation in milliseconds */
-  duration?: number
-  /** Easing function for the animation */
-  easing?: string
-  /** Scale factor during flight (default: 0.6) */
-  scale?: number
-}
-
-interface FlyAnimationParams {
-  /** The element being clicked (source) */
-  sourceElement: HTMLElement
-  /** The target element in the deck list */
-  targetElement: HTMLElement | null
-  /** The card element to clone and animate */
-  cardElement: HTMLElement
-  /** Animation options */
-  options?: AnimationOptions
-}
-
-const DEFAULT_OPTIONS: Required<AnimationOptions> = {
-  duration: 600,
-  easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-  scale: 0.15
-}
+const DURATION = 600
+const EASING = 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+const SCALE = 0.15
 
 /**
- * Creates a flying card animation from source to target position
- * Uses FLIP technique: First, Last, Invert, Play
+ * Generic flying element animation composable
+ * Clones an element and animates it from source to target position with fade out
  */
-export function useCardFlyAnimation() {
+export function useFlyAnimation() {
   /**
-   * Animates a card flying from source to target
+   * Animates an element flying from source to target position
    */
-  async function flyCard({
-    sourceElement,
-    targetElement,
-    cardElement,
-    options = {}
-  }: FlyAnimationParams): Promise<void> {
-    const opts = { ...DEFAULT_OPTIONS, ...options }
+  async function flyElement(source: HTMLElement, target: HTMLElement): Promise<void> {
 
-    // Get the source position (use cardElement for accurate sizing)
-    const sourceRect = cardElement.getBoundingClientRect()
+    const sourceRect = source.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
 
-    // Get or calculate the target position
-    let targetRect: DOMRect
-    if (targetElement) {
-      targetRect = targetElement.getBoundingClientRect()
-    } else {
-      // If no target element exists yet, fly to a default position
-      // This handles the case where the card isn't in the deck yet
-      targetRect = new DOMRect(
-        window.innerWidth * 0.15, // Approximate deck list position
-        window.innerHeight * 0.3,
-        100,
-        50
-      )
-    }
-
-    // Clone the card element for animation
-    const clone = cardElement.cloneNode(true) as HTMLElement
+    // Clone the source element for animation
+    const clone = source.cloneNode(true) as HTMLElement
     clone.style.position = 'fixed'
     clone.style.pointerEvents = 'none'
     clone.style.zIndex = '9999'
     clone.style.margin = '0'
-    clone.style.transition = 'none' // Ensure no transition initially
+    clone.style.transition = 'none'
 
     // Position clone at source
     clone.style.left = `${sourceRect.left}px`
@@ -75,7 +30,6 @@ export function useCardFlyAnimation() {
     clone.style.height = `${sourceRect.height}px`
     clone.style.opacity = '1'
 
-    // Add to DOM
     document.body.appendChild(clone)
 
     // Wait for next frame to ensure clone is rendered, then another frame to apply transition
@@ -94,19 +48,19 @@ export function useCardFlyAnimation() {
         const deltaY = targetCenterY - sourceCenterY
 
         // Apply transition
-        clone.style.transition = `transform ${opts.duration}ms ${opts.easing}, opacity ${opts.duration}ms ${opts.easing}`
-        clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${opts.scale})`
+        clone.style.transition = `transform ${DURATION}ms ${EASING}, opacity ${DURATION}ms ${EASING}`
+        clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${SCALE})`
         clone.style.opacity = '0'
 
         // Remove clone after animation completes
         setTimeout(() => {
           clone.remove()
-        }, opts.duration)
+        }, DURATION)
       })
     })
   }
 
   return {
-    flyCard
+    flyElement
   }
 }
