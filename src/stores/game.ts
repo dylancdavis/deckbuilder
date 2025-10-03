@@ -224,6 +224,17 @@ export const useGameStore = defineStore('game', () => {
     deck.rulesCard = null
   }
 
+  function addDeck(name: string) {
+    const newDeckKey = crypto.randomUUID()
+    gameState.value.game.collection.decks[newDeckKey] = {
+      name: name,
+      rulesCard: null,
+      cards: {},
+      editable: true,
+    }
+    return newDeckKey
+  }
+
   function makeRun(deck: Deck): Run {
     const baseRun: Run = {
       deck: deck,
@@ -348,6 +359,7 @@ export const useGameStore = defineStore('game', () => {
     gameState,
     run,
     runDeck,
+    addDeck,
     runCards,
     resources,
     view,

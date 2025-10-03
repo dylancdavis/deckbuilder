@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
 import { cards, cardType, type Card, type CardID, type PlayableCard, type PlayableCardID, type RulesCardID } from '@/utils/cards'
-import { entries } from '@/utils/utils'
+import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { getDeckValidationErrors } from '@/utils/deck'
 
@@ -26,7 +26,17 @@ function onSelectDeck(deckKey: string) {
 }
 
 function onAddNewDeck() {
-  // TODO: Implement add new deck
+  const deckNames = values(collection.value.decks).map(deck => deck.name)
+  const newDeckNumbers = deckNames
+    .map(name => name.match(/New Deck (\d+)/)?.[1])
+    .filter(match => match !== undefined)
+    .map(num => parseInt(num!))
+
+  const nextNumber = newDeckNumbers.length === 0 ? 1 : firstMissingNum(newDeckNumbers)
+  const newDeckName = `New Deck ${nextNumber}`
+
+  const newDeckKey = gameStore.addDeck(newDeckName)
+  gameStore.selectDeck(newDeckKey)
 }
 
 function onChangeDeckName(value: string) {
