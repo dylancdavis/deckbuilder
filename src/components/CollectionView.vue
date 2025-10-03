@@ -14,7 +14,6 @@ const selectedDeck = computed(() => gameStore.selectedDeck as Deck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
 const { flyCard } = useCardFlyAnimation()
-const cardRefs = ref<Record<string, HTMLElement>>({})
 
 function deckSize(deck: Deck) {
   if (!deck || !deck.cards) return 0
@@ -225,7 +224,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           >
             Run This Deck
           </button>
-          
+
           <!-- Validation Errors Display -->
           <div v-if="!isDeckValid && deckValidationErrors.length > 0" class="validation-errors">
             <div class="validation-error" v-for="(error, index) in deckValidationErrors" :key="index">
