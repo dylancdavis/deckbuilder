@@ -6,7 +6,7 @@ import { cards, cardType, type Card, type CardID, type PlayableCard, type Playab
 import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { getDeckValidationErrors } from '@/utils/deck'
-import { useFlyAnimation } from '@/composables/useCardFlyAnimation'
+import { useFlyAnimation } from '@/composables/useFlyAnimation'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
