@@ -94,9 +94,8 @@ async function onAddCardToSelectedDeck(cardId: PlayableCardID, event?: MouseEven
     // Target the specific deck list item for this card
     const targetElement = document.querySelector(`.deck-cards-list [data-deck-card-id="${cardId}"]`) as HTMLElement
 
-    if (targetElement) {
-      await flyElement(cardElement, targetElement)
-    }
+    if (targetElement)
+      flyElement(cardElement, targetElement)
   }
 }
 

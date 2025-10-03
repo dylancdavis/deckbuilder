@@ -10,7 +10,7 @@ export function useFlyAnimation() {
   /**
    * Animates an element flying from source to target position
    */
-  async function flyElement(source: HTMLElement, target: HTMLElement): Promise<void> {
+  function flyElement(source: HTMLElement, target: HTMLElement) {
 
     const sourceRect = source.getBoundingClientRect()
     const targetRect = target.getBoundingClientRect()
