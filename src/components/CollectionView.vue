@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
 import { cards, cardType, type Card, type CardID, type PlayableCard, type PlayableCardID, type RulesCardID } from '@/utils/cards'
@@ -14,6 +14,7 @@ const selectedDeck = computed(() => gameStore.selectedDeck as Deck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
 const { flyElement } = useFlyAnimation()
+const cardRefs = useTemplateRef<InstanceType<typeof CardItem>[]>('cardRefs')
 
 function deckSize(deck: Deck) {
   if (!deck || !deck.cards) return 0
@@ -57,7 +58,7 @@ function onStartRun() {
   gameStore.startRun(selectedDeck.value)
 }
 
-function handleCardClick(id: CardID, event: MouseEvent) {
+function handleCardClick(id: CardID, index: number) {
   if (cardType(id) === 'rules' && selectedDeck.value?.rulesCard) {
     return;
   }
@@ -67,30 +68,29 @@ function handleCardClick(id: CardID, event: MouseEvent) {
       onSetSelectedDeckRulesCard(id as RulesCardID);
       break;
     case 'playable':
-      onAddCardToSelectedDeck(id as PlayableCardID, event)
+      onAddCardToSelectedDeck(id as PlayableCardID, index)
       break;
   }
 }
 
-async function onAddCardToSelectedDeck(cardId: PlayableCardID, event?: MouseEvent) {
+async function onAddCardToSelectedDeck(cardId: PlayableCardID, index: number) {
   if (!selectedDeckKey.value) return
 
   // Add card to deck first
   gameStore.addCardToDeck(selectedDeckKey.value, cardId)
 
-  if (event) {
-    const sourceElement = (event.currentTarget as HTMLElement)
-    const cardElement = sourceElement.querySelector('.card-container') as HTMLElement
-    if (!cardElement) return
+  const cardComponent = cardRefs.value?.[index]
+  if (!cardComponent?.$el) return
 
-    // Wait for Vue to update the DOM
-    await new Promise(resolve => setTimeout(resolve, 0))
+  const sourceElement = cardComponent.$el as HTMLElement
 
-    const targetElement = document.querySelector(`.deck-cards-list [data-deck-card-id="${cardId}"]`) as HTMLElement
-    if (!targetElement) return
+  // Wait for Vue to update the DOM
+  await new Promise(resolve => setTimeout(resolve, 0))
 
-    flyElement(cardElement, targetElement)
-  }
+  const targetElement = document.querySelector(`.deck-cards-list [data-deck-card-id="${cardId}"]`) as HTMLElement
+  if (!targetElement) return
+
+  flyElement(sourceElement, targetElement)
 }
 
 function onRemoveCardFromSelectedDeck(card: PlayableCardID) {
@@ -232,16 +232,16 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           No Cards in Collection. Run the starter deck!
         </div>
         <div
-          v-for="[card, amountInCollection] in collectionCardsEntries"
+          v-for="([card, amountInCollection], index) in collectionCardsEntries"
           :key="card.name"
           class="card-collection-item"
           :class="{
             clickable: selectedDeck && !(card.type === 'rules' && selectedDeck.rulesCard),
             disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard
           }"
-          @click="handleCardClick(card.id, $event)"
+          @click="handleCardClick(card.id, index)"
         >
-          <CardItem :card="card" />
+          <CardItem ref="cardRefs" :card="card" />
           <div class="card-interaction-row">
             <div class="amount">x {{ amountInCollection }}</div>
             <div v-if="selectedDeck" class="add-card">+</div>
