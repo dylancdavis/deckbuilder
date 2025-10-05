@@ -2,29 +2,22 @@
 import { ref } from 'vue'
 import ScarabSvg from './ScarabSvg.vue'
 import type { Card, PlayableCard, RulesCard } from '@/utils/cards'
-import { useTilt } from '@/composables/useTilt'
+import { useTilt, type TiltOptions } from '@/composables/useTilt'
 
 interface Props {
   /** The card to display - can be either a playable card or rules card */
   card: Card
-  /** Whether to enable tilt effect */
-  tilt?: boolean
+  /** Tilt effect options - pass a TiltOptions object to enable tilt */
+  tilt?: TiltOptions
 }
 
 const props = defineProps<Props>()
 
 const cardRef = ref<HTMLElement | null>(null)
 
-// Initialize tilt if prop is present
+// Initialize tilt if options are provided
 if (props.tilt) {
-  useTilt(cardRef, {
-    reverse: true, // Reverse tilt direction for more natural feel
-    max: 8, // Subtle rotation (vs default 35°)
-    scale: 1.05, // Slight lift on hover
-    speed: 400, // Smooth transition
-    glare: true, // Add glare effect for polish
-    'max-glare': 0.2, // Subtle glare
-  })
+  useTilt(cardRef, props.tilt)
 }
 
 // Type guards to safely access card-type-specific properties

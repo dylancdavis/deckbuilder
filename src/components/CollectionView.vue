@@ -15,6 +15,7 @@ import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { getDeckValidationErrors } from '@/utils/deck'
 import { useFlyAnimation } from '@/composables/useFlyAnimation'
+import { TILT_PRESETS } from '@/composables/useTilt'
 
 const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
@@ -252,7 +253,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           }"
           @click="handleCardClick(card.id, index)"
         >
-          <CardItem ref="cardRefs" :card="card" tilt />
+          <CardItem ref="cardRefs" :card="card" :tilt="TILT_PRESETS.collection" />
           <div class="card-interaction-row">
             <div class="amount">x {{ amountInCollection }}</div>
             <div v-if="selectedDeck" class="add-card">+</div>

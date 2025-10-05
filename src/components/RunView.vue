@@ -6,6 +6,7 @@ import FlashValue from './FlashValue.vue'
 import type { PlayableCard } from '@/utils/cards'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
+import { TILT_PRESETS } from '@/composables/useTilt'
 
 gsap.registerPlugin(Flip)
 
@@ -107,7 +108,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
   <div v-if="run" class="run-view">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
-      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" tilt />
+      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" :tilt="TILT_PRESETS.minimal" />
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
@@ -142,7 +143,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           >
             <div class="flip-card-inner">
               <div class="flip-card-front">
-                <CardItem :card="card" tilt />
+                <CardItem :card="card" :tilt="TILT_PRESETS.hand" />
               </div>
               <div class="flip-card-back">
                 <div class="card-container card-back" />
@@ -163,7 +164,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           :key="card.instanceId || card.name"
           :data-flip-id="card.instanceId"
         >
-          <CardItem :card="card" tilt />
+          <CardItem :card="card" :tilt="TILT_PRESETS.minimal" />
         </div>
       </div>
 

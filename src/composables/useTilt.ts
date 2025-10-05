@@ -35,6 +35,37 @@ export interface TiltOptions {
   'full-page-listening'?: boolean
 }
 
+// Predefined tilt option presets
+export const TILT_PRESETS = {
+  /** Default tilt for collection view - full effect with scale */
+  collection: {
+    reverse: true,
+    max: 8,
+    scale: 1.05,
+    speed: 400,
+    glare: true,
+    'max-glare': 0.2,
+  } as TiltOptions,
+  /** Subtle tilt for hand cards - less dramatic rotation */
+  hand: {
+    reverse: true,
+    max: 4,
+    scale: 1.05,
+    speed: 400,
+    glare: true,
+    'max-glare': 0.2,
+  } as TiltOptions,
+  /** Minimal tilt for rules card, discard, and draw pile - no scale */
+  minimal: {
+    reverse: true,
+    max: 2,
+    scale: 1.0,
+    speed: 400,
+    glare: true,
+    'max-glare': 0.2,
+  } as TiltOptions,
+} as const
+
 /**
  * Vue composable for vanilla-tilt integration
  * Handles lifecycle-aware initialization and cleanup
