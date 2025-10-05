@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import FlashValue from './FlashValue.vue'
@@ -101,8 +101,6 @@ async function playCard(cardIndex: number) {
 const drawPileData = computed(() => drawPile(run.value.cards.drawPile))
 
 const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
-
-const drawPileRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
@@ -113,7 +111,7 @@ const drawPileRef = ref<HTMLElement | null>(null)
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
-      <div v-else ref="drawPileRef" class="draw-pile">
+      <div v-else class="draw-pile">
         <div
           v-for="card in drawPileData.cards"
           :key="card.instanceId || card.name"
