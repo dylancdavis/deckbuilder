@@ -107,7 +107,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
   <div v-if="run" class="run-view">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
-      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" />
+      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" tilt />
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
@@ -142,7 +142,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           >
             <div class="flip-card-inner">
               <div class="flip-card-front">
-                <CardItem :card="card" />
+                <CardItem :card="card" tilt />
               </div>
               <div class="flip-card-back">
                 <div class="card-container card-back" />
