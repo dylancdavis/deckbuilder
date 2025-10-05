@@ -54,20 +54,4 @@ export function useTilt(elementRef: Ref<HTMLElement | null>, options?: TiltOptio
       tiltInstance.destroy()
     }
   })
-
-  return {
-    /** Manually destroy the tilt effect */
-    destroy: () => {
-      if (tiltInstance && elementRef.value) {
-        tiltInstance.destroy()
-        tiltInstance = null
-      }
-    },
-    /** Temporarily disable tilt */
-    disable: () => {
-      if (elementRef.value) {
-        ;(elementRef.value as HTMLElementWithTilt).vanillaTilt?.reset()
-      }
-    },
-  }
 }
