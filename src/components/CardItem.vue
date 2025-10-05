@@ -7,19 +7,16 @@ import { useTilt } from '@/composables/useTilt'
 interface Props {
   /** The card to display - can be either a playable card or rules card */
   card: Card
-  /** Whether to enable tilt effect (default: true, 'subtle' for minimal effect, false to disable) */
-  enableTilt?: boolean | 'subtle'
+  /** Whether to enable tilt effect */
+  tilt?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  enableTilt: true,
-})
+const props = defineProps<Props>()
 
 const cardRef = ref<HTMLElement | null>(null)
 
-// Initialize tilt with settings based on enableTilt prop
-if (props.enableTilt === true) {
-  // Full tilt for interactive cards
+// Initialize tilt if prop is present
+if (props.tilt) {
   useTilt(cardRef, {
     reverse: true, // Reverse tilt direction for more natural feel
     max: 12, // Subtle rotation (vs default 35°)
@@ -27,16 +24,6 @@ if (props.enableTilt === true) {
     speed: 400, // Smooth transition
     glare: true, // Add glare effect for polish
     'max-glare': 0.2, // Subtle glare
-  })
-} else if (props.enableTilt === 'subtle') {
-  // Very subtle tilt for stacked cards
-  useTilt(cardRef, {
-    reverse: true,
-    max: 3, // Minimal rotation
-    scale: 1.01, // Barely noticeable lift
-    speed: 300,
-    glare: true, // Add glare for visual interest
-    'max-glare': 0.15, // Subtle glare
   })
 }
 

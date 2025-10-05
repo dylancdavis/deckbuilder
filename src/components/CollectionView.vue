@@ -252,7 +252,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           }"
           @click="handleCardClick(card.id, index)"
         >
-          <CardItem ref="cardRefs" :card="card" />
+          <CardItem ref="cardRefs" :card="card" tilt />
           <div class="card-interaction-row">
             <div class="amount">x {{ amountInCollection }}</div>
             <div v-if="selectedDeck" class="add-card">+</div>
