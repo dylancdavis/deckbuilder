@@ -39,10 +39,7 @@ export interface TiltOptions {
  * Vue composable for vanilla-tilt integration
  * Handles lifecycle-aware initialization and cleanup
  */
-export function useTilt(
-  elementRef: Ref<HTMLElement | null>,
-  options?: TiltOptions
-) {
+export function useTilt(elementRef: Ref<HTMLElement | null>, options?: TiltOptions) {
   let tiltInstance: VanillaTilt | null = null
 
   onMounted(() => {
@@ -69,8 +66,8 @@ export function useTilt(
     /** Temporarily disable tilt */
     disable: () => {
       if (elementRef.value) {
-        (elementRef.value as HTMLElementWithTilt).vanillaTilt?.reset()
+        ;(elementRef.value as HTMLElementWithTilt).vanillaTilt?.reset()
       }
-    }
+    },
   }
 }

@@ -130,7 +130,7 @@ export const useGameStore = defineStore('game', () => {
 
   function buyCard(options: number, tag: string) {
     // Get available cards with the specified tag (excluding buy-basic itself)
-    const availableCards = playableCardIds.filter(id => {
+    const availableCards = playableCardIds.filter((id) => {
       const card = playableCards[id]
       return id !== 'buy-basic' && card.tags?.includes(tag)
     })
@@ -140,7 +140,7 @@ export const useGameStore = defineStore('game', () => {
 
     gameState.value.viewData = {
       modalView: 'buy-card',
-      cardOptions: selectedOptions
+      cardOptions: selectedOptions,
     }
   }
 
@@ -151,14 +151,14 @@ export const useGameStore = defineStore('game', () => {
     // Close the modal
     gameState.value.viewData = {
       modalView: null,
-      cardOptions: []
+      cardOptions: [],
     }
   }
 
   function closeModal() {
     gameState.value.viewData = {
       modalView: null,
-      cardOptions: []
+      cardOptions: [],
     }
   }
 
@@ -249,7 +249,6 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function playCard(cardIndex: number) {
-
     const run = gameState.value.game.run
     if (!run) return
 
@@ -329,11 +328,7 @@ export const useGameStore = defineStore('game', () => {
     }
 
     // Collect all cards from hand, board, and discard pile
-    const allCards = [
-      ...run.cards.hand,
-      ...run.cards.board,
-      ...run.cards.discardPile
-    ]
+    const allCards = [...run.cards.hand, ...run.cards.board, ...run.cards.discardPile]
 
     // Shuffle the collected cards
     allCards.sort(() => Math.random() - 0.5)

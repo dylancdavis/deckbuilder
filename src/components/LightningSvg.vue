@@ -18,7 +18,7 @@
         strokeMiterlimit: 4,
         fill: '#fff',
         fillRule: 'nonzero',
-        opacity: 1
+        opacity: 1,
       }"
       transform="matrix(1.01974 0 0 1.01592 62.5 87.5)"
     />

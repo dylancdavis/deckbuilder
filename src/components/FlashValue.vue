@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { ref, watch, toRef } from 'vue'
 
-const props = withDefaults(defineProps<{
-  value: number | string
-  flashColor?: string
-  baseColor?: string
-  duration?: number
-}>(), {
-  flashColor: 'var(--standard-orange)',
-  baseColor: '#fff',
-  duration: 600
-})
+const props = withDefaults(
+  defineProps<{
+    value: number | string
+    flashColor?: string
+    baseColor?: string
+    duration?: number
+  }>(),
+  {
+    flashColor: 'var(--standard-orange)',
+    baseColor: '#fff',
+    duration: 600,
+  },
+)
 
 const isFlashing = ref(false)
 const valueRef = toRef(props, 'value')
@@ -30,7 +33,7 @@ watch(valueRef, () => {
     :style="{
       '--flash-color': flashColor,
       '--base-color': baseColor,
-      '--duration': `${duration}ms`
+      '--duration': `${duration}ms`,
     }"
   >
     {{ value }}

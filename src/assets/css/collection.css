@@ -1,260 +1,265 @@
 /* Styles for collection view */
 
 .collection-view {
-	display: flex;
-	width: 100%;
-	height: 100%;
-	padding: 2px;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
 }
 
 .decklist-panel {
-	width: 300px;
-	background-color: #666;
-	border-bottom-left-radius: 14px;
-	border-right: 4px solid #272727;
+  width: 300px;
+  background-color: #666;
+  border-bottom-left-radius: 14px;
+  border-right: 4px solid #272727;
 }
 
 .decklist-panel .panel-header {
-	padding: 0.5em;
-	font-size: 24px;
-	color: white;
-	background-color: rgb(62, 62, 62);
-	border-bottom: 2px solid #272727;
-	text-align: center;
-	font-weight: bold;
+  padding: 0.5em;
+  font-size: 24px;
+  color: white;
+  background-color: rgb(62, 62, 62);
+  border-bottom: 2px solid #272727;
+  text-align: center;
+  font-weight: bold;
 }
 
 .cards-panel {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	background-color: #eee;
-	box-shadow: inset 0px 0px 4px black;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #eee;
+  box-shadow: inset 0px 0px 4px black;
   border-bottom-right-radius: 12px;
 }
 
 .cards-panel .panel-header {
-	padding: 0.5em;
-	font-size: 40px;
+  padding: 0.5em;
+  font-size: 40px;
 }
 
 .card-grid {
-	flex: 1;
-	display: flex;
-	padding: 1em;
-	grid-gap: 1em;
-	overflow-y: scroll;
+  flex: 1;
+  display: flex;
+  padding: 1em;
+  grid-gap: 1em;
+  overflow-y: scroll;
 }
 
 /* Deck list detail styling */
 
 .selected-deck-view h2 {
-	font-size: 16px;
-	color: white;
-	background-color: #333;
-	padding: 0.25em;
-	border-bottom: 2px solid #272727;
-	text-align: center;
-	font-weight: bold;
-	position: relative;
+  font-size: 16px;
+  color: white;
+  background-color: #333;
+  padding: 0.25em;
+  border-bottom: 2px solid #272727;
+  text-align: center;
+  font-weight: bold;
+  position: relative;
 }
 
 .selected-deck-view .back-to-decks {
-	position: absolute;
-	left: 0.5em;
-	background-color: white;
-	padding: 0 0.25em;
-	color: black;
-	border: 1px solid black;
-	border-radius: 8px;
-	cursor: pointer;
+  position: absolute;
+  left: 0.5em;
+  background-color: white;
+  padding: 0 0.25em;
+  color: black;
+  border: 1px solid black;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .selected-deck-view .back-to-decks:hover {
-	filter: brightness(1.1)
+  filter: brightness(1.1);
 }
 
 .selected-deck-view {
-	display: flex;
-	flex-direction: column;
-	background-color: #c2c2c2
+  display: flex;
+  flex-direction: column;
+  background-color: #c2c2c2;
 }
 
 .card-list-container {
-	flex: 1;
-	padding: 0.25em;
-	display: flex;
-	gap: 0.5rem;
-	flex-direction: column;
+  flex: 1;
+  padding: 0.25em;
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
 }
 
 .card-list-block {
-	border: 1px solid #666;
-	border-radius: 4px;
+  border: 1px solid #666;
+  border-radius: 4px;
 }
 
 .card-list-header {
-	padding: 0.5em;
-	/* border-bottom: 1px solid black; */
-	font-size: 16px;
-	background-color: #626262;
-	color: white;
-	font-weight: bold;
-	border-radius: 3px 3px 0px 0px;
+  padding: 0.5em;
+  /* border-bottom: 1px solid black; */
+  font-size: 16px;
+  background-color: #626262;
+  color: white;
+  font-weight: bold;
+  border-radius: 3px 3px 0px 0px;
 }
 
 .card-list-block ul {
-	--spacing: 0.3em;
-	padding: var(--spacing);
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing);
+  --spacing: 0.3em;
+  padding: var(--spacing);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
 }
 
 .deck-card-count-item {
-	display: flex;
-	justify-content: space-between;
-	padding: 0.5em;
-	background: rgb(236, 236, 236);
-	border: 1px solid #6f6f6f;
-	border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5em;
+  background: rgb(236, 236, 236);
+  border: 1px solid #6f6f6f;
+  border-radius: 4px;
 }
 
 /* Remove card from deck button */
 .deck-card-count-item button {
-	background: rgb(199, 199, 199);
-	border: 1px solid black;
-	border-radius: 4px;
+  background: rgb(199, 199, 199);
+  border: 1px solid black;
+  border-radius: 4px;
 }
 
 .deck-card-count-item button:hover {
-	filter: brightness(1.1)
+  filter: brightness(1.1);
 }
 
 button.run-deck {
-	width: 100%;
-	padding: 0.1em;
-	font-size: 18px;
-	color: white;
-	background-color: rgb(46, 46, 46);
-	border: 0px;
-	border-radius: 4px;
-	font-weight: bold;
+  width: 100%;
+  padding: 0.1em;
+  font-size: 18px;
+  color: white;
+  background-color: rgb(46, 46, 46);
+  border: 0px;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 button.run-deck.clickable:hover {
-	filter: brightness(1.1);
-	transform: scale(1.01);
+  filter: brightness(1.1);
+  transform: scale(1.01);
 }
 
 button.run-deck.clickable {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 button.run-deck.disabled {
-	filter: brightness(0.5);
+  filter: brightness(0.5);
 }
 
 .validation-errors {
-	margin-top: 0.5em;
-	padding: 0.5em;
-	background-color: #ffeeee;
-	border: 1px solid #cc0000;
-	border-radius: 4px;
-	font-size: 14px;
+  margin-top: 0.5em;
+  padding: 0.5em;
+  background-color: #ffeeee;
+  border: 1px solid #cc0000;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
 .validation-error {
-	color: #cc0000;
-	padding: 0.25em 0;
+  color: #cc0000;
+  padding: 0.25em 0;
 }
 
 .card-collection-item .card-container {
-	position: relative;
-	z-index: 1;
-	transition: 0.1s transform ease, 0.1s filter ease, 0.15s box-shadow ease;
+  position: relative;
+  z-index: 1;
+  transition:
+    0.1s transform ease,
+    0.1s filter ease,
+    0.15s box-shadow ease;
 }
 
 .card-collection-item.clickable .card-container {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .card-collection-item:not(.disabled) .card-container:hover {
-	transform: scale(1.02);
-	box-shadow: 0 0 20px rgba(135, 206, 250, 0.8), 0px 0px 8px rgba(0, 0, 0, 0.7);
+  transform: scale(1.02);
+  box-shadow:
+    0 0 20px rgba(135, 206, 250, 0.8),
+    0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 
 .card-collection-item.disabled .card-container {
-	filter: brightness(0.5);
+  filter: brightness(0.5);
 }
 
 .card-collection-item.clickable .card-container:active {
-	transform: scale(1.0);
-	filter: brightness(1.2);
+  transform: scale(1);
+  filter: brightness(1.2);
 }
 
 .card-interaction-row {
-	display: flex;
-	justify-content: flex-start;
-	gap: 0.5em;
-	padding-left: 1em;
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5em;
+  padding-left: 1em;
 }
 
 .card-interaction-row .amount {
-	color: white;
-	background-color: #111;
-	padding: 0.5em;
-	padding-top: 1em;
-	position: relative;
-	bottom: 0.75em;
-	border: 2px solid black;
-	border-radius: 8px;
-	z-index: 0;
+  color: white;
+  background-color: #111;
+  padding: 0.5em;
+  padding-top: 1em;
+  position: relative;
+  bottom: 0.75em;
+  border: 2px solid black;
+  border-radius: 8px;
+  z-index: 0;
 }
 
 .card-interaction-row .add-card {
-	color: white;
-	background-color: #0e460c;
-	padding: 0.5em;
-	padding-top: 1em;
-	position: relative;
-	bottom: 0.75em;
-	border: 2px solid black;
-	border-radius: 8px;
-	z-index: 0;
+  color: white;
+  background-color: #0e460c;
+  padding: 0.5em;
+  padding-top: 1em;
+  position: relative;
+  bottom: 0.75em;
+  border: 2px solid black;
+  border-radius: 8px;
+  z-index: 0;
 }
 
 /* Deck Container Styling */
 
 .decks-container {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .decklist-item {
-	padding: 1em;
-	border-bottom: 2px solid #333;
-	background-color: #c2c2c2;
-	transition: all 0.1s;
+  padding: 1em;
+  border-bottom: 2px solid #333;
+  background-color: #c2c2c2;
+  transition: all 0.1s;
 }
 
 .decklist-item:hover {
-	background-color: #333;
-	color: white;
-	font-weight: bold;
-	cursor: pointer;
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .decklist-item:active {
-	filter: brightness(0.8);
+  filter: brightness(0.8);
 }
 
 .decks-container .add-new-deck {
-	padding: 1em;
-	border-radius: 0px;
-	border: 0px;
-	border-bottom: 2px solid #333;
-	font-weight: bold;
-	font-size: 16px;
-	cursor: pointer;
+  padding: 1em;
+  border-radius: 0px;
+  border: 0px;
+  border-bottom: 2px solid #333;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
 }

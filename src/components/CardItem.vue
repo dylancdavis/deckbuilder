@@ -12,7 +12,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  enableTilt: true
+  enableTilt: true,
 })
 
 const cardRef = ref<HTMLElement | null>(null)
@@ -21,22 +21,22 @@ const cardRef = ref<HTMLElement | null>(null)
 if (props.enableTilt === true) {
   // Full tilt for interactive cards
   useTilt(cardRef, {
-    reverse: true,     // Reverse tilt direction for more natural feel
-    max: 12,           // Subtle rotation (vs default 35°)
-    scale: 1.05,       // Slight lift on hover
-    speed: 400,        // Smooth transition
-    glare: true,       // Add glare effect for polish
-    'max-glare': 0.2   // Subtle glare
+    reverse: true, // Reverse tilt direction for more natural feel
+    max: 12, // Subtle rotation (vs default 35°)
+    scale: 1.05, // Slight lift on hover
+    speed: 400, // Smooth transition
+    glare: true, // Add glare effect for polish
+    'max-glare': 0.2, // Subtle glare
   })
 } else if (props.enableTilt === 'subtle') {
   // Very subtle tilt for stacked cards
   useTilt(cardRef, {
     reverse: true,
-    max: 3,            // Minimal rotation
-    scale: 1.01,       // Barely noticeable lift
+    max: 3, // Minimal rotation
+    scale: 1.01, // Barely noticeable lift
     speed: 300,
-    glare: true,       // Add glare for visual interest
-    'max-glare': 0.15  // Subtle glare
+    glare: true, // Add glare for visual interest
+    'max-glare': 0.15, // Subtle glare
   })
 }
 
@@ -59,7 +59,14 @@ function isPlayableCard(card: Card): card is PlayableCard {
           <div class="section deck-limit">
             <div class="deck-size">
               <span>Deck Size:</span>
-              <span>{{ card.deckLimits.size[0] === card.deckLimits.size[1] ? card.deckLimits.size[0] : `${card.deckLimits.size[0]}-${card.deckLimits.size[1]}` }} Cards</span>
+              <span
+                >{{
+                  card.deckLimits.size[0] === card.deckLimits.size[1]
+                    ? card.deckLimits.size[0]
+                    : `${card.deckLimits.size[0]}-${card.deckLimits.size[1]}`
+                }}
+                Cards</span
+              >
             </div>
           </div>
           <div class="section turn-structure">

@@ -2,7 +2,15 @@
 import { computed } from 'vue'
 import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
-import { cards, cardType, type Card, type CardID, type PlayableCard, type PlayableCardID, type RulesCardID } from '@/utils/cards'
+import {
+  cards,
+  cardType,
+  type Card,
+  type CardID,
+  type PlayableCard,
+  type PlayableCardID,
+  type RulesCardID,
+} from '@/utils/cards'
 import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { getDeckValidationErrors } from '@/utils/deck'
@@ -17,8 +25,8 @@ function deckSize(deck: Deck) {
   return total(deck.cards)
 }
 
-function deckEntry([key, {name}]: [string, Deck]) {
-  return {key, name}
+function deckEntry([key, { name }]: [string, Deck]) {
+  return { key, name }
 }
 
 function onSelectDeck(deckKey: string) {
@@ -26,11 +34,11 @@ function onSelectDeck(deckKey: string) {
 }
 
 function onAddNewDeck() {
-  const deckNames = values(collection.value.decks).map(deck => deck.name)
+  const deckNames = values(collection.value.decks).map((deck) => deck.name)
   const newDeckNumbers = deckNames
-    .map(name => name.match(/New Deck (\d+)/)?.[1])
-    .filter(match => match !== undefined)
-    .map(num => parseInt(num!))
+    .map((name) => name.match(/New Deck (\d+)/)?.[1])
+    .filter((match) => match !== undefined)
+    .map((num) => parseInt(num!))
 
   const nextNumber = newDeckNumbers.length === 0 ? 1 : firstMissingNum(newDeckNumbers)
   const newDeckName = `New Deck ${nextNumber}`
@@ -49,23 +57,22 @@ function onBackToDecks() {
 }
 
 function onStartRun() {
-  if (!selectedDeck.value)
-    throw new Error('No deck selected to start run')
+  if (!selectedDeck.value) throw new Error('No deck selected to start run')
   gameStore.startRun(selectedDeck.value)
 }
 
 function handleCardClick(id: CardID) {
   if (cardType(id) === 'rules' && selectedDeck.value?.rulesCard) {
-    return;
+    return
   }
 
   switch (cardType(id)) {
     case 'rules':
-      onSetSelectedDeckRulesCard(id as RulesCardID);
-      break;
+      onSetSelectedDeckRulesCard(id as RulesCardID)
+      break
     case 'playable':
       onAddCardToSelectedDeck(id as PlayableCardID)
-      break;
+      break
   }
 }
 
@@ -97,12 +104,12 @@ const selectedDeckCardsEntries = computed(() => {
   if (!selectedDeck.value) return []
   const idCounter = selectedDeck.value.cards
   const deckCards = entries(idCounter)
-  return deckCards.map(([id, amount]) => ([cards[id], amount] as [PlayableCard, number]))
+  return deckCards.map(([id, amount]) => [cards[id], amount] as [PlayableCard, number])
 })
 
 const collectionCardsEntries = computed(() => {
   const collectionCards = entries(collection.value.cards)
-  return collectionCards.map(([id, amount]) => ([cards[id], amount] as [Card, number]))
+  return collectionCards.map(([id, amount]) => [cards[id], amount] as [Card, number])
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
@@ -115,7 +122,7 @@ const isDeckValid = computed(() => deckValidationErrors.value.length === 0)
 
 function deckSizeText(currentSize: number, requiredSize: [number, number]) {
   if (!requiredSize || requiredSize[1] === 0) {
-    return "No Cards Allowed"
+    return 'No Cards Allowed'
   }
 
   const [minSize, maxSize] = requiredSize
@@ -173,7 +180,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           <!-- Selected Deck Cards Display -->
           <div class="card-list-block">
             <div class="card-list-header">
-              {{ deckSizeText(currentDeckSize, (requiredDeckSize || [0,0])) }}
+              {{ deckSizeText(currentDeckSize, requiredDeckSize || [0, 0]) }}
             </div>
             <ul v-if="selectedDeckCardsEntries.length > 0">
               <li
@@ -194,10 +201,14 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           >
             Run This Deck
           </button>
-          
+
           <!-- Validation Errors Display -->
           <div v-if="!isDeckValid && deckValidationErrors.length > 0" class="validation-errors">
-            <div class="validation-error" v-for="(error, index) in deckValidationErrors" :key="index">
+            <div
+              class="validation-error"
+              v-for="(error, index) in deckValidationErrors"
+              :key="index"
+            >
               • {{ error }}
             </div>
           </div>
@@ -217,7 +228,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           class="card-collection-item"
           :class="{
             clickable: selectedDeck && !(card.type === 'rules' && selectedDeck.rulesCard),
-            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard
+            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard,
           }"
           @click="handleCardClick(card.id)"
         >

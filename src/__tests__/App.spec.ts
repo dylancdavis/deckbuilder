@@ -7,11 +7,11 @@ describe('App', () => {
   it('mounts renders properly', () => {
     const pinia = createPinia()
     setActivePinia(pinia)
-    
+
     const wrapper = mount(App, {
       global: {
-        plugins: [pinia]
-      }
+        plugins: [pinia],
+      },
     })
     expect(wrapper.text()).toContain('Deckbuilder')
   })
