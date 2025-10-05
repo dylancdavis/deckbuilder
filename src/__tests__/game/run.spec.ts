@@ -6,28 +6,28 @@ import type { Run } from '../../stores/game.ts'
 
 const baseRules: RulesCard = {
   id: 'starter-rules',
-  name: "Example Rules",
-  type: "rules",
+  name: 'Example Rules',
+  type: 'rules',
   deckLimits: { size: [0, 0] },
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
   endConditions: { rounds: 1 },
   effects: {
-    gameStart: []
-  }
+    gameStart: [],
+  },
 }
 
 const addThreeScore: AddCardsEffect = {
   type: 'add-cards',
   params: {
     location: 'drawPile',
-    cards: {'score': 3}
-  }
+    cards: { score: 3 },
+  },
 }
 
 const rulesWithAddedCards: RulesCard = {
   id: 'starter-rules',
-  name: "Example Rules",
-  type: "rules",
+  name: 'Example Rules',
+  type: 'rules',
   deckLimits: { size: [0, 0] },
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
   endConditions: { rounds: 1 },
@@ -39,8 +39,8 @@ const preMoveRun: Partial<Run> = {
     drawPile: ['a', 'b', 'c', 'd', 'e'],
     hand: ['f', 'g', 'h', 'i'],
     discardPile: [],
-    board: []
-  }
+    board: [],
+  },
 }
 
 describe('moveCards', () => {
@@ -52,7 +52,7 @@ describe('moveCards', () => {
         hand: ['f', 'g', 'h', 'i', 'a', 'b', 'c'],
         discardPile: [],
         board: [],
-      }
+      },
     })
   })
 
@@ -64,18 +64,18 @@ describe('moveCards', () => {
         hand: ['f', 'g', 'h', 'i'],
         discardPile: ['a', 'b', 'c'],
         board: [],
-      }
+      },
     })
   })
 })
 
-const exampleCounter = { 'score': 4 }
+const exampleCounter = { score: 4 }
 
 const emptyHandRun: Run = {
   resources: { points: 0 },
   cards: { drawPile: [], hand: [], discardPile: [], board: [] },
   deck: { name: '', editable: true, cards: exampleCounter, rulesCard: rulesWithAddedCards },
-  stats: {turns: 1, rounds: 1}
+  stats: { turns: 1, rounds: 1 },
 }
 
 describe('populateDrawPile', () => {
@@ -86,23 +86,23 @@ describe('populateDrawPile', () => {
   })
 })
 
-const a = {id: 'a'}
-const b = {id: 'b'}
-const c = {id: 'c'}
+const a = { id: 'a' }
+const b = { id: 'b' }
+const c = { id: 'c' }
 const examplePile = [a, a, a, b, b, c]
 
 const populatedHandRun: Run = {
   resources: { points: 0 },
   cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
-  deck: {  name: '', editable: false, cards: exampleCounter, rulesCard: rulesWithAddedCards },
-  stats: {turns: 1, rounds: 1}
+  deck: { name: '', editable: false, cards: exampleCounter, rulesCard: rulesWithAddedCards },
+  stats: { turns: 1, rounds: 1 },
 }
 
 const populatedHandRunNoAdded: Run = {
   resources: { points: 0 },
   cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
   deck: { name: '', editable: false, cards: exampleCounter, rulesCard: baseRules },
-  stats: {turns: 1, rounds: 1}
+  stats: { turns: 1, rounds: 1 },
 }
 
 describe('processStartOfGame', () => {
@@ -119,7 +119,7 @@ describe('processStartOfGame', () => {
 
   it('preserves original draw order when cards are added', () => {
     const result = processStartOfGame(populatedHandRun)
-    const originalCards = result.cards.drawPile.filter(card => !(card.id === 'score'))
+    const originalCards = result.cards.drawPile.filter((card) => !(card.id === 'score'))
     expect(originalCards).toEqual(populatedHandRun.cards.drawPile)
   })
 })

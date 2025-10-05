@@ -2,7 +2,15 @@
 import { computed, useTemplateRef } from 'vue'
 import { useGameStore, type Deck } from '../stores/game'
 import CardItem from './CardItem.vue'
-import { cards, cardType, type Card, type CardID, type PlayableCard, type PlayableCardID, type RulesCardID } from '@/utils/cards'
+import {
+  cards,
+  cardType,
+  type Card,
+  type CardID,
+  type PlayableCard,
+  type PlayableCardID,
+  type RulesCardID,
+} from '@/utils/cards'
 import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { getDeckValidationErrors } from '@/utils/deck'
@@ -30,11 +38,11 @@ function onSelectDeck(deckKey: string) {
 }
 
 function onAddNewDeck() {
-  const deckNames = values(collection.value.decks).map(deck => deck.name)
+  const deckNames = values(collection.value.decks).map((deck) => deck.name)
   const newDeckNumbers = deckNames
-    .map(name => name.match(/New Deck (\d+)/)?.[1])
-    .filter(match => match !== undefined)
-    .map(num => parseInt(num!))
+    .map((name) => name.match(/New Deck (\d+)/)?.[1])
+    .filter((match) => match !== undefined)
+    .map((num) => parseInt(num!))
 
   const nextNumber = newDeckNumbers.length === 0 ? 1 : firstMissingNum(newDeckNumbers)
   const newDeckName = `New Deck ${nextNumber}`
@@ -53,23 +61,22 @@ function onBackToDecks() {
 }
 
 function onStartRun() {
-  if (!selectedDeck.value)
-    throw new Error('No deck selected to start run')
+  if (!selectedDeck.value) throw new Error('No deck selected to start run')
   gameStore.startRun(selectedDeck.value)
 }
 
 function handleCardClick(id: CardID, index: number) {
   if (cardType(id) === 'rules' && selectedDeck.value?.rulesCard) {
-    return;
+    return
   }
 
   switch (cardType(id)) {
     case 'rules':
-      onSetSelectedDeckRulesCard(id as RulesCardID);
-      break;
+      onSetSelectedDeckRulesCard(id as RulesCardID)
+      break
     case 'playable':
       onAddCardToSelectedDeck(id as PlayableCardID, index)
-      break;
+      break
   }
 }
 
@@ -85,7 +92,9 @@ function onAddCardToSelectedDeck(cardId: PlayableCardID, index: number) {
   const sourceElement = cardComponent.$el as HTMLElement
 
   requestAnimationFrame(() => {
-    const targetElement = document.querySelector(`.deck-cards-list [data-deck-card-id="${cardId}"]`) as HTMLElement
+    const targetElement = document.querySelector(
+      `.deck-cards-list [data-deck-card-id="${cardId}"]`,
+    ) as HTMLElement
     if (!targetElement) return
     flyElement(sourceElement, targetElement)
   })
@@ -114,12 +123,12 @@ const selectedDeckCardsEntries = computed(() => {
   if (!selectedDeck.value) return []
   const idCounter = selectedDeck.value.cards
   const deckCards = entries(idCounter)
-  return deckCards.map(([id, amount]) => ([cards[id], amount] as [PlayableCard, number]))
+  return deckCards.map(([id, amount]) => [cards[id], amount] as [PlayableCard, number])
 })
 
 const collectionCardsEntries = computed(() => {
   const collectionCards = entries(collection.value.cards)
-  return collectionCards.map(([id, amount]) => ([cards[id], amount] as [Card, number]))
+  return collectionCards.map(([id, amount]) => [cards[id], amount] as [Card, number])
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
@@ -132,7 +141,7 @@ const isDeckValid = computed(() => deckValidationErrors.value.length === 0)
 
 function deckSizeText(currentSize: number, requiredSize: [number, number]) {
   if (!requiredSize || requiredSize[1] === 0) {
-    return "No Cards Allowed"
+    return 'No Cards Allowed'
   }
 
   const [minSize, maxSize] = requiredSize
@@ -149,7 +158,12 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
 
       <!-- Deck List View -->
       <div v-if="!selectedDeckKey" class="decks-container">
-        <div v-for="entry in deckEntries" :key="entry.key" class="decklist-item" @click="onSelectDeck(entry.key)">
+        <div
+          v-for="entry in deckEntries"
+          :key="entry.key"
+          class="decklist-item"
+          @click="onSelectDeck(entry.key)"
+        >
           {{ entry.name }}
         </div>
         <button class="add-new-deck" @click="onAddNewDeck">Add New Deck</button>
@@ -159,8 +173,10 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
       <div v-else class="selected-deck-view">
         <h2>
           <span class="back-to-decks" @click="onBackToDecks">←</span>
-          <input :value="selectedDeck?.name || ''"
-            @input="onChangeDeckName(($event.target as HTMLInputElement).value)" />
+          <input
+            :value="selectedDeck?.name || ''"
+            @input="onChangeDeckName(($event.target as HTMLInputElement).value)"
+          />
         </h2>
 
         <div class="card-list-container">
@@ -183,25 +199,36 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           <!-- Selected Deck Cards Display -->
           <div class="card-list-block deck-cards-list">
             <div class="card-list-header">
-              {{ deckSizeText(currentDeckSize, (requiredDeckSize || [0, 0])) }}
+              {{ deckSizeText(currentDeckSize, requiredDeckSize || [0, 0]) }}
             </div>
             <ul v-if="selectedDeckCardsEntries.length > 0">
-              <li v-for="[card, amount] in selectedDeckCardsEntries" :key="card.name" class="deck-card-count-item"
-                :data-deck-card-id="card.id">
+              <li
+                v-for="[card, amount] in selectedDeckCardsEntries"
+                :key="card.name"
+                class="deck-card-count-item"
+                :data-deck-card-id="card.id"
+              >
                 <span>{{ card.name }} x{{ amount }}</span>
                 <button @click="onRemoveCardFromSelectedDeck(card.id)">X</button>
               </li>
             </ul>
           </div>
 
-          <button class="run-deck" :class="isDeckValid ? 'clickable' : 'disabled'"
-            @click="isDeckValid ? onStartRun() : null">
+          <button
+            class="run-deck"
+            :class="isDeckValid ? 'clickable' : 'disabled'"
+            @click="isDeckValid ? onStartRun() : null"
+          >
             Run This Deck
           </button>
 
           <!-- Validation Errors Display -->
           <div v-if="!isDeckValid && deckValidationErrors.length > 0" class="validation-errors">
-            <div class="validation-error" v-for="(error, index) in deckValidationErrors" :key="index">
+            <div
+              class="validation-error"
+              v-for="(error, index) in deckValidationErrors"
+              :key="index"
+            >
               • {{ error }}
             </div>
           </div>
@@ -215,11 +242,16 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
         <div v-if="collectionCardsEntries.length === 0">
           No Cards in Collection. Run the starter deck!
         </div>
-        <div v-for="([card, amountInCollection], index) in collectionCardsEntries" :key="card.name"
-          class="card-collection-item" :class="{
+        <div
+          v-for="([card, amountInCollection], index) in collectionCardsEntries"
+          :key="card.name"
+          class="card-collection-item"
+          :class="{
             clickable: selectedDeck && !(card.type === 'rules' && selectedDeck.rulesCard),
-            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard
-          }" @click="handleCardClick(card.id, index)">
+            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard,
+          }"
+          @click="handleCardClick(card.id, index)"
+        >
           <CardItem ref="cardRefs" :card="card" />
           <div class="card-interaction-row">
             <div class="amount">x {{ amountInCollection }}</div>

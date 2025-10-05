@@ -1,197 +1,209 @@
 /* Panel layout */
 .run-view {
-	display:flex;
-	background-color:#333;
-	padding: 1em;
-	height: 100%;
-	border-radius: 14px;
-	gap: 1em;
+  display: flex;
+  background-color: #333;
+  padding: 1em;
+  height: 100%;
+  border-radius: 14px;
+  gap: 1em;
 }
 
 .run-view .panel {
-	background-color: white;
-	border-radius: 14px;
-	padding: 1em;
+  background-color: white;
+  border-radius: 14px;
+  padding: 1em;
   display: flex;
   flex-direction: column;
   gap: 1em;
 }
 
 .run-view .panel:first-child {
-	box-shadow: -4px 4px #555, -2px 2px #555;
+  box-shadow:
+    -4px 4px #555,
+    -2px 2px #555;
 }
 
 .run-view .panel:not(:first-child):not(:last-child) {
-	box-shadow: 0px 4px #555, 0px 2px #555;
+  box-shadow:
+    0px 4px #555,
+    0px 2px #555;
 }
 
 .run-view .panel:last-child {
-	box-shadow: 4px 4px #555, 2px 2px #555;
+  box-shadow:
+    4px 4px #555,
+    2px 2px #555;
 }
 
 .round-panel {
-	flex: 1;
+  flex: 1;
 }
 
 .deck-discard-panel {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 /* Pile and other styles */
 .pile-container {
-	display: flex;
-	justify-content: center;
-	gap: 2em
+  display: flex;
+  justify-content: center;
+  gap: 2em;
 }
 
 .draw-pile {
-	position: relative;
-	transform: translateX(10px);
-	--card-stack-offset: 0.375em;
+  position: relative;
+  transform: translateX(10px);
+  --card-stack-offset: 0.375em;
 }
 
 .draw-pile .card-back {
-	box-shadow: -2px 0px 2px #00000080
+  box-shadow: -2px 0px 2px #00000080;
 }
 
 .draw-pile .card-back:nth-child(1) {
-	position: relative;
-	z-index: 3;
+  position: relative;
+  z-index: 3;
 }
 
 .draw-pile .card-back:not(:nth-child(1)) {
-	position: absolute;
-	top: 0;
+  position: absolute;
+  top: 0;
 }
 
 .draw-pile .card-back:nth-child(2) {
-	right: calc(var(--card-stack-offset) * 1);
-	z-index: 2;
+  right: calc(var(--card-stack-offset) * 1);
+  z-index: 2;
 }
 
 .draw-pile .card-back:nth-child(3) {
-	right: calc(var(--card-stack-offset) * 2);
-	z-index: 1;
+  right: calc(var(--card-stack-offset) * 2);
+  z-index: 1;
 }
 
 .draw-pile .card-back:hover {
-	z-index: 10;
+  z-index: 10;
 }
 
 .discard-pile {
-	position: relative;
-	--card-stack-offset: 0.375em;
+  position: relative;
+  --card-stack-offset: 0.375em;
 }
 
 .discard-pile .card-container:nth-child(1) {
-	position: relative;
-	z-index: 3;
+  position: relative;
+  z-index: 3;
 }
 
 .discard-pile .card-container:not(:nth-child(1)) {
-	position: absolute;
-	top: 0;
+  position: absolute;
+  top: 0;
 }
 
 .discard-pile .card-container:nth-child(2) {
-	left: calc(var(--card-stack-offset) * 1);
-	z-index: 2;
+  left: calc(var(--card-stack-offset) * 1);
+  z-index: 2;
 }
 
 .discard-pile .card-container:nth-child(3) {
-	left: calc(var(--card-stack-offset) * 2);
-	z-index: 1;
+  left: calc(var(--card-stack-offset) * 2);
+  z-index: 1;
 }
 
 .discard-pile .card-container:hover {
-	z-index: 10;
+  z-index: 10;
 }
 
 .button-wrapper {
-	box-shadow: #9a9a9a 0px 5px;
-	border-radius: 16px;
-
+  box-shadow: #9a9a9a 0px 5px;
+  border-radius: 16px;
 }
 
 button.advance {
-	padding: 0.5em 1em;
-	border-radius: 16px;
-	border: 2px solid #dfdfdf;
-	color: rgb(78, 78, 78);
-	font-weight: bold;
-	cursor: pointer;
+  padding: 0.5em 1em;
+  border-radius: 16px;
+  border: 2px solid #dfdfdf;
+  color: rgb(78, 78, 78);
+  font-weight: bold;
+  cursor: pointer;
 }
 
 button.advance:hover {
-	background-color: white;
+  background-color: white;
 }
 
 button.advance:active {
-	transform :translateY(5px);
+  transform: translateY(5px);
 }
 
 .round-panel .pile-container {
-	width: 100%;
+  width: 100%;
 }
 
 .hand-group {
-	flex: 1
+  flex: 1;
 }
 
 .empty-pile {
-	width: 100%;
+  width: 100%;
   min-width: var(--collection-card-width);
-	height: calc(350px + 8px + 8px);
-	border: 4px solid var(--card-grey);
-	background-color: #e8e8e8;
-	background-image: linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(224, 224, 224, 0.3) 100%), url(http://www.transparenttextures.com/patterns/axiom-pattern.png);
-	box-shadow: inset 0px 1px 0px 1px grey;
-	border-radius: 8px;
-	display: grid;
-	place-items: center;
-	color: #9a9a9a;
+  height: calc(350px + 8px + 8px);
+  border: 4px solid var(--card-grey);
+  background-color: #e8e8e8;
+  background-image:
+    linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(224, 224, 224, 0.3) 100%),
+    url(http://www.transparenttextures.com/patterns/axiom-pattern.png);
+  box-shadow: inset 0px 1px 0px 1px grey;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #9a9a9a;
 }
 
 .pile-text {
-	position: absolute;
+  position: absolute;
 }
 
 .hand-group {
-	position: relative;
+  position: relative;
 }
 
 .hand-group .empty-pile {
-	position: relative;
+  position: relative;
 }
 
 .hand-group .flip-card {
-	position: relative;
+  position: relative;
 }
 
 .hand-group .card-container {
-	transition: 0.1s transform ease, 0.1s filter ease, 0.15s box-shadow ease;
-	cursor: pointer;
+  transition:
+    0.1s transform ease,
+    0.1s filter ease,
+    0.15s box-shadow ease;
+  cursor: pointer;
 }
 
 .hand-group .card-container:hover {
-	transform: scale(1.02);
-	box-shadow: 0 0 20px rgba(135, 206, 250, 0.8), 0px 0px 8px rgba(0, 0, 0, 0.7);
+  transform: scale(1.02);
+  box-shadow:
+    0 0 20px rgba(135, 206, 250, 0.8),
+    0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 
 .hand-group .card-container:active {
-	transform: scale(1.0);
-	filter: brightness(1.2);
+  transform: scale(1);
+  filter: brightness(1.2);
 }
 
 .round-panel {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 1em;
-	padding: 1em 2em;
-	background-color: #fdfdfd;
-	border-radius: 14px;
-	flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  padding: 1em 2em;
+  background-color: #fdfdfd;
+  border-radius: 14px;
+  flex: 1;
 }

@@ -1,11 +1,22 @@
 <template>
-  <svg class="card-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img"
-    aria-labelledby="scarab-title scarab-desc">
+  <svg
+    class="card-svg"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 128 128"
+    role="img"
+    aria-labelledby="scarab-title scarab-desc"
+  >
     <title id="scarab-title">Scarab currency symbol</title>
     <desc id="scarab-desc">A circle with four extended arms at 45-degree angles.</desc>
 
     <!-- Outer black stroke -->
-    <g fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <g
+      fill="none"
+      stroke="currentColor"
+      stroke-width="24"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
       <!-- Circle -->
       <circle cx="64" cy="64" r="40" />
       <!-- Arms (25% of diameter ≈ 20 units long beyond the circle edge) -->

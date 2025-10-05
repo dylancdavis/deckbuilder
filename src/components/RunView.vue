@@ -11,8 +11,7 @@ gsap.registerPlugin(Flip)
 
 const gameStore = useGameStore()
 const run = computed(() => {
-  if (!gameStore.run)
-    throw new Error('Called RunView when Run is null.')
+  if (!gameStore.run) throw new Error('Called RunView when Run is null.')
   return gameStore.run
 })
 
@@ -36,9 +35,7 @@ const nextTurnButtonText = computed(() => {
 
   const hasCardsInHand = run.value.cards.hand.length > 0
 
-  const main = isEndOfRun.value
-    ? 'End Run'
-    : 'Next Turn'
+  const main = isEndOfRun.value ? 'End Run' : 'Next Turn'
 
   const subtitle = hasCardsInHand ? '(Discard Hand)' : null
 
@@ -53,7 +50,7 @@ function drawPile(cards: PlayableCard[]) {
   const visibleCards = cards.slice(-pileSize).reverse()
   return {
     pileSize,
-    cards: visibleCards
+    cards: visibleCards,
   }
 }
 
@@ -61,7 +58,7 @@ function discardPile(cards: PlayableCard[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,
-    cards: cards.slice(-pileSize).reverse()
+    cards: cards.slice(-pileSize).reverse(),
   }
 }
 
@@ -79,7 +76,7 @@ async function nextTurn() {
   Flip.from(state, {
     targets: '.flip-card, .discard-pile [data-flip-id], .draw-pile [data-flip-id]',
     duration: 0.2,
-    ease: "power2.inOut"
+    ease: 'power2.inOut',
   })
 }
 
@@ -97,17 +94,13 @@ async function playCard(cardIndex: number) {
   Flip.from(state, {
     targets: '.flip-card, .discard-pile [data-flip-id]',
     duration: 0.2,
-    ease: "power2",
+    ease: 'power2',
   })
 }
 
-const drawPileData = computed(() =>
-  drawPile(run.value.cards.drawPile)
-)
+const drawPileData = computed(() => drawPile(run.value.cards.drawPile))
 
-const discardPileData = computed(() =>
-  discardPile(run.value.cards.discardPile)
-)
+const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 </script>
 
 <template>
@@ -133,11 +126,7 @@ const discardPileData = computed(() =>
       <!-- Board Display -->
       <div class="hand-group">
         <div class="empty-pile">
-          <CardItem
-            v-for="card in (run.cards.board)"
-            :key="card.name"
-            :card="card"
-          />
+          <CardItem v-for="card in run.cards.board" :key="card.name" :card="card" />
         </div>
       </div>
 
@@ -145,7 +134,7 @@ const discardPileData = computed(() =>
       <div class="hand-group">
         <div class="empty-pile">
           <div
-            v-for="(card, index) in (run.cards.hand)"
+            v-for="(card, index) in run.cards.hand"
             :key="card.instanceId || card.name"
             :data-flip-id="card.instanceId"
             class="flip-card"
@@ -187,7 +176,11 @@ const discardPileData = computed(() =>
           <div class="resources-grid">
             <div class="chip chip-resource chip-wide">
               <span>Points</span>
-              <FlashValue :value="run.resources.points" flash-color="var(--standard-blue)" base-color="#666" />
+              <FlashValue
+                :value="run.resources.points"
+                flash-color="var(--standard-blue)"
+                base-color="#666"
+              />
             </div>
           </div>
         </div>
@@ -195,7 +188,7 @@ const discardPileData = computed(() =>
           class="next-turn-btn"
           :class="{
             'next-turn-btn--highlighted': noActionsLeft && !isEndOfRun,
-            'next-turn-btn--end-run': isEndOfRun
+            'next-turn-btn--end-run': isEndOfRun,
           }"
           @click="nextTurn"
         >
@@ -210,15 +203,16 @@ const discardPileData = computed(() =>
 </template>
 
 <style scoped>
-
 .panel.board-hand {
-  flex: 1
+  flex: 1;
 }
 
 /* Round info panel styling - match empty pile background */
 .round-info-panel {
   background-color: #e8e8e8;
-  background-image: linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(224, 224, 224, 0.3) 100%), url(http://www.transparenttextures.com/patterns/axiom-pattern.png);
+  background-image:
+    linear-gradient(135deg, rgba(250, 250, 250, 0.8) 0%, rgba(224, 224, 224, 0.3) 100%),
+    url(http://www.transparenttextures.com/patterns/axiom-pattern.png);
   border: 4px solid var(--card-grey);
   box-shadow: inset 0px 1px 0px 1px grey;
   border-radius: 8px;
@@ -321,5 +315,4 @@ const discardPileData = computed(() =>
   background-color: var(--standard-orange);
   border-bottom-color: #cc4400;
 }
-
 </style>

@@ -28,7 +28,14 @@ function isPlayableCard(card: Card): card is PlayableCard {
           <div class="section deck-limit">
             <div class="deck-size">
               <span>Deck Size:</span>
-              <span>{{ card.deckLimits.size[0] === card.deckLimits.size[1] ? card.deckLimits.size[0] : `${card.deckLimits.size[0]}-${card.deckLimits.size[1]}` }} Cards</span>
+              <span
+                >{{
+                  card.deckLimits.size[0] === card.deckLimits.size[1]
+                    ? card.deckLimits.size[0]
+                    : `${card.deckLimits.size[0]}-${card.deckLimits.size[1]}`
+                }}
+                Cards</span
+              >
             </div>
           </div>
           <div class="section turn-structure">

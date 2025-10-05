@@ -33,9 +33,9 @@ export function moveCards(run: Run, fromLocation: Location, toLocation: Location
 export function populateDrawPile(run: Run): Run {
   const idsToAdd: PlayableCardID[] = toArray(run.deck.cards)
   idsToAdd.sort(() => Math.random() - 0.5) // shuffle
-  const cardsToAdd = idsToAdd.map(id => ({
+  const cardsToAdd = idsToAdd.map((id) => ({
     ...playableCards[id],
-    instanceId: crypto.randomUUID()
+    instanceId: crypto.randomUUID(),
   }))
 
   return {
@@ -71,21 +71,20 @@ export function processStartOfGame(run: Run): Run {
       case 'add-cards': {
         const { location, cards, mode } = params
         const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
-        const cardsToAdd = shuffledIDs.map(id => ({
+        const cardsToAdd = shuffledIDs.map((id) => ({
           ...playableCards[id],
-          instanceId: crypto.randomUUID()
+          instanceId: crypto.randomUUID(),
         }))
         const existingCards = updatedRun.cards[location]
-        const newCardArr = mode === 'top'
-                ? [...cardsToAdd, ...existingCards]
-                : [...existingCards, ...cardsToAdd]
+        const newCardArr =
+          mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
 
         // TODO: Use lodash for object updating?
         updatedRun = {
           ...updatedRun,
           cards: {
             ...updatedRun.cards,
-            [location]: newCardArr
+            [location]: newCardArr,
           },
         }
         break

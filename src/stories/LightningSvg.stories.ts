@@ -20,8 +20,7 @@ export const Default: Story = {
         <div style="width: 128px; height: 128px;">
           <story />
         </div>
-      `
-    })
-  ]
+      `,
+    }),
+  ],
 }
-
