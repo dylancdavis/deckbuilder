@@ -2,6 +2,7 @@
 import { useGameStore } from '@/stores/game'
 import { cards, type PlayableCardID } from '@/utils/cards'
 import CardItem from './CardItem.vue'
+import { TILT_PRESETS } from '@/composables/useTilt'
 
 const gameStore = useGameStore()
 
@@ -28,7 +29,7 @@ function closeModal() {
           class="card-option"
           @click="selectCard(cardId)"
         >
-          <CardItem :card="cards[cardId]" />
+          <CardItem :card="cards[cardId]" :tilt="TILT_PRESETS.collection" />
         </div>
       </div>
     </div>
