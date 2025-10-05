@@ -11,7 +11,6 @@ export function useFlyAnimation() {
    * Animates an element flying from source to target position
    */
   function flyElement(source: HTMLElement, target: HTMLElement) {
-
     const sourceRect = source.getBoundingClientRect()
     const targetRect = target.getBoundingClientRect()
 
@@ -28,32 +27,30 @@ export function useFlyAnimation() {
 
     document.body.appendChild(clone)
 
-    // Wait for next frame to ensure clone is rendered, then another frame to apply transition
+    // Wait for next frame before applying transition
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        // Calculate the translation needed to center on target
-        const targetCenterX = targetRect.left + targetRect.width / 2
-        const targetCenterY = targetRect.top + targetRect.height / 2
-        const sourceCenterX = sourceRect.left + sourceRect.width / 2
-        const sourceCenterY = sourceRect.top + sourceRect.height / 2
+      // Calculate the translation needed to center on target
+      const targetCenterX = targetRect.left + targetRect.width / 2
+      const targetCenterY = targetRect.top + targetRect.height / 2
+      const sourceCenterX = sourceRect.left + sourceRect.width / 2
+      const sourceCenterY = sourceRect.top + sourceRect.height / 2
 
-        const deltaX = targetCenterX - sourceCenterX
-        const deltaY = targetCenterY - sourceCenterY
+      const deltaX = targetCenterX - sourceCenterX
+      const deltaY = targetCenterY - sourceCenterY
 
-        // Apply transition
-        clone.style.transition = `transform ${DURATION}ms ${EASING}, opacity ${DURATION}ms ${EASING}`
-        clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${SCALE})`
-        clone.style.opacity = '0'
+      // Apply transition
+      clone.style.transition = `transform ${DURATION}ms ${EASING}, opacity ${DURATION}ms ${EASING}`
+      clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${SCALE})`
+      clone.style.opacity = '0'
 
-        // Remove clone after animation completes
-        setTimeout(() => {
-          clone.remove()
-        }, DURATION)
-      })
+      // Remove clone after animation completes
+      setTimeout(() => {
+        clone.remove()
+      }, DURATION)
     })
   }
 
   return {
-    flyElement
+    flyElement,
   }
 }
