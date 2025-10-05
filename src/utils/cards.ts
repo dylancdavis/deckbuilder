@@ -97,7 +97,7 @@ export const starterRules: RulesCard = {
   name: 'Starter Rules',
   deckLimits: { size: [0, 4] },
   turnStructure: {
-    drawAmount: 1,
+    drawAmount: 2,
     playAmount: 'any',
     discardAmount: 'all',
   },

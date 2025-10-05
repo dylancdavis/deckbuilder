@@ -52,7 +52,7 @@ function isPlayableCard(card: Card): card is PlayableCard {
           <div class="section turn-structure">
             <div class="turn-structure">
               <span>Turn:</span>
-              <span>Draw 1, Play 1</span>
+              <span>Draw 2, Play 1</span>
             </div>
           </div>
           <div class="section end-conditions">
