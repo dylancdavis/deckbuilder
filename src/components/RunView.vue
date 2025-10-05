@@ -2,6 +2,7 @@
 import { computed, nextTick } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
+import CardBack from './CardBack.vue'
 import FlashValue from './FlashValue.vue'
 import type { PlayableCard } from '@/utils/cards'
 import { gsap } from 'gsap'
@@ -113,11 +114,11 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
       <!-- Draw Pile -->
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
       <div v-else class="draw-pile">
-        <div
+        <CardBack
           v-for="card in drawPileData.cards"
           :key="card.instanceId || card.name"
           :data-flip-id="card.instanceId"
-          class="card-container card-back"
+          :tilt="TILT_PRESETS.minimal"
         />
       </div>
     </div>
