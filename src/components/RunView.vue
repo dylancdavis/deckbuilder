@@ -158,12 +158,13 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
       <!-- Discard Pile -->
       <div v-if="discardPileData.pileSize === 0" class="empty-pile">discard</div>
       <div v-else class="discard-pile">
-        <CardItem
+        <div
           v-for="card in discardPileData.cards"
           :key="card.instanceId || card.name"
           :data-flip-id="card.instanceId"
-          :card="card"
-        />
+        >
+          <CardItem :card="card" tilt />
+        </div>
       </div>
 
       <!-- Round Info Panel -->
