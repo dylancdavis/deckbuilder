@@ -19,7 +19,7 @@ const cardRef = ref<HTMLElement | null>(null)
 if (props.tilt) {
   useTilt(cardRef, {
     reverse: true, // Reverse tilt direction for more natural feel
-    max: 12, // Subtle rotation (vs default 35°)
+    max: 8, // Subtle rotation (vs default 35°)
     scale: 1.05, // Slight lift on hover
     speed: 400, // Smooth transition
     glare: true, // Add glare effect for polish
