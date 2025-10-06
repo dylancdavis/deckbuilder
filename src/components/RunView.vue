@@ -197,9 +197,14 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             <span>Round <FlashValue :value="run.stats.rounds" /></span>
             <span>Turn <FlashValue :value="run.stats.turns" /></span>
           </div>
-          <div class="chip chip-counter chip-wide">
+          <div class="chip chip-counter chip-wide chip-cards-played">
             <span>Cards Played</span>
-            <span><FlashValue :value="cardsPlayedThisTurn" /> / <FlashValue :value="run.deck.rulesCard?.turnStructure.playAmount || 0" /></span>
+            <span v-if="run.deck.rulesCard?.turnStructure.playAmount === 'any'">
+              <FlashValue :value="cardsPlayedThisTurn" />
+            </span>
+            <span v-else>
+              <FlashValue :value="cardsPlayedThisTurn" /> / <FlashValue :value="run.deck.rulesCard?.turnStructure.playAmount || 0" />
+            </span>
           </div>
           <div class="resources-grid">
             <div class="chip chip-resource chip-wide">
@@ -348,5 +353,10 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.chip-cards-played {
+  background-color: #555;
+  border-color: #777;
 }
 </style>
