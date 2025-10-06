@@ -32,6 +32,26 @@ const noActionsLeft = computed(() => {
   return run.value.cards.hand.length === 0
 })
 
+const cardsPlayedThisTurn = computed(() => {
+  return run.value.events.filter(
+    (e) =>
+      e.type === 'card-play' &&
+      e.round === run.value.stats.rounds &&
+      e.turn === run.value.stats.turns
+  ).length
+})
+
+const canPlayCard = computed(() => {
+  if (!run.value.deck.rulesCard) return false
+
+  const playAmount = run.value.deck.rulesCard.turnStructure.playAmount
+  // If playAmount is 'any', can always play
+  if (playAmount === 'any') return true
+
+  // Otherwise check if we haven't reached the numeric limit
+  return cardsPlayedThisTurn.value < playAmount
+})
+
 const nextTurnButtonText = computed(() => {
   if (!run.value.deck.rulesCard) return { main: 'Next Turn', subtitle: null }
 
@@ -140,7 +160,8 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             :key="card.instanceId || card.name"
             :data-flip-id="card.instanceId"
             class="flip-card"
-            @click="playCard(index)"
+            :class="{ 'card-disabled': !canPlayCard }"
+            @click="canPlayCard && playCard(index)"
           >
             <div class="flip-card-inner">
               <div class="flip-card-front">
@@ -175,6 +196,10 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           <div class="chip chip-counter chip-wide">
             <span>Round <FlashValue :value="run.stats.rounds" /></span>
             <span>Turn <FlashValue :value="run.stats.turns" /></span>
+          </div>
+          <div class="chip chip-counter chip-wide">
+            <span>Cards Played</span>
+            <span><FlashValue :value="cardsPlayedThisTurn" /> / <FlashValue :value="run.deck.rulesCard?.turnStructure.playAmount || 0" /></span>
           </div>
           <div class="resources-grid">
             <div class="chip chip-resource chip-wide">
@@ -317,5 +342,11 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 .next-turn-btn--end-run {
   background-color: var(--standard-orange);
   border-bottom-color: #cc4400;
+}
+
+.card-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 </style>

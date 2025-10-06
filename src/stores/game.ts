@@ -11,6 +11,15 @@ export enum Resource {
   POINTS = 'points',
 }
 
+export type CardPlayEvent = {
+  type: 'card-play'
+  round: number
+  turn: number
+  cardId: PlayableCardID
+}
+
+export type Event = CardPlayEvent
+
 export type Deck = {
   name: string
   rulesCard: RulesCard | null
@@ -33,6 +42,7 @@ export type Run = {
   }
   resources: { points: number }
   stats: { turns: number; rounds: number }
+  events: Event[]
 }
 
 type GameState = {
@@ -241,6 +251,7 @@ export const useGameStore = defineStore('game', () => {
       cards: { drawPile: [], hand: [], board: [], discardPile: [] },
       resources: { points: 0 },
       stats: { turns: 1, rounds: 1 },
+      events: [],
     }
 
     const runWithDrawPile = populateDrawPile(baseRun)
@@ -250,10 +261,28 @@ export const useGameStore = defineStore('game', () => {
 
   function playCard(cardIndex: number) {
     const run = gameState.value.game.run
-    if (!run) return
+    if (!run || !run.deck.rulesCard) {
+      throw new Error('Cannot play card: no active run or rules card')
+    }
 
     const card = run.cards.hand[cardIndex]
-    if (!card) return
+    if (!card) {
+      throw new Error(`Cannot play card: no card at index ${cardIndex}`)
+    }
+
+    // Check playAmount limit by counting events for current turn
+    const playAmount = run.deck.rulesCard.turnStructure.playAmount
+    if (typeof playAmount === 'number') {
+      const cardsPlayedThisTurn = run.events.filter(
+        (e) =>
+          e.type === 'card-play' && e.round === run.stats.rounds && e.turn === run.stats.turns
+      ).length
+      if (cardsPlayedThisTurn >= playAmount) {
+        throw new Error(
+          `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`
+        )
+      }
+    }
 
     // Process card effects
     if (card.effects.length >= 3 && card.effects[0] === 'gain-resource') {
@@ -269,6 +298,14 @@ export const useGameStore = defineStore('game', () => {
     // Remove card from hand and add to discard pile
     run.cards.hand.splice(cardIndex, 1)
     run.cards.discardPile.push(card)
+
+    // Log the card play event
+    run.events.push({
+      type: 'card-play',
+      round: run.stats.rounds,
+      turn: run.stats.turns,
+      cardId: card.id,
+    })
   }
 
   function nextTurn() {
