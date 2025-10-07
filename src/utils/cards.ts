@@ -81,11 +81,11 @@ export const score: PlayableCard = {
   tags: ['basic'],
 }
 
-export const buyBasic: PlayableCard = {
+export const collectBasic: PlayableCard = {
   type: 'playable',
-  id: 'buy-basic',
+  id: 'collect-basic',
   name: 'Buy Basic',
-  description: 'Buy a Basic Card.',
+  description: 'Collect a Basic Card.',
   effects: ['buy-card', 3, 'basic'],
   cost: 2,
   tags: ['basic'],
@@ -209,7 +209,7 @@ export const rulesCards = {
 
 export const playableCards = {
   score: score,
-  'buy-basic': buyBasic,
+  'collect-basic': collectBasic,
   'dual-score': dualScore,
   'save-reward': saveReward,
   'zero-reward': zeroReward,

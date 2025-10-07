@@ -138,11 +138,10 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function buyCard(options: number, tag: string) {
-    // Get available cards with the specified tag (excluding buy-basic itself)
+  function collectBasic(options: number, tag: string) {
     const availableCards = playableCardIds.filter((id) => {
       const card = playableCards[id]
-      return id !== 'buy-basic' && card.tags?.includes(tag)
+      return card.tags?.includes(tag)
     })
 
     const shuffled = [...availableCards].sort(() => Math.random() - 0.5)
@@ -274,12 +273,11 @@ export const useGameStore = defineStore('game', () => {
     const playAmount = run.deck.rulesCard.turnStructure.playAmount
     if (typeof playAmount === 'number') {
       const cardsPlayedThisTurn = run.events.filter(
-        (e) =>
-          e.type === 'card-play' && e.round === run.stats.rounds && e.turn === run.stats.turns
+        (e) => e.type === 'card-play' && e.round === run.stats.rounds && e.turn === run.stats.turns,
       ).length
       if (cardsPlayedThisTurn >= playAmount) {
         throw new Error(
-          `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`
+          `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`,
         )
       }
     }
@@ -292,7 +290,7 @@ export const useGameStore = defineStore('game', () => {
     } else if (card.effects.length >= 3 && card.effects[0] === 'buy-card') {
       const options = card.effects[1] as number
       const tag = card.effects[2] as string
-      buyCard(options, tag)
+      collectBasic(options, tag)
     }
 
     // Remove card from hand and add to discard pile
@@ -408,7 +406,7 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    buyCard,
+    buyCard: collectBasic,
     selectCard,
     closeModal,
     drawCards,
