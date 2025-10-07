@@ -84,7 +84,7 @@ export const score: PlayableCard = {
 export const collectBasic: PlayableCard = {
   type: 'playable',
   id: 'collect-basic',
-  name: 'Buy Basic',
+  name: 'Collect Basic',
   description: 'Collect a Basic Card.',
   effects: [{ type: 'buy-card', params: { options: 3, tags: ['basic'] } }],
   cost: 2,
@@ -207,7 +207,7 @@ export const lastResort: PlayableCard = {
   type: 'playable',
   id: 'last-resort',
   name: 'Last Resort',
-  description: 'Gain 8 Points. Destroy this card',
+  description: 'Gain 8 Points. Destroy this card.',
   effects: [],
   cost: 12,
   tags: ['basic'],
