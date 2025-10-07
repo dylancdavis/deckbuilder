@@ -1,4 +1,4 @@
-import { Resource } from '@/stores/game'
+import { Resource } from './resource'
 import type { Counter } from './counter'
 import { keys } from './utils'
 

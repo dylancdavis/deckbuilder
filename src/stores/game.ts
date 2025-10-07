@@ -6,10 +6,7 @@ import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } fro
 import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
 import { processStartOfGame, drawFirstHand, populateDrawPile } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
-
-export enum Resource {
-  POINTS = 'points',
-}
+import { Resource } from '@/utils/resource.ts'
 
 export type CardPlayEvent = {
   type: 'card-play'
@@ -283,14 +280,12 @@ export const useGameStore = defineStore('game', () => {
     }
 
     // Process card effects
-    if (card.effects.length >= 3 && card.effects[0] === 'gain-resource') {
-      const resource = card.effects[1] as Resource
-      const amount = card.effects[2] as number
-      gainResource(resource, amount)
-    } else if (card.effects.length >= 3 && card.effects[0] === 'buy-card') {
-      const options = card.effects[1] as number
-      const tag = card.effects[2] as string
-      collectBasic(options, tag)
+    for (const effect of card.effects) {
+      if (effect.type === 'gain-resource') {
+        gainResource(effect.params.resource, effect.params.amount)
+      } else if (effect.type === 'buy-card') {
+        collectBasic(effect.params.options, effect.params.tags[0])
+      }
     }
 
     // Remove card from hand and add to discard pile
