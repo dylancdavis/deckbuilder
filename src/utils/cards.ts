@@ -1,4 +1,4 @@
-import type { Resource } from '@/stores/game'
+import { Resource } from '@/stores/game'
 import type { Counter } from './counter'
 import { keys } from './utils'
 
@@ -47,7 +47,7 @@ export interface PlayableCard extends Card {
   type: 'playable'
   description: string
   cost: number
-  effects: (string | number)[]
+  effects: Effect[]
   deckLimit?: number
   instanceId?: string
 }
@@ -76,7 +76,7 @@ export const score: PlayableCard = {
   id: 'score',
   name: 'Score',
   description: 'Gain 1 Point.',
-  effects: ['gain-resource', 'points', 1],
+  effects: [{ type: 'gain-resource', params: { resource: Resource.POINTS, amount: 1 } }],
   cost: 0,
   tags: ['basic'],
 }
@@ -86,7 +86,7 @@ export const collectBasic: PlayableCard = {
   id: 'collect-basic',
   name: 'Buy Basic',
   description: 'Collect a Basic Card.',
-  effects: ['buy-card', 3, 'basic'],
+  effects: [{ type: 'buy-card', params: { options: 3, tags: ['basic'] } }],
   cost: 2,
   tags: ['basic'],
 }
@@ -118,7 +118,7 @@ export const dualScore: PlayableCard = {
   name: 'Dual Score',
   description: 'Gain 2 Points. Deck Limit 2.',
   deckLimit: 2,
-  effects: ['gain-resource', 'points', 2],
+  effects: [{ type: 'gain-resource', params: { resource: Resource.POINTS, amount: 2 } }],
   cost: 4,
   tags: ['basic'],
 }
