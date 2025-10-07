@@ -127,7 +127,7 @@ export const saveReward: PlayableCard = {
   type: 'playable',
   id: 'save-reward',
   name: 'A Penny Saved',
-  description: "If you haven't purchased a card this round, gain 2 points.",
+  description: "If you haven't collected a card this round, gain 2 points.",
   effects: [],
   cost: 4,
   tags: ['basic'],
@@ -147,7 +147,7 @@ export const pointReset: PlayableCard = {
   type: 'playable',
   id: 'point-reset',
   name: 'Point Reboot',
-  description: 'Lose all points, then gain 4 points.',
+  description: 'Set your point total to 4.',
   effects: [],
   cost: 6,
   tags: ['basic'],
@@ -167,7 +167,7 @@ export const scoreSurge: PlayableCard = {
   type: 'playable',
   id: 'score-surge',
   name: 'Score Surge',
-  description: 'Gain 2 points for each "Score" played this round (up to 4).',
+  description: 'Gain 2 points (max 8) for each "Score" played this round.',
   effects: [],
   cost: 10,
   tags: ['basic'],
@@ -177,27 +177,37 @@ export const scoreSynergy: PlayableCard = {
   type: 'playable',
   id: 'score-synergy',
   name: 'Score Synergy',
-  description: 'Gain 1 point for each "Score" in your deck (up to 6).',
+  description: 'Gain 1 point (max 6) for each "Score" in your deck.',
   effects: [],
   cost: 10,
   tags: ['basic'],
 }
 
-export const borrowPoints: PlayableCard = {
+export const pointLoan: PlayableCard = {
   type: 'playable',
-  id: 'borrow-points',
-  name: 'Borrowed Points',
-  description: 'Gain 6 points. In 2 turns, lose 6 points (down to zero)',
+  id: 'point-loan',
+  name: 'Point Loan',
+  description: 'Gain 6 points. Add a "Debt" card to your draw pile.',
   effects: [],
   cost: 10,
   tags: ['basic'],
+}
+
+export const debt: PlayableCard = {
+  type: 'playable',
+  id: 'debt',
+  name: 'Debt',
+  description: 'When you draw this, lose 6 points.',
+  effects: [],
+  cost: 0,
+  tags: [],
 }
 
 export const lastResort: PlayableCard = {
   type: 'playable',
   id: 'last-resort',
   name: 'Last Resort',
-  description: 'Gain 8 Points, then destroy this card',
+  description: 'Gain 8 Points. Destroy this card',
   effects: [],
   cost: 12,
   tags: ['basic'],
@@ -217,7 +227,8 @@ export const playableCards = {
   'point-multiply': pointMultiply,
   'score-surge': scoreSurge,
   'score-synergy': scoreSynergy,
-  'borrow-points': borrowPoints,
+  'point-loan': pointLoan,
+  debt: debt,
   'last-resort': lastResort,
 } as const
 
