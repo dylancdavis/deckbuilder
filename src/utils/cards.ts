@@ -106,7 +106,7 @@ export const starterRules: RulesCard = {
     gameStart: [
       {
         type: 'add-cards',
-        params: { location: 'drawPile', cards: { score: 7, 'buy-basic': 1 } },
+        params: { location: 'drawPile', cards: { score: 7, 'collect-basic': 1 } },
       },
     ],
   },

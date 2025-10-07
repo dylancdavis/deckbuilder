@@ -37,7 +37,7 @@ const cardsPlayedThisTurn = computed(() => {
     (e) =>
       e.type === 'card-play' &&
       e.round === run.value.stats.rounds &&
-      e.turn === run.value.stats.turns
+      e.turn === run.value.stats.turns,
   ).length
 })
 
@@ -203,7 +203,8 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
               <FlashValue :value="cardsPlayedThisTurn" />
             </span>
             <span v-else>
-              <FlashValue :value="cardsPlayedThisTurn" /> / <FlashValue :value="run.deck.rulesCard?.turnStructure.playAmount || 0" />
+              <FlashValue :value="cardsPlayedThisTurn" /> /
+              <FlashValue :value="run.deck.rulesCard?.turnStructure.playAmount || 0" />
             </span>
           </div>
           <div class="resources-grid">
