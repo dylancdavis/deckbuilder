@@ -33,6 +33,7 @@
   box-shadow: inset 0px 0px 4px black;
   border-bottom-right-radius: 12px;
   min-height: 0;
+  overflow-y: auto;
 }
 
 .cards-panel .panel-header {
@@ -41,12 +42,10 @@
 }
 
 .card-grid {
-  flex: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, 250px);
   padding: 1em;
   gap: 1em;
-  overflow-y: auto;
   align-content: start;
   justify-content: space-evenly;
 }
