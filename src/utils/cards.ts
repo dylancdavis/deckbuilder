@@ -17,12 +17,15 @@ export type AddCardsEffect = {
   }
 }
 
-export type GainResourceEffect = {
-  type: 'gain-resource'
+export type UpdateResourceEffect = {
+  type: 'update-resource'
   params: {
     resource: Resource
-    amount: number
-  }
+  } & (
+    | { delta: number }
+    | { set: number }
+    | { update: (currentAmount: number, run: import('@/stores/game').Run) => number }
+  )
 }
 
 export type BuyCardEffect = {
@@ -33,7 +36,7 @@ export type BuyCardEffect = {
   }
 }
 
-export type Effect = AddCardsEffect | GainResourceEffect | BuyCardEffect
+export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
 
 export interface Card {
   id: CardID
@@ -76,7 +79,7 @@ export const score: PlayableCard = {
   id: 'score',
   name: 'Score',
   description: 'Gain 1 Point.',
-  effects: [{ type: 'gain-resource', params: { resource: Resource.POINTS, amount: 1 } }],
+  effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
   cost: 0,
   tags: ['basic'],
 }
@@ -118,7 +121,7 @@ export const dualScore: PlayableCard = {
   name: 'Dual Score',
   description: 'Gain 2 Points. Deck Limit 2.',
   deckLimit: 2,
-  effects: [{ type: 'gain-resource', params: { resource: Resource.POINTS, amount: 2 } }],
+  effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
   cost: 4,
   tags: ['basic'],
 }

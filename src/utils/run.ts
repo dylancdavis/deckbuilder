@@ -89,8 +89,8 @@ export function processStartOfGame(run: Run): Run {
         }
         break
       }
-      case 'gain-resource': {
-        throw new Error('Not implemented: gain-resource effect')
+      case 'update-resource': {
+        throw new Error('Not implemented: update-resource effect')
       }
       default:
         throw new Error(`Unknown effect type: ${type}`)

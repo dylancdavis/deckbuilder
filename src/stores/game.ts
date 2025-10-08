@@ -281,8 +281,19 @@ export const useGameStore = defineStore('game', () => {
 
     // Process card effects
     for (const effect of card.effects) {
-      if (effect.type === 'gain-resource') {
-        gainResource(effect.params.resource, effect.params.amount)
+      if (effect.type === 'update-resource') {
+        const currentAmount = run.resources[effect.params.resource] || 0
+        let newAmount: number
+
+        if ('delta' in effect.params) {
+          newAmount = currentAmount + effect.params.delta
+        } else if ('set' in effect.params) {
+          newAmount = effect.params.set
+        } else {
+          newAmount = effect.params.update(currentAmount, run)
+        }
+
+        run.resources[effect.params.resource] = newAmount
       } else if (effect.type === 'buy-card') {
         collectBasic(effect.params.options, effect.params.tags[0])
       }
