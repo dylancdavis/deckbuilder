@@ -6,6 +6,7 @@ import type { Run } from '@/stores/game.ts'
 import { moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
 import { playableCards, type PlayableCardID } from './cards.ts'
+import { applyEffects } from './effects.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -60,44 +61,7 @@ export function processStartOfGame(run: Run): Run {
 
   if (!gameStartEffects) return run
 
-  let updatedRun = { ...run }
-
-  // Add cards specified in deck to draw pile then shuffle
-
-  // Process all start-of-game effects from rules card
-  // TODO: Apply effects with reduce
-  for (const { type, params } of gameStartEffects) {
-    switch (type) {
-      case 'add-cards': {
-        const { location, cards, mode } = params
-        const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
-        const cardsToAdd = shuffledIDs.map((id) => ({
-          ...playableCards[id],
-          instanceId: crypto.randomUUID(),
-        }))
-        const existingCards = updatedRun.cards[location]
-        const newCardArr =
-          mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
-
-        // TODO: Use lodash for object updating?
-        updatedRun = {
-          ...updatedRun,
-          cards: {
-            ...updatedRun.cards,
-            [location]: newCardArr,
-          },
-        }
-        break
-      }
-      case 'update-resource': {
-        throw new Error('Not implemented: update-resource effect')
-      }
-      default:
-        throw new Error(`Unknown effect type: ${type}`)
-    }
-  }
-
-  return updatedRun
+  return applyEffects(run, gameStartEffects)
 }
 
 /**

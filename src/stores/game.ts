@@ -7,6 +7,7 @@ import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
 import { processStartOfGame, drawFirstHand, populateDrawPile } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
+import { applyEffect } from '@/utils/effects.ts'
 
 export type CardPlayEvent = {
   type: 'card-play'
@@ -281,21 +282,14 @@ export const useGameStore = defineStore('game', () => {
 
     // Process card effects
     for (const effect of card.effects) {
-      if (effect.type === 'update-resource') {
-        const currentAmount = run.resources[effect.params.resource] || 0
-        let newAmount: number
-
-        if ('delta' in effect.params) {
-          newAmount = currentAmount + effect.params.delta
-        } else if ('set' in effect.params) {
-          newAmount = effect.params.set
-        } else {
-          newAmount = effect.params.update(currentAmount, run)
-        }
-
-        run.resources[effect.params.resource] = newAmount
-      } else if (effect.type === 'buy-card') {
+      if (effect.type === 'buy-card') {
+        // buy-card needs UI interaction, handle in store
         collectBasic(effect.params.options, effect.params.tags[0])
+      } else {
+        // All other effects are pure and handled by applyEffect
+        const updatedRun = applyEffect(run, effect)
+        // Update the run reference with the new state
+        gameState.value.game.run = updatedRun
       }
     }
 

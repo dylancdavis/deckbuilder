@@ -1,42 +1,6 @@
 import { Resource } from './resource'
-import type { Counter } from './counter'
 import { keys } from './utils'
-
-// Game locations where cards can be placed
-export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
-
-// Card placement modes when adding cards to locations
-export type PlacementMode = 'top' | 'bottom' | 'shuffle'
-
-export type AddCardsEffect = {
-  type: 'add-cards'
-  params: {
-    location: GameLocation
-    cards: Counter<PlayableCardID>
-    mode?: PlacementMode
-  }
-}
-
-export type UpdateResourceEffect = {
-  type: 'update-resource'
-  params: {
-    resource: Resource
-  } & (
-    | { delta: number }
-    | { set: number }
-    | { update: (currentAmount: number, run: import('@/stores/game').Run) => number }
-  )
-}
-
-export type BuyCardEffect = {
-  type: 'buy-card'
-  params: {
-    options: number
-    tags: string[]
-  }
-}
-
-export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
+import type { Effect } from './effects'
 
 export interface Card {
   id: CardID
