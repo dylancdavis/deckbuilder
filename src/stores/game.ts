@@ -64,7 +64,20 @@ export const useGameStore = defineStore('game', () => {
   const gameState: Ref<GameState> = ref({
     game: {
       collection: {
-        cards: { score: 9, 'starter-rules': 1 },
+        cards: {
+          score: 4,
+          'collect-basic': 4,
+          'dual-score': 4,
+          'save-reward': 4,
+          'zero-reward': 4,
+          'point-reset': 4,
+          'point-multiply': 4,
+          'score-surge': 4,
+          'score-synergy': 4,
+          'point-loan': 4,
+          'last-resort': 4,
+          'starter-rules': 1,
+        },
         decks: { startingDeck: startingDeck },
       },
       run: null,
@@ -95,26 +108,6 @@ export const useGameStore = defineStore('game', () => {
   const cardOptions = computed(() => gameState.value.viewData.cardOptions)
 
   // Actions
-  function initializeDb() {
-    gameState.value = {
-      game: {
-        collection: {
-          cards: { score: 9, 'starter-rules': 1 },
-          decks: { startingDeck: startingDeck },
-        },
-        run: null,
-      },
-      ui: {
-        currentView: ['collection'],
-        collection: { selectedDeck: null },
-      },
-      viewData: {
-        modalView: null,
-        cardOptions: [],
-      },
-    }
-  }
-
   function selectDeck(key: string | null) {
     gameState.value.ui.collection.selectedDeck = key
   }
@@ -382,9 +375,6 @@ export const useGameStore = defineStore('game', () => {
     drawCards(turnStructure.drawAmount)
   }
 
-  // Initialize the store on creation
-  initializeDb()
-
   return {
     gameState,
     run,
@@ -398,7 +388,6 @@ export const useGameStore = defineStore('game', () => {
     selectedDeckKey,
     modalView,
     cardOptions,
-    initializeDb,
     selectDeck,
     startRun,
     playCard,
