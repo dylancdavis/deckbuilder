@@ -18,6 +18,21 @@ export type CardPlayEvent = {
 
 export type Event = CardPlayEvent
 
+const initialCollectionCards: Counter<CardID> = {
+  score: 4,
+  'collect-basic': 4,
+  'dual-score': 4,
+  'save-reward': 4,
+  'zero-reward': 4,
+  'point-reset': 4,
+  'point-multiply': 4,
+  'score-surge': 4,
+  'score-synergy': 4,
+  'point-loan': 4,
+  'last-resort': 4,
+  'starter-rules': 1,
+}
+
 export type Deck = {
   name: string
   rulesCard: RulesCard | null
@@ -64,20 +79,7 @@ export const useGameStore = defineStore('game', () => {
   const gameState: Ref<GameState> = ref({
     game: {
       collection: {
-        cards: {
-          score: 4,
-          'collect-basic': 4,
-          'dual-score': 4,
-          'save-reward': 4,
-          'zero-reward': 4,
-          'point-reset': 4,
-          'point-multiply': 4,
-          'score-surge': 4,
-          'score-synergy': 4,
-          'point-loan': 4,
-          'last-resort': 4,
-          'starter-rules': 1,
-        },
+        cards: initialCollectionCards,
         decks: { startingDeck: startingDeck },
       },
       run: null,
