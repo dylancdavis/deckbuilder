@@ -48,7 +48,7 @@ export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
  * Applies an effect to a run, returning the updated run.
  * This is a pure function that does not mutate the original run.
  */
-export function applyEffect(run: Run, effect: Effect): Run {
+export function handleEffect(run: Run, effect: Effect): Run {
   switch (effect.type) {
     case 'update-resource': {
       const currentAmount = run.resources[effect.params.resource] || 0
@@ -103,6 +103,6 @@ export function applyEffect(run: Run, effect: Effect): Run {
 /**
  * Applies multiple effects to a run sequentially, returning the final run.
  */
-export function applyEffects(run: Run, effects: Effect[]): Run {
-  return effects.reduce((currentRun, effect) => applyEffect(currentRun, effect), run)
+export function handleEffects(run: Run, effects: Effect[]): Run {
+  return effects.reduce((currentRun, effect) => handleEffect(currentRun, effect), run)
 }

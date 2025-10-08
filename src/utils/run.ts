@@ -6,7 +6,7 @@ import type { Run } from '@/stores/game.ts'
 import { moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
 import { playableCards, type PlayableCardID } from './cards.ts'
-import { applyEffects } from './effects.ts'
+import { handleEffects } from './effects.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -61,7 +61,7 @@ export function processStartOfGame(run: Run): Run {
 
   if (!gameStartEffects) return run
 
-  return applyEffects(run, gameStartEffects)
+  return handleEffects(run, gameStartEffects)
 }
 
 /**
