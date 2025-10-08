@@ -14,6 +14,9 @@ export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
 // Card placement modes when adding cards to locations
 export type PlacementMode = 'top' | 'bottom' | 'shuffle'
 
+// Effect triggers - when effects should activate
+export type EffectTrigger = 'on-play' | 'on-draw'
+
 export type AddCardsEffect = {
   type: 'add-cards'
   params: {
@@ -42,7 +45,14 @@ export type BuyCardEffect = {
   }
 }
 
-export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
+export type DestroyCardEffect = {
+  type: 'destroy-card'
+  params: {
+    instanceId: string
+  }
+}
+
+export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect | DestroyCardEffect
 
 /**
  * Applies an effect to a run, returning the updated run.
@@ -92,6 +102,10 @@ export function handleEffect(run: Run, effect: Effect): Run {
     case 'buy-card': {
       // This needs UI interaction and should be handled by the store
       throw new Error('buy-card effect should be handled by the store')
+    }
+    case 'destroy-card': {
+      // This needs to modify collection state and should be handled by the store
+      throw new Error('destroy-card effect should be handled by the store')
     }
     default: {
       const _exhaustive: never = effect

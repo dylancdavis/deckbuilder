@@ -165,20 +165,29 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function drawCards(n: number) {
-    if (gameState.value.game.run) {
-      const drawPile = gameState.value.game.run.cards.drawPile
-      const hand = gameState.value.game.run.cards.hand
+    let run = gameState.value.game.run
+    if (!run) return
 
-      for (let i = 0; i < n && drawPile.length > 0; i++) {
-        const card = drawPile.pop()
-        if (card) {
-          hand.push(card)
+    const drawPile = run.cards.drawPile
+    const hand = run.cards.hand
+
+    for (let i = 0; i < n && drawPile.length > 0; i++) {
+      const card = drawPile.pop()
+      if (card) {
+        hand.push(card)
+
+        // Process on-draw effects
+        const onDrawEffects = card.effects['on-draw'] || []
+        for (const effect of onDrawEffects) {
+          run = handleEffect(run, effect)
         }
       }
+    }
 
-      // Update the run state
-      gameState.value.game.run.cards.drawPile = drawPile
-      gameState.value.game.run.cards.hand = hand
+    // Update the run state
+    gameState.value.game.run = {
+      ...run,
+      cards: { ...run.cards, drawPile, hand },
     }
   }
 
@@ -275,11 +284,29 @@ export const useGameStore = defineStore('game', () => {
       }
     }
 
-    // Process card effects
-    for (const effect of card.effects) {
+    // Process card on-play effects
+    const onPlayEffects = card.effects['on-play'] || []
+    for (const effect of onPlayEffects) {
       if (effect.type === 'buy-card') {
         // buy-card needs UI interaction, handle in store
         collectBasic(effect.params.options, effect.params.tags[0])
+      } else if (effect.type === 'destroy-card') {
+        // destroy-card modifies collection state, handle in store
+        const cardId = card.id
+        const instanceId = card.instanceId || ''
+
+        // Remove from collection
+        if (gameState.value.game.collection.cards[cardId]) {
+          gameState.value.game.collection.cards = sub(
+            gameState.value.game.collection.cards,
+            cardId,
+          )
+        }
+        // Remove from all run locations by instanceId
+        run.cards.drawPile = run.cards.drawPile.filter((c) => c.instanceId !== instanceId)
+        run.cards.hand = run.cards.hand.filter((c) => c.instanceId !== instanceId)
+        run.cards.board = run.cards.board.filter((c) => c.instanceId !== instanceId)
+        run.cards.discardPile = run.cards.discardPile.filter((c) => c.instanceId !== instanceId)
       } else {
         // All other effects are pure and handled by handleEffect
         const updatedRun = handleEffect(run, effect)
