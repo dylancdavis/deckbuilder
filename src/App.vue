@@ -22,8 +22,7 @@ function getView(viewName: string[]) {
 </script>
 
 <template>
-  <div class="app">
-    <h1 class="game-title">Deckbuilder</h1>
+  <h1 class="game-title">Deckbuilder</h1>
     <div class="main-content">
       <div class="main-panel">
         <div class="nav">
@@ -35,7 +34,6 @@ function getView(viewName: string[]) {
       </div>
     </div>
 
-    <!-- Modals -->
-    <BuyCardModal v-if="modalView === 'buy-card'" />
-  </div>
+  <!-- Modals -->
+  <BuyCardModal v-if="modalView === 'buy-card'" />
 </template>
