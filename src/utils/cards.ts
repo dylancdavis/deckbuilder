@@ -95,7 +95,25 @@ export const saveReward: PlayableCard = {
   id: 'save-reward',
   name: 'A Penny Saved',
   description: "If you haven't collected a card this round, gain 2 points.",
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        update: (current, run) => {
+          // Check if any buy-card events occurred this round
+          const buyEventsThisRound = run.events.filter(
+            (e) => e.type === 'card-play' && e.round === run.stats.rounds,
+          )
+          const hasBoughtCard = buyEventsThisRound.some((e) => {
+            const card = playableCards[e.cardId]
+            return card.effects.some((eff) => eff.type === 'buy-card')
+          })
+          return hasBoughtCard ? current : current + 2
+        },
+      },
+    },
+  ],
   cost: 4,
   tags: ['basic'],
 }
@@ -105,7 +123,15 @@ export const zeroReward: PlayableCard = {
   id: 'zero-reward',
   name: 'Starting Surge',
   description: 'If you have 0 points, gain 6 points.',
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        update: (current) => (current === 0 ? 6 : current),
+      },
+    },
+  ],
   cost: 4,
   tags: ['basic'],
 }
@@ -115,7 +141,15 @@ export const pointReset: PlayableCard = {
   id: 'point-reset',
   name: 'Point Reboot',
   description: 'Set your point total to 4.',
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        set: 4,
+      },
+    },
+  ],
   cost: 6,
   tags: ['basic'],
 }
@@ -125,7 +159,15 @@ export const pointMultiply: PlayableCard = {
   id: 'point-multiply',
   name: 'Point Multiplication',
   description: 'If you have 4 or less points, double them.',
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        update: (current) => (current <= 4 ? current * 2 : current),
+      },
+    },
+  ],
   cost: 0,
   tags: ['basic'],
 }
@@ -155,7 +197,23 @@ export const pointLoan: PlayableCard = {
   id: 'point-loan',
   name: 'Point Loan',
   description: 'Gain 6 points. Add a "Debt" card to your draw pile.',
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        delta: 6,
+      },
+    },
+    {
+      type: 'add-cards',
+      params: {
+        location: 'drawPile',
+        cards: { debt: 1 },
+        mode: 'shuffle',
+      },
+    },
+  ],
   cost: 10,
   tags: ['basic'],
 }
