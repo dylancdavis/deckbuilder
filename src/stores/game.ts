@@ -45,15 +45,17 @@ export type Collection = {
   decks: Record<string, Deck>
 }
 
+export type RunCards = {
+  drawPile: PlayableCard[]
+  hand: PlayableCard[]
+  board: PlayableCard[]
+  discardPile: PlayableCard[]
+}
+
 export type Run = {
   deck: Deck
-  cards: {
-    drawPile: PlayableCard[]
-    hand: PlayableCard[]
-    board: PlayableCard[]
-    discardPile: PlayableCard[]
-  }
-  resources: { points: number }
+  cards: RunCards
+  resources: Record<Resource, number>
   stats: { turns: number; rounds: number }
   events: Event[]
 }
