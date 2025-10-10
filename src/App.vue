@@ -23,16 +23,16 @@ function getView(viewName: string[]) {
 
 <template>
   <h1 class="game-title">Deckbuilder</h1>
-    <div class="main-content">
-      <div class="main-panel">
-        <div class="nav">
-          Collection
-          <div class="nav-divider"></div>
-          Current Run
-        </div>
-        <component :is="getView(view)" />
+  <div class="main-content">
+    <div class="main-panel">
+      <div class="nav">
+        Collection
+        <div class="nav-divider"></div>
+        Current Run
       </div>
+      <component :is="getView(view)" />
     </div>
+  </div>
 
   <!-- Modals -->
   <BuyCardModal v-if="modalView === 'buy-card'" />
