@@ -1,6 +1,7 @@
 import { Resource } from './resource'
 import { keys } from './utils'
 import type { Effect } from './effects'
+import type { Run } from './run'
 
 export interface Card {
   id: CardID
@@ -100,7 +101,7 @@ export const saveReward: PlayableCard = {
       type: 'update-resource',
       params: {
         resource: Resource.POINTS,
-        update: (current, run) => {
+        update: (current, run: Run) => {
           // Check if any buy-card events occurred this round
           const buyEventsThisRound = run.events.filter(
             (e) => e.type === 'card-play' && e.round === run.stats.rounds,

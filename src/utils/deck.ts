@@ -2,10 +2,23 @@
  * Deck utility functions
  */
 
-import type { Collection, Deck } from '@/stores/game.ts'
 import { total, missingCounts, type Counter } from './counter.ts'
-import { cards, type CardID, type PlayableCard, type PlayableCardID } from './cards.ts'
+import {
+  cards,
+  type CardID,
+  type PlayableCard,
+  type PlayableCardID,
+  type RulesCard,
+} from './cards.ts'
 import { entries, keys } from './utils.ts'
+import type { Collection } from './collection.ts'
+
+export type Deck = {
+  name: string
+  rulesCard: RulesCard | null
+  cards: Counter<PlayableCardID>
+  editable: boolean
+}
 
 /**
  * Returns true if a deck has a rules card.

@@ -2,13 +2,30 @@
  * Game run utility functions
  */
 
-import type { Run } from '@/stores/game.ts'
 import { moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
-import { playableCards, type PlayableCardID } from './cards.ts'
+import { playableCards, type PlayableCard, type PlayableCardID } from './cards.ts'
 import { handleEffects } from './effects.ts'
+import type { Deck } from './deck.ts'
+import type { Resource } from './resource.ts'
+import type { Event } from './event.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
+
+export type RunCards = {
+  drawPile: PlayableCard[]
+  hand: PlayableCard[]
+  board: PlayableCard[]
+  discardPile: PlayableCard[]
+}
+
+export type Run = {
+  deck: Deck
+  cards: RunCards
+  resources: Record<Resource, number>
+  stats: { turns: number; rounds: number }
+  events: Event[]
+}
 
 /**
  * Move amount cards from fromLocation to toLocation.

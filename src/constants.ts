@@ -1,5 +1,5 @@
-import type { Deck } from './stores/game.ts'
 import { cards } from './utils/cards.ts'
+import type { Deck } from './utils/deck.ts'
 
 export const startingDeck: Deck = {
   name: 'Starter Deck',

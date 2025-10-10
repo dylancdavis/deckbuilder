@@ -2,21 +2,14 @@ import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
-import type { PlayableCardID, PlayableCard, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
+import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
-import { processStartOfGame, drawFirstHand, populateDrawPile } from '@/utils/run.ts'
+import { processStartOfGame, drawFirstHand, populateDrawPile, type Run } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
 import { handleEffect } from '@/utils/effects.ts'
-
-export type CardPlayEvent = {
-  type: 'card-play'
-  round: number
-  turn: number
-  cardId: PlayableCardID
-}
-
-export type Event = CardPlayEvent
+import type { Deck } from '@/utils/deck.ts'
+import type { Collection } from '@/utils/collection.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -31,33 +24,6 @@ const initialCollectionCards: Counter<CardID> = {
   'point-loan': 4,
   'last-resort': 4,
   'starter-rules': 1,
-}
-
-export type Deck = {
-  name: string
-  rulesCard: RulesCard | null
-  cards: Counter<PlayableCardID>
-  editable: boolean
-}
-
-export type Collection = {
-  cards: Counter<CardID>
-  decks: Record<string, Deck>
-}
-
-export type RunCards = {
-  drawPile: PlayableCard[]
-  hand: PlayableCard[]
-  board: PlayableCard[]
-  discardPile: PlayableCard[]
-}
-
-export type Run = {
-  deck: Deck
-  cards: RunCards
-  resources: Record<Resource, number>
-  stats: { turns: number; rounds: number }
-  events: Event[]
 }
 
 type GameState = {

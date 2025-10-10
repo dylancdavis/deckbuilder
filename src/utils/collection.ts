@@ -2,7 +2,15 @@
  * Collection utility functions
  */
 
+import type { CardID } from './cards.ts'
+import type { Counter } from './counter.ts'
+import type { Deck } from './deck.ts'
 import { firstMissingNum } from './utils.ts'
+
+export type Collection = {
+  cards: Counter<CardID>
+  decks: Record<string, Deck>
+}
 
 /**
  * Generates a new deck name based on existing deck names

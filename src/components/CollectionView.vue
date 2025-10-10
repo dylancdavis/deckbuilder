@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
-import { useGameStore, type Deck } from '../stores/game'
+import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import {
   cards,
@@ -13,7 +13,7 @@ import {
 } from '@/utils/cards'
 import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
-import { getDeckValidationErrors } from '@/utils/deck'
+import { getDeckValidationErrors, type Deck } from '@/utils/deck'
 import { useFlyAnimation } from '@/composables/useFlyAnimation'
 import { TILT_PRESETS } from '@/composables/useTilt'
 
