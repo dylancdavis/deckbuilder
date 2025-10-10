@@ -99,7 +99,7 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function collectBasic(options: number, tag: string) {
+  function buyCard(options: number, tag: string) {
     const availableCards = playableCardIds.filter((id) => {
       const card = playableCards[id]
       return card.tags?.includes(tag)
@@ -247,7 +247,7 @@ export const useGameStore = defineStore('game', () => {
     for (const effect of card.effects) {
       if (effect.type === 'buy-card') {
         // buy-card needs UI interaction, handle in store
-        collectBasic(effect.params.options, effect.params.tags[0])
+        buyCard(effect.params.options, effect.params.tags[0])
       } else {
         // All other effects are pure and handled by handleEffect
         const updatedRun = handleEffect(run, effect)
@@ -365,7 +365,7 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    buyCard: collectBasic,
+    buyCard,
     selectCard,
     closeModal,
     drawCards,
