@@ -2,11 +2,11 @@
  * Effect processing utilities
  */
 
-import type { Run } from '@/stores/game'
 import type { Counter } from './counter'
 import { toArray } from './counter'
 import { playableCards, type PlayableCardID } from './cards'
 import { Resource } from './resource'
+import type { Run } from './run'
 
 // Game locations where cards can be placed
 export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
