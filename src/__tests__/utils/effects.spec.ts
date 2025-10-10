@@ -133,8 +133,8 @@ describe('update-resource with delta', () => {
     const resultLocal = localHandleEffect(baseRun, effect)
 
     baseRun.hello()
-    resultImported.hello()  // Should NOT error (circular dependency issue)
-    resultLocal.hello()     // Should error (local copy works)
+    resultImported.hello() // Should NOT error (circular dependency issue)
+    resultLocal.hello() // Should error (local copy works)
 
     expect(resultImported.resources.points).toBe(15)
     expect(resultLocal.resources.points).toBe(15)
