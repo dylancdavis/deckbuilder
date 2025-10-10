@@ -1,10 +1,14 @@
-import type { Run } from './src/stores/game'
-import { starterRules } from './src/utils/cards'
-import { handleEffect } from './src/utils/effects'
-import { Resource } from './src/utils/resource'
-import type { Counter } from './src/utils/counter'
-import { toArray } from './src/utils/counter'
-import { playableCards, type PlayableCardID } from './src/utils/cards'
+/**
+ * Effect processing utilities
+ */
+
+import type { Run } from '@/stores/game'
+import { starterRules } from '@/utils/cards'
+import { handleEffect, type Effect } from '@/utils/effects'
+import { Resource } from '@/utils/resource'
+import type { Counter } from '@/utils/counter'
+import { toArray } from '@/utils/counter'
+import { playableCards, type PlayableCardID } from '@/utils/cards'
 
 const testRun: Run = {
   deck: {
@@ -24,41 +28,8 @@ const testRun: Run = {
   events: [],
 }
 
-// Local copy of handleEffect (exact same implementation as in utils/effects.ts)
-type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
-type PlacementMode = 'top' | 'bottom' | 'shuffle'
-
-type AddCardsEffect = {
-  type: 'add-cards'
-  params: {
-    location: GameLocation
-    cards: Counter<PlayableCardID>
-    mode?: PlacementMode
-  }
-}
-
-type UpdateResourceEffect = {
-  type: 'update-resource'
-  params: {
-    resource: Resource
-  } & (
-    | { delta: number }
-    | { set: number }
-    | { update: (currentAmount: number, run: Run) => number }
-  )
-}
-
-type BuyCardEffect = {
-  type: 'buy-card'
-  params: {
-    options: number
-    tags: string[]
-  }
-}
-
-type LocalEffect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
-
-function localHandleEffect(run: Run, effect: LocalEffect): Run {
+// Local copy of handleEffect using the REAL Effect type from utils/effects
+export function localHandleEffect(run: Run, effect: Effect): Run {
   switch (effect.type) {
     case 'update-resource': {
       const currentAmount = run.resources[effect.params.resource] || 0
