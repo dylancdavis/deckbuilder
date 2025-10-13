@@ -88,3 +88,55 @@ export function drawFirstHand(run: Run) {
   const drawAmount = run.deck.rulesCard?.turnStructure?.drawAmount || 0
   return moveCards(run, 'drawPile', 'hand', drawAmount)
 }
+
+/**
+ * Pure function that processes playing a card from hand at the given index.
+ * Applies card effects, moves card to discard pile, and logs the event.
+ *
+ * Note: This does not handle buy-card effects or validation - those should be
+ * handled by the caller (e.g., the store).
+ *
+ * @param run - The current run state
+ * @param cardIndex - The index of the card in the hand to play
+ * @returns A new run with the card played and effects applied
+ */
+export function playCardPure(run: Run, cardIndex: number): Run {
+  const card = run.cards.hand[cardIndex]
+  if (!card) {
+    throw new Error(`Cannot play card: no card at index ${cardIndex}`)
+  }
+
+  // Process non-buy-card effects
+  let updatedRun = run
+  for (const effect of card.effects) {
+    if (effect.type !== 'buy-card') {
+      updatedRun = handleEffects(updatedRun, [effect])
+    }
+  }
+
+  // Remove card from hand and add to discard pile
+  const newHand = [...updatedRun.cards.hand]
+  const removedCard = newHand.splice(cardIndex, 1)[0]
+  const newDiscardPile = [...updatedRun.cards.discardPile, removedCard]
+
+  // Log the card play event
+  const newEvents = [
+    ...updatedRun.events,
+    {
+      type: 'card-play' as const,
+      round: updatedRun.stats.rounds,
+      turn: updatedRun.stats.turns,
+      cardId: card.id,
+    },
+  ]
+
+  return {
+    ...updatedRun,
+    cards: {
+      ...updatedRun.cards,
+      hand: newHand,
+      discardPile: newDiscardPile,
+    },
+    events: newEvents,
+  }
+}

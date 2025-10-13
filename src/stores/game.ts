@@ -4,10 +4,15 @@ import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
-import { processStartOfGame, drawFirstHand, populateDrawPile, type Run } from '@/utils/run.ts'
+import {
+  processStartOfGame,
+  drawFirstHand,
+  populateDrawPile,
+  playCardPure,
+  type Run,
+} from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
-import { handleEffect } from '@/utils/effects.ts'
 import type { Deck } from '@/utils/deck.ts'
 import type { Collection } from '@/utils/collection.ts'
 
@@ -243,30 +248,18 @@ export const useGameStore = defineStore('game', () => {
       }
     }
 
-    // Process card effects
-    for (const effect of card.effects) {
-      if (effect.type === 'buy-card') {
-        // buy-card needs UI interaction, handle in store
-        buyCard(effect.params.options, effect.params.tags[0])
-      } else {
-        // All other effects are pure and handled by handleEffect
-        const updatedRun = handleEffect(run, effect)
-        // Update the run reference with the new state
-        gameState.value.game.run = updatedRun
+    // Handle buy-card effects separately (need UI interaction)
+    const hasBuyCardEffect = card.effects.some((effect) => effect.type === 'buy-card')
+    if (hasBuyCardEffect) {
+      const buyCardEffect = card.effects.find((effect) => effect.type === 'buy-card')
+      if (buyCardEffect && buyCardEffect.type === 'buy-card') {
+        buyCard(buyCardEffect.params.options, buyCardEffect.params.tags[0])
       }
     }
 
-    // Remove card from hand and add to discard pile
-    run.cards.hand.splice(cardIndex, 1)
-    run.cards.discardPile.push(card)
-
-    // Log the card play event
-    run.events.push({
-      type: 'card-play',
-      round: run.stats.rounds,
-      turn: run.stats.turns,
-      cardId: card.id,
-    })
+    // Use pure function to process card play and non-buy-card effects
+    const updatedRun = playCardPure(run, cardIndex)
+    gameState.value.game.run = updatedRun
   }
 
   function nextTurn() {
