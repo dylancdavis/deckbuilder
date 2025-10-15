@@ -100,7 +100,7 @@ export function drawFirstHand(run: Run) {
  * @param cardIndex - The index of the card in the hand to play
  * @returns A new run with the card played and effects applied
  */
-export function playCardPure(run: Run, cardIndex: number): Run {
+export function resolveCard(run: Run, cardIndex: number): Run {
   const card = run.cards.hand[cardIndex]
   if (!card) {
     throw new Error(`Cannot play card: no card at index ${cardIndex}`)

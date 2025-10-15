@@ -8,7 +8,7 @@ import {
   processStartOfGame,
   drawFirstHand,
   populateDrawPile,
-  playCardPure,
+  resolveCard,
   type Run,
 } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
@@ -258,7 +258,7 @@ export const useGameStore = defineStore('game', () => {
     }
 
     // Use pure function to process card play and non-buy-card effects
-    const updatedRun = playCardPure(run, cardIndex)
+    const updatedRun = resolveCard(run, cardIndex)
     gameState.value.game.run = updatedRun
   }
 
