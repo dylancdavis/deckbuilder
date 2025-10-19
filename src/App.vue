@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
-import CollectBasicModal from './components/CollectBasicModal.vue'
+import CardChoiceModal from './components/CardChoiceModal.vue'
 
 const gameStore = useGameStore()
 const view = computed(() => gameStore.view)
@@ -35,5 +35,5 @@ function getView(viewName: string[]) {
   </div>
 
   <!-- Modals -->
-  <CollectBasicModal v-if="modalView === 'collect-basic'" />
+  <CardChoiceModal v-if="modalView === 'collect-basic'" />
 </template>
