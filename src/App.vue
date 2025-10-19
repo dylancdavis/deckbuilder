@@ -35,5 +35,5 @@ function getView(viewName: string[]) {
   </div>
 
   <!-- Modals -->
-  <CardChoiceModal v-if="modalView === 'collect-basic'" />
+  <CardChoiceModal v-if="modalView === 'collect-basic'" :card-options="gameStore.cardOptions" :handle-select="gameStore.collectCard" />
 </template>

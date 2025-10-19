@@ -4,10 +4,17 @@ import { cards, type PlayableCardID } from '@/utils/cards'
 import CardItem from './CardItem.vue'
 import { TILT_PRESETS } from '@/composables/useTilt'
 
+interface Props {
+  cardOptions: PlayableCardID[]
+  handleSelect: (cardId: PlayableCardID) => void
+}
+
+const props = defineProps<Props>()
+
 const gameStore = useGameStore()
 
 function selectCard(cardId: PlayableCardID) {
-  gameStore.collectCard(cardId)
+  props.handleSelect(cardId)
   gameStore.closeModal()
 }
 
@@ -25,7 +32,7 @@ function closeModal() {
       </div>
       <div class="card-options">
         <div
-          v-for="cardId in gameStore.cardOptions"
+          v-for="cardId in props.cardOptions"
           :key="cardId"
           class="card-option"
           @click="selectCard(cardId)"
