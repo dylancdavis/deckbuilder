@@ -345,7 +345,6 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    openCollectModal,
     collectCard,
     closeModal,
     drawCards,
