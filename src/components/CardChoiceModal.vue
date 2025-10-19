@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game'
-import { cards, type PlayableCardID } from '@/utils/cards'
+import { cards, type CardID } from '@/utils/cards'
 import CardItem from './CardItem.vue'
 import { TILT_PRESETS } from '@/composables/useTilt'
 
 interface Props {
-  cardOptions: PlayableCardID[]
-  handleSelect: (cardId: PlayableCardID) => void
+  cardOptions: CardID[]
+  handleSelect: (cardId: CardID) => void
 }
 
 const props = defineProps<Props>()
 
 const gameStore = useGameStore()
 
-function selectCard(cardId: PlayableCardID) {
+function selectCard(cardId: CardID) {
   props.handleSelect(cardId)
   gameStore.closeModal()
 }

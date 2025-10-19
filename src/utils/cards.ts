@@ -1,5 +1,5 @@
 import { Resource } from './resource'
-import { keys } from './utils'
+import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
@@ -259,6 +259,13 @@ export const playableCards = {
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }
+
+export function getCardChoices(numChoices: number, tags: string[]): CardID[] {
+  const filteredIDs = values(cards)
+    .filter((card) => tags.every((tag) => card.tags?.includes(tag)))
+    .map((c) => c.id)
+  return selectRandom(filteredIDs, numChoices)
+}
 
 export type RulesCardID = keyof typeof rulesCards
 export type PlayableCardID = keyof typeof playableCards

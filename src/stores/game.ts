@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
-import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
+import { cards, getCardChoices } from '@/utils/cards.ts'
 import {
   processStartOfGame,
   drawFirstHand,
@@ -44,7 +44,7 @@ type GameState = {
   }
   viewData: {
     modalView: 'collect-basic' | null
-    cardOptions: PlayableCardID[]
+    cardOptions: CardID[]
   }
 }
 
@@ -104,22 +104,15 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function openBasicCollectModal(options: number, tag: string) {
-    const availableCards = playableCardIds.filter((id) => {
-      const card = playableCards[id]
-      return card.tags?.includes(tag)
-    })
-
-    const shuffled = [...availableCards].sort(() => Math.random() - 0.5)
-    const selectedOptions = shuffled.slice(0, options)
-
+  function openCollectModal(options: number, tags: string[]) {
+    const choices = getCardChoices(options, tags)
     gameState.value.viewData = {
       modalView: 'collect-basic',
-      cardOptions: selectedOptions,
+      cardOptions: choices
     }
   }
 
-  function collectCard(cardId: PlayableCardID) {
+  function collectCard(cardId: CardID) {
     // Add the selected card to the collection
     gameState.value.game.collection.cards = add(gameState.value.game.collection.cards, cardId)
   }
@@ -247,7 +240,7 @@ export const useGameStore = defineStore('game', () => {
     if (hasChoiceEffect) {
       const choiceEffect = card.effects.find((effect) => effect.type === 'collect-basic')
       if (choiceEffect) {
-        openBasicCollectModal(choiceEffect.params.options, choiceEffect.params.tags[0])
+        openCollectModal(choiceEffect.params.options, choiceEffect.params.tags)
       }
     }
 
@@ -352,7 +345,7 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    openBasicCollectModal,
+    openBasicCollectModal: openCollectModal,
     collectCard,
     closeModal,
     drawCards,

@@ -73,3 +73,11 @@ export function push<T>(array: T[], item: T, n: number = 1) {
     array.push(item)
   }
 }
+
+/**
+ * Returns an array of `n` random items from an array at random
+ */
+export function selectRandom<T>(arr: T[], n?: number) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, n)
+}
