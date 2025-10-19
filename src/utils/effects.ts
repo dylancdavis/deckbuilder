@@ -34,15 +34,15 @@ export type UpdateResourceEffect = {
   )
 }
 
-export type BuyCardEffect = {
-  type: 'buy-card'
+export type CollectBasicEffect = {
+  type: 'collect-basic'
   params: {
     options: number
     tags: string[]
   }
 }
 
-export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
+export type Effect = AddCardsEffect | UpdateResourceEffect | CollectBasicEffect
 
 /**
  * Applies an effect to a run, returning the updated run.
@@ -89,9 +89,9 @@ export function handleEffect(run: Run, effect: Effect): Run {
         },
       }
     }
-    case 'buy-card': {
+    case 'collect-basic': {
       // This needs UI interaction and should be handled by the store
-      throw new Error('buy-card effect should be handled by the store')
+      throw new Error('collect-basic effect should be handled by the store')
     }
     default: {
       const _exhaustive: never = effect

@@ -93,7 +93,7 @@ export function drawFirstHand(run: Run) {
  * Pure function that processes playing a card from hand at the given index.
  * Applies card effects, moves card to discard pile, and logs the event.
  *
- * Note: This does not handle buy-card effects or validation - those should be
+ * Note: This does not handle choice effects or validation - those should be
  * handled by the caller (e.g., the store).
  *
  * @param run - The current run state
@@ -106,10 +106,10 @@ export function resolveCard(run: Run, cardIndex: number): Run {
     throw new Error(`Cannot play card: no card at index ${cardIndex}`)
   }
 
-  // Process non-buy-card effects
+  // Process non-choice effects
   let updatedRun = run
   for (const effect of card.effects) {
-    if (effect.type !== 'buy-card') {
+    if (effect.type !== 'collect-basic') {
       updatedRun = handleEffects(updatedRun, [effect])
     }
   }

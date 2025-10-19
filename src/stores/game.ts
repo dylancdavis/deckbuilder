@@ -43,7 +43,7 @@ type GameState = {
     }
   }
   viewData: {
-    modalView: string | null
+    modalView: 'collect-basic' | null
     cardOptions: PlayableCardID[]
   }
 }
@@ -104,7 +104,7 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function buyCard(options: number, tag: string) {
+  function openBasicCollectModal(options: number, tag: string) {
     const availableCards = playableCardIds.filter((id) => {
       const card = playableCards[id]
       return card.tags?.includes(tag)
@@ -114,7 +114,7 @@ export const useGameStore = defineStore('game', () => {
     const selectedOptions = shuffled.slice(0, options)
 
     gameState.value.viewData = {
-      modalView: 'buy-card',
+      modalView: 'collect-basic',
       cardOptions: selectedOptions,
     }
   }
@@ -248,16 +248,16 @@ export const useGameStore = defineStore('game', () => {
       }
     }
 
-    // Handle buy-card effects separately (need UI interaction)
-    const hasBuyCardEffect = card.effects.some((effect) => effect.type === 'buy-card')
-    if (hasBuyCardEffect) {
-      const buyCardEffect = card.effects.find((effect) => effect.type === 'buy-card')
-      if (buyCardEffect && buyCardEffect.type === 'buy-card') {
-        buyCard(buyCardEffect.params.options, buyCardEffect.params.tags[0])
+    // Open a modal for choice effects, resolving with a callback
+    const hasChoiceEffect = card.effects.some((effect) => effect.type === 'collect-basic')
+    if (hasChoiceEffect) {
+      const choiceEffect = card.effects.find((effect) => effect.type === 'collect-basic')
+      if (choiceEffect) {
+        openBasicCollectModal(choiceEffect.params.options, choiceEffect.params.tags[0])
       }
     }
 
-    // Use pure function to process card play and non-buy-card effects
+    // Use pure function to process card play and non-choice effects
     const updatedRun = resolveCard(run, cardIndex)
     gameState.value.game.run = updatedRun
   }
@@ -358,7 +358,7 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    buyCard,
+    openBasicCollectModal,
     selectCard,
     closeModal,
     drawCards,

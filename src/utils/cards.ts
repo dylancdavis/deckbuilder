@@ -54,7 +54,7 @@ export const collectBasic: PlayableCard = {
   id: 'collect-basic',
   name: 'Collect Basic',
   description: 'Collect a Basic Card.',
-  effects: [{ type: 'buy-card', params: { options: 3, tags: ['basic'] } }],
+  effects: [{ type: 'collect-basic', params: { options: 3, tags: ['basic'] } }],
   cost: 2,
   tags: ['basic'],
 }
@@ -102,15 +102,15 @@ export const saveReward: PlayableCard = {
       params: {
         resource: Resource.POINTS,
         update: (current, run: Run) => {
-          // Check if any buy-card events occurred this round
-          const buyEventsThisRound = run.events.filter(
+          // Check if any collect-card events occurred this round
+          const roundCardPlayEvents = run.events.filter(
             (e) => e.type === 'card-play' && e.round === run.stats.rounds,
           )
-          const hasBoughtCard = buyEventsThisRound.some((e) => {
+          const basicCollectEvents = roundCardPlayEvents.some((e) => {
             const card = playableCards[e.cardId]
-            return card.effects.some((eff) => eff.type === 'buy-card')
+            return card.effects.some((eff) => eff.type === 'collect-basic')
           })
-          return hasBoughtCard ? current : current + 2
+          return basicCollectEvents ? current : current + 2
         },
       },
     },
