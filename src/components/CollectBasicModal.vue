@@ -7,7 +7,8 @@ import { TILT_PRESETS } from '@/composables/useTilt'
 const gameStore = useGameStore()
 
 function selectCard(cardId: PlayableCardID) {
-  gameStore.selectCard(cardId)
+  gameStore.collectCard(cardId)
+  gameStore.closeModal()
 }
 
 function closeModal() {
