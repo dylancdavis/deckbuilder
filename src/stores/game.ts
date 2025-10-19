@@ -43,7 +43,7 @@ type GameState = {
     }
   }
   viewData: {
-    modalView: 'collect-basic' | null
+    modalView: 'collect-card' | null
     cardOptions: CardID[]
   }
 }
@@ -107,7 +107,7 @@ export const useGameStore = defineStore('game', () => {
   function openCollectModal(options: number, tags: string[]) {
     const choices = getCardChoices(options, tags)
     gameState.value.viewData = {
-      modalView: 'collect-basic',
+      modalView: 'collect-card',
       cardOptions: choices
     }
   }
@@ -345,7 +345,7 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    openBasicCollectModal: openCollectModal,
+    openCollectModal,
     collectCard,
     closeModal,
     drawCards,
