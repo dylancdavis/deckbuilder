@@ -4,7 +4,7 @@
 
 import type { Counter } from './counter'
 import { toArray } from './counter'
-import { playableCards, type PlayableCardID } from './cards'
+import { playableCards, type CardID, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import type { Run } from './run'
 
@@ -34,6 +34,22 @@ export type UpdateResourceEffect = {
   )
 }
 
+export type CollectCardEffect = {
+  type: 'collect-card'
+  params: {
+    cards: Counter<CardID>
+  }
+}
+
+export type CardChoiceEffect = {
+  type: 'card-choice-effect'
+  params: {
+    options: number
+    tags: string[]
+    then: (chosenCard: CardID) => Effect
+  }
+}
+
 export type CollectBasicEffect = {
   type: 'collect-basic'
   params: {
@@ -42,7 +58,12 @@ export type CollectBasicEffect = {
   }
 }
 
-export type Effect = AddCardsEffect | UpdateResourceEffect | CollectBasicEffect
+export type Effect =
+  | AddCardsEffect
+  | UpdateResourceEffect
+  | CollectCardEffect
+  | CardChoiceEffect
+  | CollectBasicEffect
 
 /**
  * Applies an effect to a run, returning the updated run.
