@@ -43,7 +43,7 @@ type GameState = {
     }
   }
   viewData: {
-    modalView: 'collect-card' | null
+    modalView: 'card-choice' | null
     cardOptions: CardID[]
   }
 }
@@ -104,11 +104,11 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function openCollectModal(options: number, tags: string[]) {
+  function openCardChoiceModal(options: number, tags: string[]) {
     const choices = getCardChoices(options, tags)
     gameState.value.viewData = {
-      modalView: 'collect-card',
-      cardOptions: choices
+      modalView: 'card-choice',
+      cardOptions: choices,
     }
   }
 
@@ -240,7 +240,7 @@ export const useGameStore = defineStore('game', () => {
     if (hasChoiceEffect) {
       const choiceEffect = card.effects.find((effect) => effect.type === 'collect-basic')
       if (choiceEffect) {
-        openCollectModal(choiceEffect.params.options, choiceEffect.params.tags)
+        openCardChoiceModal(choiceEffect.params.options, choiceEffect.params.tags)
       }
     }
 
