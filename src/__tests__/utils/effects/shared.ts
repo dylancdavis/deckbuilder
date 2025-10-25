@@ -1,4 +1,5 @@
 import type { Run } from '../../../utils/run'
+import type { GameState } from '../../../utils/game'
 import { starterRules } from '../../../utils/cards'
 
 /**
@@ -26,4 +27,28 @@ export const createTestRun = (overrides: Partial<Run> = {}): Run => ({
   },
   events: [],
   ...overrides,
+})
+
+/**
+ * Helper to create a minimal game state for testing effects
+ */
+export const createTestGameState = (runOverrides: Partial<Run> = {}): GameState => ({
+  game: {
+    collection: {
+      cards: {},
+      decks: {},
+    },
+    run: createTestRun(runOverrides),
+  },
+  ui: {
+    currentView: ['run'],
+    collection: {
+      selectedDeck: null,
+    },
+  },
+  viewData: {
+    modalView: null,
+    cardOptions: [],
+    resolver: null,
+  },
 })

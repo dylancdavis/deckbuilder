@@ -3,6 +3,17 @@ import { moveCardByIndex, moveCards, populateDrawPile, processStartOfGame } from
 import { pileToIdCounter } from '../../utils/deck.ts'
 import type { AddCardsEffect, RulesCard } from '../../utils/cards.ts'
 import type { Run } from '../../stores/game.ts'
+import type { GameState } from '../../utils/game.ts'
+
+// Helper to wrap a Run in a minimal GameState for testing
+const wrapInGameState = (run: Run): GameState => ({
+  game: {
+    collection: { cards: {}, decks: {} },
+    run,
+  },
+  ui: { currentView: ['run'], collection: { selectedDeck: null } },
+  viewData: { modalView: null, cardOptions: [], resolver: null },
+})
 
 const baseRules: RulesCard = {
   id: 'starter-rules',
@@ -133,19 +144,22 @@ const populatedHandRunNoAdded: Run = {
 
 describe('processStartOfGame', () => {
   it("doesn't modify cards in draw-pile when no cards are added", () => {
-    const result = processStartOfGame(populatedHandRunNoAdded)
-    expect(result.cards.drawPile).toEqual(populatedHandRunNoAdded.cards.drawPile)
+    const gameState = wrapInGameState(populatedHandRunNoAdded)
+    const result = processStartOfGame(gameState)
+    expect(result.game.run!.cards.drawPile).toEqual(populatedHandRunNoAdded.cards.drawPile)
   })
 
   it('adds cards to draw-pile from rules card', () => {
-    const result = processStartOfGame(populatedHandRun)
-    const idCounter = pileToIdCounter(result.cards.drawPile)
+    const gameState = wrapInGameState(populatedHandRun)
+    const result = processStartOfGame(gameState)
+    const idCounter = pileToIdCounter(result.game.run!.cards.drawPile)
     expect(idCounter).toEqual({ a: 3, b: 2, c: 1, score: 3 })
   })
 
   it('preserves original draw order when cards are added', () => {
-    const result = processStartOfGame(populatedHandRun)
-    const originalCards = result.cards.drawPile.filter((card) => !(card.id === 'score'))
+    const gameState = wrapInGameState(populatedHandRun)
+    const result = processStartOfGame(gameState)
+    const originalCards = result.game.run!.cards.drawPile.filter((card) => !(card.id === 'score'))
     expect(originalCards).toEqual(populatedHandRun.cards.drawPile)
   })
 })

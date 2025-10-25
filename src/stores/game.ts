@@ -183,7 +183,20 @@ export const useGameStore = defineStore('game', () => {
     }
 
     const runWithDrawPile = populateDrawPile(baseRun)
-    const runWithStartEffects = processStartOfGame(runWithDrawPile)
+
+    // Create a temporary game state wrapper for processing start effects
+    const tempGameState: GameState = {
+      game: {
+        collection: gameState.value.game.collection,
+        run: runWithDrawPile,
+      },
+      ui: gameState.value.ui,
+      viewData: gameState.value.viewData,
+    }
+
+    const stateWithStartEffects = processStartOfGame(tempGameState)
+    const runWithStartEffects = stateWithStartEffects.game.run as Run
+
     return drawFirstHand(runWithStartEffects)
   }
 

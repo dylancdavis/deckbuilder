@@ -66,7 +66,7 @@ export function resolveCard(gameState: GameState, cardIndex: number, effects?: E
   const cardEffects = effects ?? card.effects
 
   // Loop through and apply each effect to the game state
-  let updatedRun = run
+  let updatedGameState = gameState
   for (const effect of cardEffects) {
 
     // In the choice case, just update the modal state and return early
@@ -79,11 +79,14 @@ export function resolveCard(gameState: GameState, cardIndex: number, effects?: E
         return resolveCard(gameState, cardIndex, [newEffect, ...remainingEffects])
       }
 
-      return openCardChoiceModal(gameState, options, tags, resolver)
+      return openCardChoiceModal(updatedGameState, options, tags, resolver)
 
     }
-    updatedRun = handleEffect(updatedRun, effect)
+    updatedGameState = handleEffect(updatedGameState, effect)
   }
+
+  // Extract the updated run from the game state
+  const updatedRun = updatedGameState.game.run as Run
 
   // Remove card from hand and add to discard pile
   const newHand = [...updatedRun.cards.hand]
@@ -102,9 +105,9 @@ export function resolveCard(gameState: GameState, cardIndex: number, effects?: E
   ]
 
   return {
-    ...gameState,
+    ...updatedGameState,
     game: {
-      ...gameState.game,
+      ...updatedGameState.game,
       run: {
         ...updatedRun,
         cards: {
