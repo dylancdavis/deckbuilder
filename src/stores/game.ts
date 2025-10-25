@@ -14,7 +14,7 @@ import {
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
 import type { Deck } from '@/utils/deck.ts'
-import type { GameState } from '@/utils/game.ts'
+import { openCardChoiceModal, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -84,14 +84,6 @@ export const useGameStore = defineStore('game', () => {
     if (gameState.value.game.run) {
       gameState.value.game.run.resources[resourceName] =
         (gameState.value.game.run.resources[resourceName] || 0) + amount
-    }
-  }
-
-  function openCardChoiceModal(options: number, tags: string[]) {
-    const choices = getCardChoices(options, tags)
-    gameState.value.viewData = {
-      modalView: 'card-choice',
-      cardOptions: choices,
     }
   }
 
@@ -223,7 +215,8 @@ export const useGameStore = defineStore('game', () => {
     if (hasChoiceEffect) {
       const choiceEffect = card.effects.find((effect) => effect.type === 'collect-basic')
       if (choiceEffect) {
-        openCardChoiceModal(choiceEffect.params.options, choiceEffect.params.tags)
+        gameState.value = openCardChoiceModal(gameState.value, choiceEffect.params.options, choiceEffect.params.tags)
+        return
       }
     }
 
