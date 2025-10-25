@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { moveCards, populateDrawPile, processStartOfGame } from '../../utils/run.js'
+import { moveCardByIndex, moveCards, populateDrawPile, processStartOfGame } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
 import type { AddCardsEffect, RulesCard } from '../../utils/cards.ts'
 import type { Run } from '../../stores/game.ts'
@@ -42,6 +42,32 @@ const preMoveRun: Partial<Run> = {
     board: [],
   },
 }
+
+describe('moveCardByIndex', () => {
+  it('moves card from hand to discard when toIndex is not specified', () => {
+    const result = moveCardByIndex(preMoveRun, 'hand', 'discardPile', 1)
+    expect(result).toEqual({
+      cards: {
+        drawPile: ['a', 'b', 'c', 'd', 'e'],
+        hand: ['f', 'h', 'i'],
+        discardPile: ['g'],
+        board: [],
+      },
+    })
+  })
+
+  it('moves card from hand to specific index in board when toIndex is specified', () => {
+    const result = moveCardByIndex(preMoveRun, 'hand', 'board', 2, 0)
+    expect(result).toEqual({
+      cards: {
+        drawPile: ['a', 'b', 'c', 'd', 'e'],
+        hand: ['f', 'g', 'i'],
+        discardPile: [],
+        board: ['h'],
+      },
+    })
+  })
+})
 
 describe('moveCards', () => {
   it('moves top 3 cards from draw-pile to hand', () => {

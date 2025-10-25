@@ -55,6 +55,24 @@ export function selectKeysBy<T extends object>(obj: T, predicate: (value: T[keyo
 }
 
 /**
+ * Transfers the item at `index` from `fromArray` to `toArray`, returning the updated arrays.
+ * If `toIndex` is provided, inserts at that position; otherwise appends to the end.
+ */
+export function moveItem<T>(fromArray: T[], toArray: T[], index: number, toIndex?: number) {
+  const itemToMove = fromArray[index]
+  const remainingItems = [...fromArray.slice(0, index), ...fromArray.slice(index + 1)]
+
+  let updatedToArray: T[]
+  if (toIndex !== undefined) {
+    updatedToArray = [...toArray.slice(0, toIndex), itemToMove, ...toArray.slice(toIndex)]
+  } else {
+    updatedToArray = [...toArray, itemToMove]
+  }
+
+  return [remainingItems, updatedToArray]
+}
+
+/**
  * Transfers the first `amount` items from the first array to the second, returning the updated arrays.
  */
 export function moveItems<T>(fromArray: T[], toArray: T[], amount: number) {
