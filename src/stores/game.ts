@@ -3,18 +3,17 @@ import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
-import { cards, getCardChoices } from '@/utils/cards.ts'
+import { cards } from '@/utils/cards.ts'
 import {
   processStartOfGame,
   drawFirstHand,
   populateDrawPile,
-  resolveCard,
   type Run,
 } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
 import type { Deck } from '@/utils/deck.ts'
-import { openCardChoiceModal, type GameState } from '@/utils/game.ts'
+import { openCardChoiceModal, resolveCard, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -221,8 +220,8 @@ export const useGameStore = defineStore('game', () => {
     }
 
     // Use pure function to process card play and non-choice effects
-    const updatedRun = resolveCard(run, cardIndex)
-    gameState.value.game.run = updatedRun
+    const updatedGame = resolveCard(gameState.value, cardIndex)
+    gameState.value = updatedGame
   }
 
   function nextTurn() {
