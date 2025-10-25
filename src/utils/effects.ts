@@ -42,7 +42,7 @@ export type CollectCardEffect = {
 }
 
 export type CardChoiceEffect = {
-  type: 'card-choice-effect'
+  type: 'card-choice'
   params: {
     options: number
     tags: string[]
