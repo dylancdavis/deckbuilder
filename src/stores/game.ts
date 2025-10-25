@@ -14,7 +14,7 @@ import {
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
 import type { Deck } from '@/utils/deck.ts'
-import type { Collection } from '@/utils/collection.ts'
+import type { GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -29,23 +29,6 @@ const initialCollectionCards: Counter<CardID> = {
   'point-loan': 4,
   'last-resort': 4,
   'starter-rules': 1,
-}
-
-export type GameState = {
-  game: {
-    collection: Collection
-    run: Run | null
-  }
-  ui: {
-    currentView: string[]
-    collection: {
-      selectedDeck: string | null
-    }
-  }
-  viewData: {
-    modalView: 'card-choice' | null
-    cardOptions: CardID[]
-  }
 }
 
 export const useGameStore = defineStore('game', () => {
