@@ -110,9 +110,10 @@ export function handleEffect(run: Run, effect: Effect): Run {
         },
       }
     }
-    case 'collect-basic': {
-      // This needs UI interaction and should be handled by the store
-      throw new Error('collect-basic effect should be handled by the store')
+    case 'collect-card': {
+      const { cards } = effect.params
+      console.log('Would add cards to collection:', cards)
+      return run // No changes to run
     }
     default: {
       throw new Error(`Unknown effect type: ${JSON.stringify(effect.type)}`)

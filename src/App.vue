@@ -4,6 +4,7 @@ import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
 import CardChoiceModal from './components/CardChoiceModal.vue'
+import type { CardID } from './utils/cards'
 
 const gameStore = useGameStore()
 const view = computed(() => gameStore.view)
@@ -19,6 +20,11 @@ function getView(viewName: string[]) {
       return CollectionView
   }
 }
+
+function handleSelect(cardId: CardID) {
+  gameStore.gameState = gameStore.gameState.viewData.resolver!(gameStore.gameState, cardId)
+}
+
 </script>
 
 <template>
@@ -35,5 +41,6 @@ function getView(viewName: string[]) {
   </div>
 
   <!-- Modals -->
-  <CardChoiceModal v-if="modalView === 'card-choice'" :card-options="gameStore.cardOptions" :handle-select="gameStore.collectCard" />
+  <CardChoiceModal v-if="modalView === 'card-choice'" :card-options="gameStore.cardOptions" :handle-select="handleSelect" />
+
 </template>

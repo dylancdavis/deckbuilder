@@ -13,7 +13,7 @@ import {
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
 import type { Deck } from '@/utils/deck.ts'
-import { openCardChoiceModal, resolveCard, type GameState } from '@/utils/game.ts'
+import { resolveCard, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -46,6 +46,7 @@ export const useGameStore = defineStore('game', () => {
     viewData: {
       modalView: null,
       cardOptions: [],
+      resolver: null,
     },
   })
 
@@ -95,6 +96,7 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.viewData = {
       modalView: null,
       cardOptions: [],
+      resolver: null,
     }
   }
 
@@ -186,6 +188,8 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function playCard(cardIndex: number) {
+
+    // Validation checks
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) {
       throw new Error('Cannot play card: no active run or rules card')
@@ -209,19 +213,8 @@ export const useGameStore = defineStore('game', () => {
       }
     }
 
-    // Open a modal for choice effects, resolving with a callback
-    const hasChoiceEffect = card.effects.some((effect) => effect.type === 'collect-basic')
-    if (hasChoiceEffect) {
-      const choiceEffect = card.effects.find((effect) => effect.type === 'collect-basic')
-      if (choiceEffect) {
-        gameState.value = openCardChoiceModal(gameState.value, choiceEffect.params.options, choiceEffect.params.tags)
-        return
-      }
-    }
-
     // Use pure function to process card play and non-choice effects
-    const updatedGame = resolveCard(gameState.value, cardIndex)
-    gameState.value = updatedGame
+    gameState.value = resolveCard(gameState.value, cardIndex)
   }
 
   function nextTurn() {

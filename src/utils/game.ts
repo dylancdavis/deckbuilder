@@ -2,7 +2,7 @@ import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID } from './cards.ts'
 import { getCardChoices } from './cards.ts'
-import { handleEffects } from './effects.ts'
+import { handleEffect, type Effect } from './effects.ts'
 
 export type GameState = {
   game: {
@@ -18,6 +18,7 @@ export type GameState = {
   viewData: {
     modalView: 'card-choice' | null
     cardOptions: CardID[]
+    resolver: ((gameState: GameState, chosenCard: CardID) => GameState) | null
   }
 }
 
@@ -28,12 +29,14 @@ export type GameState = {
  * @param gameState - The current game state
  * @param options - Number of card options to present
  * @param tags - Tags to filter card choices
+ * @param resolver - Pure function to process gamestate update when a card is chosen
  * @returns A new game state with the modal opened
  */
 export function openCardChoiceModal(
   gameState: GameState,
   options: number,
-  tags: string[]
+  tags: string[],
+  resolver: (game: GameState, chosenCard: CardID) => GameState
 ): GameState {
   const choices = getCardChoices(options, tags)
   return {
@@ -41,6 +44,7 @@ export function openCardChoiceModal(
     viewData: {
       modalView: 'card-choice',
       cardOptions: choices,
+      resolver: resolver,
     },
   }
 }
@@ -56,20 +60,29 @@ export function openCardChoiceModal(
  * @param cardIndex - The index of the card in the hand to play
  * @returns A new game state with the card played and effects applied
  */
-export function resolveCard(gameState: GameState, cardIndex: number): GameState {
+export function resolveCard(gameState: GameState, cardIndex: number, effects?: Effect[]): GameState {
   const run = gameState.game.run as Run
-
   const card = run.cards.hand[cardIndex]
-  if (!card) {
-    throw new Error(`Cannot play card: no card at index ${cardIndex}`)
-  }
+  const cardEffects = effects ?? card.effects
 
-  // Process non-choice effects
+  // Loop through and apply each effect to the game state
   let updatedRun = run
-  for (const effect of card.effects) {
-    if (effect.type !== 'collect-basic') {
-      updatedRun = handleEffects(updatedRun, [effect])
+  for (const effect of cardEffects) {
+
+    // In the choice case, just update the modal state and return early
+    if (effect.type === 'card-choice') {
+      const remainingEffects = cardEffects.slice(cardEffects.indexOf(effect) + 1)
+      const { options, tags, then } = effect.params
+
+      const resolver = (gameState: GameState, chosenCard: CardID) => {
+        const newEffect = then(chosenCard)
+        return resolveCard(gameState, cardIndex, [newEffect, ...remainingEffects])
+      }
+
+      return openCardChoiceModal(gameState, options, tags, resolver)
+
     }
+    updatedRun = handleEffect(updatedRun, effect)
   }
 
   // Remove card from hand and add to discard pile

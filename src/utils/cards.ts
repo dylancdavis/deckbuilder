@@ -54,7 +54,19 @@ export const collectBasic: PlayableCard = {
   id: 'collect-basic',
   name: 'Collect Basic',
   description: 'Collect a Basic Card.',
-  effects: [{ type: 'collect-basic', params: { options: 3, tags: ['basic'] } }],
+  effects: [
+    {
+      type: 'card-choice',
+      params: {
+        options: 3,
+        tags: ['basic'],
+        then: (chosenCard) => ({
+          type: 'collect-card',
+          params: { cards: { [chosenCard]: 1 } },
+        }),
+      },
+    },
+  ],
   cost: 2,
   tags: ['basic'],
 }
