@@ -31,7 +31,7 @@ const initialCollectionCards: Counter<CardID> = {
   'starter-rules': 1,
 }
 
-type GameState = {
+export type GameState = {
   game: {
     collection: Collection
     run: Run | null
