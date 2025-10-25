@@ -115,8 +115,7 @@ export function handleEffect(run: Run, effect: Effect): Run {
       throw new Error('collect-basic effect should be handled by the store')
     }
     default: {
-      const _exhaustive: never = effect
-      throw new Error(`Unknown effect type: ${JSON.stringify(_exhaustive)}`)
+      throw new Error(`Unknown effect type: ${JSON.stringify(effect.type)}`)
     }
   }
 }
