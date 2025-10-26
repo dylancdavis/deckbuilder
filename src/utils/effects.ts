@@ -51,20 +51,11 @@ export type CardChoiceEffect = {
   }
 }
 
-export type CollectBasicEffect = {
-  type: 'collect-basic'
-  params: {
-    options: number
-    tags: string[]
-  }
-}
-
 export type Effect =
   | AddCardsEffect
   | UpdateResourceEffect
   | CollectCardEffect
   | CardChoiceEffect
-  | CollectBasicEffect
 
 /**
  * Applies an effect to a game state, returning the updated game state.

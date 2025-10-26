@@ -118,11 +118,11 @@ export const saveReward: PlayableCard = {
           const roundCardPlayEvents = run.events.filter(
             (e) => e.type === 'card-play' && e.round === run.stats.rounds,
           )
-          const basicCollectEvents = roundCardPlayEvents.some((e) => {
+          const cardCollectEvents = roundCardPlayEvents.some((e) => {
             const card = playableCards[e.cardId]
-            return card.effects.some((eff) => eff.type === 'collect-basic')
+            return card.effects.some((eff) => eff.type === 'collect-card')
           })
-          return basicCollectEvents ? current : current + 2
+          return cardCollectEvents ? current : current + 2
         },
       },
     },
