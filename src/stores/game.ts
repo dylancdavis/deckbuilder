@@ -3,13 +3,17 @@ import { defineStore } from 'pinia'
 import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
-import { cards, playableCardIds, playableCards } from '@/utils/cards.ts'
-import { processStartOfGame, drawFirstHand, populateDrawPile, type Run } from '@/utils/run.ts'
+import { cards } from '@/utils/cards.ts'
+import {
+  processStartOfGame,
+  drawFirstHand,
+  populateDrawPile,
+  type Run,
+} from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
-import { handleEffect } from '@/utils/effects.ts'
 import type { Deck } from '@/utils/deck.ts'
-import type { Collection } from '@/utils/collection.ts'
+import { resolveCard, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -24,23 +28,6 @@ const initialCollectionCards: Counter<CardID> = {
   'point-loan': 4,
   'last-resort': 4,
   'starter-rules': 1,
-}
-
-type GameState = {
-  game: {
-    collection: Collection
-    run: Run | null
-  }
-  ui: {
-    currentView: string[]
-    collection: {
-      selectedDeck: string | null
-    }
-  }
-  viewData: {
-    modalView: string | null
-    cardOptions: PlayableCardID[]
-  }
 }
 
 export const useGameStore = defineStore('game', () => {
@@ -59,6 +46,7 @@ export const useGameStore = defineStore('game', () => {
     viewData: {
       modalView: null,
       cardOptions: [],
+      resolver: null,
     },
   })
 
@@ -99,36 +87,11 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function buyCard(options: number, tag: string) {
-    const availableCards = playableCardIds.filter((id) => {
-      const card = playableCards[id]
-      return card.tags?.includes(tag)
-    })
-
-    const shuffled = [...availableCards].sort(() => Math.random() - 0.5)
-    const selectedOptions = shuffled.slice(0, options)
-
-    gameState.value.viewData = {
-      modalView: 'buy-card',
-      cardOptions: selectedOptions,
-    }
-  }
-
-  function selectCard(cardId: PlayableCardID) {
-    // Add the selected card to the collection
-    gameState.value.game.collection.cards = add(gameState.value.game.collection.cards, cardId)
-
-    // Close the modal
-    gameState.value.viewData = {
-      modalView: null,
-      cardOptions: [],
-    }
-  }
-
   function closeModal() {
     gameState.value.viewData = {
       modalView: null,
       cardOptions: [],
+      resolver: null,
     }
   }
 
@@ -215,11 +178,26 @@ export const useGameStore = defineStore('game', () => {
     }
 
     const runWithDrawPile = populateDrawPile(baseRun)
-    const runWithStartEffects = processStartOfGame(runWithDrawPile)
+
+    // Create a temporary game state wrapper for processing start effects
+    const tempGameState: GameState = {
+      game: {
+        collection: gameState.value.game.collection,
+        run: runWithDrawPile,
+      },
+      ui: gameState.value.ui,
+      viewData: gameState.value.viewData,
+    }
+
+    const stateWithStartEffects = processStartOfGame(tempGameState)
+    const runWithStartEffects = stateWithStartEffects.game.run as Run
+
     return drawFirstHand(runWithStartEffects)
   }
 
   function playCard(cardIndex: number) {
+
+    // Validation checks
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) {
       throw new Error('Cannot play card: no active run or rules card')
@@ -243,30 +221,8 @@ export const useGameStore = defineStore('game', () => {
       }
     }
 
-    // Process card effects
-    for (const effect of card.effects) {
-      if (effect.type === 'buy-card') {
-        // buy-card needs UI interaction, handle in store
-        buyCard(effect.params.options, effect.params.tags[0])
-      } else {
-        // All other effects are pure and handled by handleEffect
-        const updatedRun = handleEffect(run, effect)
-        // Update the run reference with the new state
-        gameState.value.game.run = updatedRun
-      }
-    }
-
-    // Remove card from hand and add to discard pile
-    run.cards.hand.splice(cardIndex, 1)
-    run.cards.discardPile.push(card)
-
-    // Log the card play event
-    run.events.push({
-      type: 'card-play',
-      round: run.stats.rounds,
-      turn: run.stats.turns,
-      cardId: card.id,
-    })
+    // Use pure function to process card play and non-choice effects
+    gameState.value = resolveCard(gameState.value, cardIndex)
   }
 
   function nextTurn() {
@@ -365,8 +321,6 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    buyCard,
-    selectCard,
     closeModal,
     drawCards,
     changeDeckName,

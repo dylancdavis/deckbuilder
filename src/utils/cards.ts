@@ -1,5 +1,5 @@
 import { Resource } from './resource'
-import { keys } from './utils'
+import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
@@ -54,7 +54,19 @@ export const collectBasic: PlayableCard = {
   id: 'collect-basic',
   name: 'Collect Basic',
   description: 'Collect a Basic Card.',
-  effects: [{ type: 'buy-card', params: { options: 3, tags: ['basic'] } }],
+  effects: [
+    {
+      type: 'card-choice',
+      params: {
+        options: 3,
+        tags: ['basic'],
+        then: (chosenCard) => ({
+          type: 'collect-card',
+          params: { cards: { [chosenCard]: 1 } },
+        }),
+      },
+    },
+  ],
   cost: 2,
   tags: ['basic'],
 }
@@ -102,15 +114,15 @@ export const saveReward: PlayableCard = {
       params: {
         resource: Resource.POINTS,
         update: (current, run: Run) => {
-          // Check if any buy-card events occurred this round
-          const buyEventsThisRound = run.events.filter(
+          // Check if any collect-card events occurred this round
+          const roundCardPlayEvents = run.events.filter(
             (e) => e.type === 'card-play' && e.round === run.stats.rounds,
           )
-          const hasBoughtCard = buyEventsThisRound.some((e) => {
+          const cardCollectEvents = roundCardPlayEvents.some((e) => {
             const card = playableCards[e.cardId]
-            return card.effects.some((eff) => eff.type === 'buy-card')
+            return card.effects.some((eff) => eff.type === 'collect-card')
           })
-          return hasBoughtCard ? current : current + 2
+          return cardCollectEvents ? current : current + 2
         },
       },
     },
@@ -259,6 +271,13 @@ export const playableCards = {
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }
+
+export function getCardChoices(numChoices: number, tags: string[]): CardID[] {
+  const filteredIDs = values(cards)
+    .filter((card) => tags.every((tag) => card.tags?.includes(tag)))
+    .map((c) => c.id)
+  return selectRandom(filteredIDs, numChoices)
+}
 
 export type RulesCardID = keyof typeof rulesCards
 export type PlayableCardID = keyof typeof playableCards

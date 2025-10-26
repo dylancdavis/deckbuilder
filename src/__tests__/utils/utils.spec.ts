@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { firstMissingNum, selectKeysBy, moveItems } from '../../utils/utils.js'
+import { firstMissingNum, selectKeysBy, moveItem, moveItems } from '../../utils/utils.js'
 
 describe('firstMissingNum', () => {
   it('returns 1 when given empty list', () => {
@@ -38,6 +38,47 @@ describe('selectKeysBy', () => {
 
   it('filters to only keys according to predicate', () => {
     expect(selectKeysBy({ a: 1, b: 2, c: 3 }, (n) => n % 2 === 1)).toEqual({ a: 1, c: 3 })
+  })
+})
+
+describe('moveItem', () => {
+  it('moves item from one array to end of another by default', () => {
+    expect(moveItem([1, 2, 3, 4], [5, 6, 7, 8], 1)).toEqual([
+      [1, 3, 4],
+      [5, 6, 7, 8, 2],
+    ])
+  })
+
+  it('moves item to specific index when toIndex is provided', () => {
+    expect(moveItem([1, 2, 3, 4], [5, 6, 7, 8], 2, 1)).toEqual([
+      [1, 2, 4],
+      [5, 3, 6, 7, 8],
+    ])
+  })
+
+  it('moves first item to end of target array', () => {
+    expect(moveItem([1, 2, 3], [4, 5], 0)).toEqual([
+      [2, 3],
+      [4, 5, 1],
+    ])
+  })
+
+  it('moves last item to beginning of target array', () => {
+    expect(moveItem([1, 2, 3], [4, 5], 2, 0)).toEqual([
+      [1, 2],
+      [3, 4, 5],
+    ])
+  })
+
+  it('moves item into an empty array', () => {
+    expect(moveItem([1, 2, 3], [], 1)).toEqual([[1, 3], [2]])
+  })
+
+  it('moves item to index 0 of target array', () => {
+    expect(moveItem([1, 2, 3], [4, 5, 6], 1, 0)).toEqual([
+      [1, 3],
+      [2, 4, 5, 6],
+    ])
   })
 })
 

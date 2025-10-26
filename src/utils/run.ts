@@ -2,10 +2,11 @@
  * Game run utility functions
  */
 
-import { moveItems } from './utils.ts'
+import { moveItem, moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
 import { playableCards, type PlayableCard, type PlayableCardID } from './cards.ts'
 import { handleEffects } from './effects.ts'
+import type { GameState } from './game.ts'
 import type { Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
 import type { Event } from './event.ts'
@@ -25,6 +26,30 @@ export type Run = {
   resources: Record<Resource, number>
   stats: { turns: number; rounds: number }
   events: Event[]
+}
+
+/**
+ * Move a card by its index in a location to another location.
+ * If `toIndex` is not specified, it is added to the end of the array (the top of a pile).
+ */
+export function moveCardByIndex(
+  run: Run,
+  fromLocation: Location,
+  toLocation: Location,
+  fromIndex: number,
+  toIndex?: number,
+) {
+  const runCards = run.cards
+  const [newFrom, newTo] = moveItem(runCards[fromLocation], runCards[toLocation], fromIndex, toIndex)
+
+  return {
+    ...run,
+    cards: {
+      ...runCards,
+      [fromLocation]: newFrom,
+      [toLocation]: newTo,
+    },
+  }
 }
 
 /**
@@ -69,16 +94,20 @@ export function populateDrawPile(run: Run): Run {
 /**
  * Process the game-start effects of the rules card, if any.
  */
-export function processStartOfGame(run: Run): Run {
+export function processStartOfGame(gameState: GameState): GameState {
+  const run = gameState.game.run
+  if (!run) {
+    throw new Error('Cannot process start of game without an active run')
+  }
   if (run.deck.rulesCard == null) {
     throw new Error('Tried to process a run without a rules card.')
   }
 
   const gameStartEffects = run.deck.rulesCard.effects.gameStart
 
-  if (!gameStartEffects) return run
+  if (!gameStartEffects) return gameState
 
-  return handleEffects(run, gameStartEffects)
+  return handleEffects(gameState, gameStartEffects)
 }
 
 /**

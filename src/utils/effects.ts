@@ -3,10 +3,11 @@
  */
 
 import type { Counter } from './counter'
-import { toArray } from './counter'
-import { playableCards, type PlayableCardID } from './cards'
+import { toArray, mergeCounters } from './counter'
+import { playableCards, type CardID, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import type { Run } from './run'
+import type { GameState } from './game'
 
 // Game locations where cards can be placed
 export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
@@ -34,23 +35,41 @@ export type UpdateResourceEffect = {
   )
 }
 
-export type BuyCardEffect = {
-  type: 'buy-card'
+export type CollectCardEffect = {
+  type: 'collect-card'
   params: {
-    options: number
-    tags: string[]
+    cards: Counter<CardID>
   }
 }
 
-export type Effect = AddCardsEffect | UpdateResourceEffect | BuyCardEffect
+export type CardChoiceEffect = {
+  type: 'card-choice'
+  params: {
+    options: number
+    tags: string[]
+    then: (chosenCard: CardID) => Effect
+  }
+}
+
+export type Effect =
+  | AddCardsEffect
+  | UpdateResourceEffect
+  | CollectCardEffect
+  | CardChoiceEffect
 
 /**
- * Applies an effect to a run, returning the updated run.
- * This is a pure function that does not mutate the original run.
+ * Applies an effect to a game state, returning the updated game state.
+ * This is a pure function that does not mutate the original game state.
  */
-export function handleEffect(run: Run, effect: Effect): Run {
+export function handleEffect(gameState: GameState, effect: Effect): GameState {
+  const run = gameState.game.run
+
   switch (effect.type) {
     case 'update-resource': {
+      if (!run) {
+        throw new Error('Cannot update resource without an active run')
+      }
+
       const currentAmount = run.resources[effect.params.resource] || 0
       let newAmount: number
 
@@ -63,14 +82,24 @@ export function handleEffect(run: Run, effect: Effect): Run {
       }
 
       return {
-        ...run,
-        resources: {
-          ...run.resources,
-          [effect.params.resource]: newAmount,
+        ...gameState,
+        game: {
+          ...gameState.game,
+          run: {
+            ...run,
+            resources: {
+              ...run.resources,
+              [effect.params.resource]: newAmount,
+            },
+          },
         },
       }
     }
     case 'add-cards': {
+      if (!run) {
+        throw new Error('Cannot add cards without an active run')
+      }
+
       const { location, cards, mode } = effect.params
       const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
       const cardsToAdd = shuffledIDs.map((id) => ({
@@ -82,27 +111,41 @@ export function handleEffect(run: Run, effect: Effect): Run {
         mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
 
       return {
-        ...run,
-        cards: {
-          ...run.cards,
-          [location]: newCardArr,
+        ...gameState,
+        game: {
+          ...gameState.game,
+          run: {
+            ...run,
+            cards: {
+              ...run.cards,
+              [location]: newCardArr,
+            },
+          },
         },
       }
     }
-    case 'buy-card': {
-      // This needs UI interaction and should be handled by the store
-      throw new Error('buy-card effect should be handled by the store')
+    case 'collect-card': {
+      const { cards } = effect.params
+      return {
+        ...gameState,
+        game: {
+          ...gameState.game,
+          collection: {
+            ...gameState.game.collection,
+            cards: mergeCounters(gameState.game.collection.cards, cards),
+          },
+        },
+      }
     }
     default: {
-      const _exhaustive: never = effect
-      throw new Error(`Unknown effect type: ${JSON.stringify(_exhaustive)}`)
+      throw new Error(`Unknown effect type: ${JSON.stringify(effect.type)}`)
     }
   }
 }
 
 /**
- * Applies multiple effects to a run sequentially, returning the final run.
+ * Applies multiple effects to a game state sequentially, returning the final game state.
  */
-export function handleEffects(run: Run, effects: Effect[]): Run {
-  return effects.reduce((currentRun, effect) => handleEffect(currentRun, effect), run)
+export function handleEffects(gameState: GameState, effects: Effect[]): GameState {
+  return effects.reduce((currentState, effect) => handleEffect(currentState, effect), gameState)
 }
