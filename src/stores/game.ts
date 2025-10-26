@@ -87,11 +87,6 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function collectCard(cardId: CardID) {
-    // Add the selected card to the collection
-    gameState.value.game.collection.cards = add(gameState.value.game.collection.cards, cardId)
-  }
-
   function closeModal() {
     gameState.value.viewData = {
       modalView: null,
@@ -326,7 +321,6 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    collectCard,
     closeModal,
     drawCards,
     changeDeckName,
