@@ -195,7 +195,7 @@ export const useGameStore = defineStore('game', () => {
     return drawFirstHand(runWithStartEffects)
   }
 
-  function playCard(cardIndex: number) {
+  function playCard(instanceId: string) {
 
     // Validation checks
     const run = gameState.value.game.run
@@ -203,9 +203,9 @@ export const useGameStore = defineStore('game', () => {
       throw new Error('Cannot play card: no active run or rules card')
     }
 
-    const card = run.cards.hand[cardIndex]
+    const card = run.cards.hand.find(card => card.instanceId === instanceId)
     if (!card) {
-      throw new Error(`Cannot play card: no card at index ${cardIndex}`)
+      throw new Error(`Cannot play card: no card with instanceId ${instanceId}`)
     }
 
     // Check playAmount limit by counting events for current turn
@@ -222,7 +222,7 @@ export const useGameStore = defineStore('game', () => {
     }
 
     // Use pure function to process card play and non-choice effects
-    gameState.value = resolveCard(gameState.value, cardIndex)
+    gameState.value = resolveCard(gameState.value, instanceId)
   }
 
   function nextTurn() {

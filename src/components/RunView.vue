@@ -102,12 +102,12 @@ async function nextTurn() {
   })
 }
 
-async function playCard(cardIndex: number) {
+async function playCard(instanceId: string) {
   // Capture state of all cards in hand and discard pile
   const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
 
   // Make the state change
-  gameStore.playCard(cardIndex)
+  gameStore.playCard(instanceId)
 
   // Wait for Vue to re-render
   await nextTick()
@@ -156,12 +156,12 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
       <div class="hand-group">
         <div class="empty-pile">
           <div
-            v-for="(card, index) in run.cards.hand"
+            v-for="card in run.cards.hand"
             :key="card.instanceId || card.name"
             :data-flip-id="card.instanceId"
             class="flip-card"
             :class="{ 'card-disabled': !canPlayCard }"
-            @click="canPlayCard && playCard(index)"
+            @click="canPlayCard && card.instanceId && playCard(card.instanceId)"
           >
             <div class="flip-card-inner">
               <div class="flip-card-front">

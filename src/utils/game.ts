@@ -50,19 +50,24 @@ export function openCardChoiceModal(
 }
 
 /**
- * Pure function that processes playing a card from hand at the given index.
+ * Pure function that processes playing a card from hand with the given instance ID.
  * Applies card effects, moves card to discard pile, and logs the event.
  *
  * Note: This does not handle choice effects or validation - those should be
  * handled by the caller (e.g., the store).
  *
  * @param gameState - The current game state
- * @param cardIndex - The index of the card in the hand to play
+ * @param instanceId - The instance ID of the card in the hand to play
  * @returns A new game state with the card played and effects applied
  */
-export function resolveCard(gameState: GameState, cardIndex: number, effects?: Effect[]): GameState {
+export function resolveCard(gameState: GameState, instanceId: string, effects?: Effect[]): GameState {
   const run = gameState.game.run as Run
-  const card = run.cards.hand[cardIndex]
+  const card = run.cards.hand.find(card => card.instanceId === instanceId)
+
+  if (!card) {
+    throw new Error(`Cannot resolve card: no card with instanceId ${instanceId} found in hand`)
+  }
+
   const cardEffects = effects ?? card.effects
 
   // Loop through and apply each effect to the game state
@@ -76,7 +81,7 @@ export function resolveCard(gameState: GameState, cardIndex: number, effects?: E
 
       const resolver = (gameState: GameState, chosenCard: CardID) => {
         const newEffect = then(chosenCard)
-        return resolveCard(gameState, cardIndex, [newEffect, ...remainingEffects])
+        return resolveCard(gameState, instanceId, [newEffect, ...remainingEffects])
       }
 
       return openCardChoiceModal(updatedGameState, options, tags, resolver)
@@ -89,9 +94,8 @@ export function resolveCard(gameState: GameState, cardIndex: number, effects?: E
   const updatedRun = updatedGameState.game.run as Run
 
   // Remove card from hand and add to discard pile
-  const newHand = [...updatedRun.cards.hand]
-  const removedCard = newHand.splice(cardIndex, 1)[0]
-  const newDiscardPile = [...updatedRun.cards.discardPile, removedCard]
+  const newHand = updatedRun.cards.hand.filter(c => c.instanceId !== instanceId)
+  const newDiscardPile = [...updatedRun.cards.discardPile, card]
 
   // Log the card play event
   const newEvents = [
