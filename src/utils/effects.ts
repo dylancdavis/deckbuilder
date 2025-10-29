@@ -51,11 +51,20 @@ export type CardChoiceEffect = {
   }
 }
 
+export type DestroyCardEffect = {
+  type: 'destroy-card'
+  params: {
+    location: GameLocation
+    instanceId: string
+  }
+}
+
 export type Effect =
   | AddCardsEffect
   | UpdateResourceEffect
   | CollectCardEffect
   | CardChoiceEffect
+  | DestroyCardEffect
 
 /**
  * Applies an effect to a game state, returning the updated game state.
@@ -63,13 +72,12 @@ export type Effect =
  */
 export function handleEffect(gameState: GameState, effect: Effect): GameState {
   const run = gameState.game.run
+  if (!run) {
+    throw new Error('No active run in game state')
+  }
 
   switch (effect.type) {
     case 'update-resource': {
-      if (!run) {
-        throw new Error('Cannot update resource without an active run')
-      }
-
       const currentAmount = run.resources[effect.params.resource] || 0
       let newAmount: number
 
@@ -96,10 +104,6 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
       }
     }
     case 'add-cards': {
-      if (!run) {
-        throw new Error('Cannot add cards without an active run')
-      }
-
       const { location, cards, mode } = effect.params
       const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
       const cardsToAdd = shuffledIDs.map((id) => ({
