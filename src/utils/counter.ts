@@ -72,6 +72,25 @@ export function mergeCounters<T extends string>(
 }
 
 /**
+ * Subtracts counter2 from counter1, removing keys that reach 0 or below.
+ */
+export function subtractCounters<T extends string>(
+  counter1: Counter<T>,
+  counter2: Counter<T>,
+): Counter<T> {
+  const result = { ...counter1 }
+  for (const [key, value] of entries(counter2)) {
+    const newValue = (result[key] ?? 0) - (value ?? 0)
+    if (newValue <= 0) {
+      delete result[key]
+    } else {
+      result[key] = newValue
+    }
+  }
+  return result
+}
+
+/**
  * Returns a counter tracking for each key the value within `counter1` minus the value within `counter2`,
  * with non-positive values omitted.
  */

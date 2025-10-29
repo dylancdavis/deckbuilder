@@ -3,7 +3,7 @@
  */
 
 import type { Counter } from './counter'
-import { toArray, mergeCounters } from './counter'
+import { toArray, mergeCounters, subtractCounters } from './counter'
 import { playableCards, type CardID, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import type { Run } from './run'
@@ -42,20 +42,19 @@ export type CollectCardEffect = {
   }
 }
 
+export type DestroyCardEffect = {
+  type: 'destroy-card'
+  params: {
+    cards: Counter<CardID>
+  }
+}
+
 export type CardChoiceEffect = {
   type: 'card-choice'
   params: {
     options: number
     tags: string[]
     then: (chosenCard: CardID) => Effect
-  }
-}
-
-export type DestroyCardEffect = {
-  type: 'destroy-card'
-  params: {
-    location: GameLocation
-    instanceId: string
   }
 }
 
@@ -137,6 +136,19 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
           collection: {
             ...gameState.game.collection,
             cards: mergeCounters(gameState.game.collection.cards, cards),
+          },
+        },
+      }
+    }
+    case 'destroy-card': {
+      const { cards } = effect.params
+      return {
+        ...gameState,
+        game: {
+          ...gameState.game,
+          collection: {
+            ...gameState.game.collection,
+            cards: subtractCounters(gameState.game.collection.cards, cards),
           },
         },
       }
