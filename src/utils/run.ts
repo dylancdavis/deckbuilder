@@ -11,12 +11,13 @@ import type { Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
 import type { Event } from './event.ts'
 
-export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
+export type Location = 'drawPile' | 'hand' | 'board' | 'stack' | 'discardPile'
 
 export type RunCards = {
   drawPile: PlayableCard[]
   hand: PlayableCard[]
   board: PlayableCard[]
+  stack: PlayableCard[]
   discardPile: PlayableCard[]
 }
 
