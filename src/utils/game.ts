@@ -62,16 +62,40 @@ export function openCardChoiceModal(
  */
 export function resolveCard(gameState: GameState, instanceId: string, effects?: Effect[]): GameState {
   const run = gameState.game.run as Run
-  const card = run.cards.hand.find(card => card.instanceId === instanceId)
+
+  // Find card in either hand or stack
+  const cardInHand = run.cards.hand.find(card => card.instanceId === instanceId)
+  const cardInStack = run.cards.stack.find(card => card.instanceId === instanceId)
+  const card = cardInHand ?? cardInStack
 
   if (!card) {
-    throw new Error(`Cannot resolve card: no card with instanceId ${instanceId} found in hand`)
+    throw new Error(`Cannot resolve card: no card with instanceId ${instanceId} found in hand or stack`)
+  }
+
+  // If card is in hand, move it to stack before processing effects
+  let updatedGameState = gameState
+  if (cardInHand) {
+    const newHand = run.cards.hand.filter(c => c.instanceId !== instanceId)
+    const newStack = [...run.cards.stack, card]
+    updatedGameState = {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: {
+            ...run.cards,
+            hand: newHand,
+            stack: newStack,
+          },
+        },
+      },
+    }
   }
 
   const cardEffects = effects ?? card.effects
 
   // Loop through and apply each effect to the game state
-  let updatedGameState = gameState
   for (const effect of cardEffects) {
 
     // In the choice case, just update the modal state and return early
@@ -93,8 +117,8 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
   // Extract the updated run from the game state
   const updatedRun = updatedGameState.game.run as Run
 
-  // Remove card from hand and add to discard pile
-  const newHand = updatedRun.cards.hand.filter(c => c.instanceId !== instanceId)
+  // Remove card from stack and add to discard pile
+  const newStack = updatedRun.cards.stack.filter(c => c.instanceId !== instanceId)
   const newDiscardPile = [...updatedRun.cards.discardPile, card]
 
   // Log the card play event
@@ -116,7 +140,7 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
         ...updatedRun,
         cards: {
           ...updatedRun.cards,
-          hand: newHand,
+          stack: newStack,
           discardPile: newDiscardPile,
         },
         events: newEvents,

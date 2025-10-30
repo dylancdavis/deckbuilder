@@ -171,7 +171,7 @@ export const useGameStore = defineStore('game', () => {
   function makeRun(deck: Deck): Run {
     const baseRun: Run = {
       deck: deck,
-      cards: { drawPile: [], hand: [], board: [], discardPile: [] },
+      cards: { drawPile: [], hand: [], board: [], stack: [], discardPile: [] },
       resources: { points: 0 },
       stats: { turns: 1, rounds: 1 },
       events: [],
