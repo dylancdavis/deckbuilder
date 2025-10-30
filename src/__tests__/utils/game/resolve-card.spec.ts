@@ -12,6 +12,7 @@ describe('resolveCard', () => {
         drawPile: [],
         hand: [card1, card2],
         board: [],
+        stack: [],
         discardPile: [],
       },
     })
@@ -20,23 +21,25 @@ describe('resolveCard', () => {
 
     expect(result.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.run!.cards.hand[0].instanceId).toBe('card-2')
+    expect(result.game.run!.cards.stack).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
   })
 
-  it('throws error when instance ID not found in hand', () => {
+  it('throws error when instance ID not found in hand or stack', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const gameState = createTestGameState({
       cards: {
         drawPile: [],
         hand: [card1],
         board: [],
+        stack: [],
         discardPile: [],
       },
     })
 
     expect(() => resolveCard(gameState, 'nonexistent-id')).toThrow(
-      'Cannot resolve card: no card with instanceId nonexistent-id found in hand',
+      'Cannot resolve card: no card with instanceId nonexistent-id found in hand or stack',
     )
   })
 
@@ -47,6 +50,7 @@ describe('resolveCard', () => {
         drawPile: [],
         hand: [card1],
         board: [],
+        stack: [],
         discardPile: [],
       },
       resources: {
@@ -60,6 +64,8 @@ describe('resolveCard', () => {
     expect(result.game.run!.resources.points).toBe(1)
     // Card moved to discard
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
+    // Stack should be empty after resolution
+    expect(result.game.run!.cards.stack).toHaveLength(0)
   })
 
   it('logs card play event', () => {
@@ -69,6 +75,7 @@ describe('resolveCard', () => {
         drawPile: [],
         hand: [card1],
         board: [],
+        stack: [],
         discardPile: [],
       },
       stats: {
@@ -97,6 +104,7 @@ describe('resolveCard', () => {
         drawPile: [],
         hand: [card1, card2, card3],
         board: [],
+        stack: [],
         discardPile: [],
       },
     })
@@ -106,6 +114,7 @@ describe('resolveCard', () => {
     expect(result.game.run!.cards.hand).toHaveLength(2)
     expect(result.game.run!.cards.hand[0].instanceId).toBe('card-1')
     expect(result.game.run!.cards.hand[1].instanceId).toBe('card-3')
+    expect(result.game.run!.cards.stack).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-2')
   })
@@ -117,16 +126,19 @@ describe('resolveCard', () => {
         drawPile: [],
         hand: [card1],
         board: [],
+        stack: [],
         discardPile: [],
       },
     })
 
     const originalHandLength = gameState.game.run!.cards.hand.length
+    const originalStackLength = gameState.game.run!.cards.stack.length
     const originalDiscardLength = gameState.game.run!.cards.discardPile.length
 
     resolveCard(gameState, 'card-1')
 
     expect(gameState.game.run!.cards.hand).toHaveLength(originalHandLength)
+    expect(gameState.game.run!.cards.stack).toHaveLength(originalStackLength)
     expect(gameState.game.run!.cards.discardPile).toHaveLength(originalDiscardLength)
   })
 
@@ -139,6 +151,7 @@ describe('resolveCard', () => {
         drawPile: [],
         hand: [card1, card2],
         board: [],
+        stack: [],
         discardPile: [existingCard],
       },
     })
@@ -148,5 +161,25 @@ describe('resolveCard', () => {
     expect(result.game.run!.cards.discardPile).toHaveLength(2)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('existing')
     expect(result.game.run!.cards.discardPile[1].instanceId).toBe('card-1')
+  })
+
+  it('can resolve card from stack (for continuation after choice)', () => {
+    const card1 = { ...score, instanceId: 'card-1' }
+    const gameState = createTestGameState({
+      cards: {
+        drawPile: [],
+        hand: [],
+        board: [],
+        stack: [card1],
+        discardPile: [],
+      },
+    })
+
+    const result = resolveCard(gameState, 'card-1')
+
+    expect(result.game.run!.cards.hand).toHaveLength(0)
+    expect(result.game.run!.cards.stack).toHaveLength(0)
+    expect(result.game.run!.cards.discardPile).toHaveLength(1)
+    expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
   })
 })
