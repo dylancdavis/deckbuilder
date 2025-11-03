@@ -13,7 +13,7 @@ import {
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
 import type { Deck } from '@/utils/deck.ts'
-import { resolveCard, type GameState } from '@/utils/game.ts'
+import { resolveCard, drawCards as drawCardsPure, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -96,21 +96,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function drawCards(n: number) {
-    if (gameState.value.game.run) {
-      const drawPile = gameState.value.game.run.cards.drawPile
-      const hand = gameState.value.game.run.cards.hand
-
-      for (let i = 0; i < n && drawPile.length > 0; i++) {
-        const card = drawPile.pop()
-        if (card) {
-          hand.push(card)
-        }
-      }
-
-      // Update the run state
-      gameState.value.game.run.cards.drawPile = drawPile
-      gameState.value.game.run.cards.hand = hand
-    }
+    gameState.value = drawCardsPure(gameState.value, n)
   }
 
   function changeDeckName(oldName: string, newName: string) {

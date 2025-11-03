@@ -50,6 +50,48 @@ export function openCardChoiceModal(
 }
 
 /**
+ * Pure function that draws n cards from the draw pile to hand.
+ *
+ * TODO: Process onDraw effects when drawing cards (e.g., debt card should lose 6 points)
+ *
+ * @param gameState - The current game state
+ * @param n - Number of cards to draw
+ * @returns A new game state with cards moved from draw pile to hand
+ */
+export function drawCards(gameState: GameState, n: number): GameState {
+  const run = gameState.game.run
+  if (!run) {
+    throw new Error('Cannot draw cards: no active run')
+  }
+
+  const drawPile = [...run.cards.drawPile]
+  const hand = [...run.cards.hand]
+
+  // Move up to n cards from draw pile to hand
+  for (let i = 0; i < n && drawPile.length > 0; i++) {
+    const card = drawPile.shift() // Take from front of draw pile
+    if (card) {
+      hand.push(card) // Add to hand
+    }
+  }
+
+  return {
+    ...gameState,
+    game: {
+      ...gameState.game,
+      run: {
+        ...run,
+        cards: {
+          ...run.cards,
+          drawPile,
+          hand,
+        },
+      },
+    },
+  }
+}
+
+/**
  * Pure function that processes playing a card from hand with the given instance ID.
  * Applies card effects, moves card to discard pile, and logs the event.
  *
