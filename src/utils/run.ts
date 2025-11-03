@@ -118,3 +118,57 @@ export function drawFirstHand(run: Run) {
   const drawAmount = run.deck.rulesCard?.turnStructure?.drawAmount || 0
   return moveCards(run, 'drawPile', 'hand', drawAmount)
 }
+
+/**
+ * Creates a new run from a deck with populated draw pile.
+ */
+export function makeRun(deck: Deck): Run {
+  const baseRun: Run = {
+    deck: deck,
+    cards: { drawPile: [], hand: [], board: [], stack: [], discardPile: [] },
+    resources: { points: 0 },
+    stats: { turns: 1, rounds: 1 },
+    events: [],
+  }
+
+  return populateDrawPile(baseRun)
+}
+
+/**
+ * Initializes a new run from the selected deck in gameState and processes game-start effects.
+ * Returns updated GameState which may include changes to collection or modals.
+ */
+export function initializeRun(gameState: GameState): GameState {
+  const selectedDeckKey = gameState.ui.collection.selectedDeck
+  if (!selectedDeckKey) {
+    throw new Error('Cannot initialize run: no deck selected')
+  }
+
+  const deck = gameState.game.collection.decks[selectedDeckKey]
+  if (!deck) {
+    throw new Error(`Cannot initialize run: deck ${selectedDeckKey} not found`)
+  }
+
+  const run = makeRun(deck)
+
+  // Create game state with the new run for processing start effects
+  const stateWithRun: GameState = {
+    ...gameState,
+    game: {
+      ...gameState.game,
+      run: run,
+    },
+  }
+
+  const stateWithStartEffects = processStartOfGame(stateWithRun)
+  const runWithStartEffects = stateWithStartEffects.game.run as Run
+  const runWithHand = drawFirstHand(runWithStartEffects)
+
+  return {
+    ...stateWithStartEffects,
+    game: {
+      ...stateWithStartEffects.game,
+      run: runWithHand,
+    },
+  }
+}

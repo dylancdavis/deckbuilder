@@ -63,7 +63,7 @@ function onBackToDecks() {
 
 function onStartRun() {
   if (!selectedDeck.value) throw new Error('No deck selected to start run')
-  gameStore.startRun(selectedDeck.value)
+  gameStore.startRun()
 }
 
 function handleCardClick(id: CardID, index: number) {

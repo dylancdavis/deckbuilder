@@ -4,15 +4,9 @@ import { startingDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards } from '@/utils/cards.ts'
-import {
-  processStartOfGame,
-  drawFirstHand,
-  populateDrawPile,
-  type Run,
-} from '@/utils/run.ts'
+import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
-import type { Deck } from '@/utils/deck.ts'
 import { resolveCard, drawCards as drawCardsPure, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
@@ -70,9 +64,9 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.ui.collection.selectedDeck = key
   }
 
-  function startRun(deck: Deck) {
+  function startRun() {
     gameState.value.ui.currentView = ['run']
-    gameState.value.game.run = makeRun(deck)
+    gameState.value = initializeRun(gameState.value)
   }
 
   function endRun() {
@@ -152,33 +146,6 @@ export const useGameStore = defineStore('game', () => {
       editable: true,
     }
     return newDeckKey
-  }
-
-  function makeRun(deck: Deck): Run {
-    const baseRun: Run = {
-      deck: deck,
-      cards: { drawPile: [], hand: [], board: [], stack: [], discardPile: [] },
-      resources: { points: 0 },
-      stats: { turns: 1, rounds: 1 },
-      events: [],
-    }
-
-    const runWithDrawPile = populateDrawPile(baseRun)
-
-    // Create a temporary game state wrapper for processing start effects
-    const tempGameState: GameState = {
-      game: {
-        collection: gameState.value.game.collection,
-        run: runWithDrawPile,
-      },
-      ui: gameState.value.ui,
-      viewData: gameState.value.viewData,
-    }
-
-    const stateWithStartEffects = processStartOfGame(tempGameState)
-    const runWithStartEffects = stateWithStartEffects.game.run as Run
-
-    return drawFirstHand(runWithStartEffects)
   }
 
   function playCard(instanceId: string) {
