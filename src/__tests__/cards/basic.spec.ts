@@ -11,6 +11,8 @@ import {
   lastResort,
   debt,
   starterRules,
+  zeroReward,
+  pointMultiply,
 } from '../../utils/cards'
 import { createTestGameState } from '../utils/effects/shared'
 
@@ -48,6 +50,78 @@ it('point-reset sets points to 4', () => {
   const result = resolveCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(4)
+})
+
+it('zero-reward gains 6 points when at 0 points', () => {
+  const card = { ...zeroReward, instanceId: 'card-1' }
+  const gameState = createTestGameState({
+    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    resources: { points: 0 },
+  })
+
+  const result = resolveCard(gameState, 'card-1')
+
+  expect(result.game.run!.resources.points).toBe(6)
+})
+
+it('zero-reward does not change points when not at 0', () => {
+  const card = { ...zeroReward, instanceId: 'card-1' }
+  const gameState = createTestGameState({
+    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    resources: { points: 5 },
+  })
+
+  const result = resolveCard(gameState, 'card-1')
+
+  expect(result.game.run!.resources.points).toBe(5)
+})
+
+it('point-multiply doubles points when at 0', () => {
+  const card = { ...pointMultiply, instanceId: 'card-1' }
+  const gameState = createTestGameState({
+    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    resources: { points: 0 },
+  })
+
+  const result = resolveCard(gameState, 'card-1')
+
+  expect(result.game.run!.resources.points).toBe(0)
+})
+
+it('point-multiply doubles points when at 2', () => {
+  const card = { ...pointMultiply, instanceId: 'card-1' }
+  const gameState = createTestGameState({
+    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    resources: { points: 2 },
+  })
+
+  const result = resolveCard(gameState, 'card-1')
+
+  expect(result.game.run!.resources.points).toBe(4)
+})
+
+it('point-multiply doubles points when at 4', () => {
+  const card = { ...pointMultiply, instanceId: 'card-1' }
+  const gameState = createTestGameState({
+    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    resources: { points: 4 },
+  })
+
+  const result = resolveCard(gameState, 'card-1')
+
+  expect(result.game.run!.resources.points).toBe(8)
+})
+
+it('point-multiply does not change points when above 4', () => {
+  const card = { ...pointMultiply, instanceId: 'card-1' }
+  const gameState = createTestGameState({
+    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    resources: { points: 10 },
+  })
+
+  const result = resolveCard(gameState, 'card-1')
+
+  expect(result.game.run!.resources.points).toBe(10)
 })
 
 it('point-loan gains 6 points and adds debt to draw pile', () => {
