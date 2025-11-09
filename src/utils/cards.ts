@@ -190,7 +190,22 @@ export const scoreSurge: PlayableCard = {
   id: 'score-surge',
   name: 'Score Surge',
   description: 'Gain 2 points (max 8) for each "Score" played this round.',
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        update: (current, run) => {
+          const currentRound = run.stats.rounds
+          const scoreCardsPlayedThisRound = run.events.filter(
+            (event) => event.type === 'card-play' && event.cardId === 'score' && event.round === currentRound
+          ).length
+          const pointsToGain = Math.min(scoreCardsPlayedThisRound * 2, 8)
+          return current + pointsToGain
+        },
+      },
+    },
+  ],
   cost: 10,
   tags: ['basic'],
 }
@@ -200,7 +215,19 @@ export const scoreSynergy: PlayableCard = {
   id: 'score-synergy',
   name: 'Score Synergy',
   description: 'Gain 1 point (max 6) for each "Score" in your deck.',
-  effects: [],
+  effects: [
+    {
+      type: 'update-resource',
+      params: {
+        resource: Resource.POINTS,
+        update: (current, run) => {
+          const scoreCardsInDeck = run.deck.cards['score'] || 0
+          const pointsToGain = Math.min(scoreCardsInDeck, 6)
+          return current + pointsToGain
+        },
+      },
+    },
+  ],
   cost: 10,
   tags: ['basic'],
 }
