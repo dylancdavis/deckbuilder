@@ -69,7 +69,7 @@ const MAX_DRAW_PILE_SIZE = 3
 function drawPile(cards: PlayableCard[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   // Show the top cards from the draw pile (the ones that would be drawn next)
-  const visibleCards = cards.slice(-pileSize).reverse()
+  const visibleCards = cards.slice(0, pileSize).reverse()
   return {
     pileSize,
     cards: visibleCards,
