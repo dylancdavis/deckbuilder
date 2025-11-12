@@ -137,12 +137,25 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
 
   const cardEffects = effects ?? card.effects
 
+  // Transform 'self' references in remove-card effects to the actual instanceId
+  const transformedEffects = cardEffects.map(effect => {
+    if (effect.type === 'remove-card' && effect.params.instanceId === 'self') {
+      return {
+        ...effect,
+        params: {
+          instanceId: instanceId
+        }
+      }
+    }
+    return effect
+  })
+
   // Loop through and apply each effect to the game state
-  for (const effect of cardEffects) {
+  for (const effect of transformedEffects) {
 
     // In the choice case, just update the modal state and return early
     if (effect.type === 'card-choice') {
-      const remainingEffects = cardEffects.slice(cardEffects.indexOf(effect) + 1)
+      const remainingEffects = transformedEffects.slice(transformedEffects.indexOf(effect) + 1)
       const { options, tags, then } = effect.params
 
       const resolver = (gameState: GameState, chosenCard: CardID) => {
@@ -159,9 +172,14 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
   // Extract the updated run from the game state
   const updatedRun = updatedGameState.game.run as Run
 
-  // Remove card from stack and add to discard pile
+  // Check if the card is still in the stack (it may have been removed by an effect)
+  const cardStillInStack = updatedRun.cards.stack.some(c => c.instanceId === instanceId)
+
+  // Remove card from stack and add to discard pile (only if it's still in the stack)
   const newStack = updatedRun.cards.stack.filter(c => c.instanceId !== instanceId)
-  const newDiscardPile = [...updatedRun.cards.discardPile, card]
+  const newDiscardPile = cardStillInStack
+    ? [...updatedRun.cards.discardPile, card]
+    : updatedRun.cards.discardPile
 
   // Log the card play event
   const newEvents = [

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { resolveCard } from '../../../utils/game'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from '../effects/shared'
+import { Resource } from '../../../utils/resource'
 
 describe('resolveCard', () => {
   it('plays a card by instance ID', () => {
@@ -181,5 +182,38 @@ describe('resolveCard', () => {
     expect(result.game.run!.cards.stack).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
+  })
+
+  it("transforms 'self' in remove-card effect to card's instanceId", () => {
+    const cardWithSelfRemoval = {
+      ...score,
+      instanceId: 'card-1',
+      effects: [
+        { type: 'update-resource' as const, params: { resource: Resource.POINTS, delta: 1 } },
+        { type: 'remove-card' as const, params: { instanceId: 'self' as const } },
+      ],
+    }
+    const gameState = createTestGameState({
+      cards: {
+        drawPile: [],
+        hand: [cardWithSelfRemoval],
+        board: [],
+        stack: [],
+        discardPile: [],
+      },
+      resources: {
+        points: 0,
+      },
+    })
+
+    const result = resolveCard(gameState, 'card-1')
+
+    // Effect should have been applied
+    expect(result.game.run!.resources.points).toBe(1)
+    // Card should not be in discard pile (removed instead)
+    expect(result.game.run!.cards.discardPile).toHaveLength(0)
+    // Card should not be in any location
+    expect(result.game.run!.cards.hand).toHaveLength(0)
+    expect(result.game.run!.cards.stack).toHaveLength(0)
   })
 })

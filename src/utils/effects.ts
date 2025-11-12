@@ -61,7 +61,7 @@ export type CardChoiceEffect = {
 export type RemoveCardEffect = {
   type: 'remove-card'
   params: {
-    instanceId: string
+    instanceId: string | 'self'
   }
 }
 
