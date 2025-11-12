@@ -275,6 +275,8 @@ export const lastResort: PlayableCard = {
   description: 'Gain 8 Points. Destroy this card.',
   effects: [
     { type: 'update-resource', params: { resource: Resource.POINTS, delta: 8 } },
+    { type: 'remove-card', params: { instanceId: 'self' } },
+    { type: 'destroy-card', params: { cards: { 'last-resort': 1 } } },
   ],
   cost: 12,
   tags: ['basic'],
