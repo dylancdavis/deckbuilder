@@ -58,12 +58,20 @@ export type CardChoiceEffect = {
   }
 }
 
+export type RemoveCardEffect = {
+  type: 'remove-card'
+  params: {
+    instanceId: string
+  }
+}
+
 export type Effect =
   | AddCardsEffect
   | UpdateResourceEffect
   | CollectCardEffect
   | CardChoiceEffect
   | DestroyCardEffect
+  | RemoveCardEffect
 
 /**
  * Applies an effect to a game state, returning the updated game state.
@@ -149,6 +157,41 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
           collection: {
             ...gameState.game.collection,
             cards: subtractCounters(gameState.game.collection.cards, cards),
+          },
+        },
+      }
+    }
+    case 'remove-card': {
+      const { instanceId } = effect.params
+      const locations: Array<keyof typeof run.cards> = [
+        'drawPile',
+        'hand',
+        'board',
+        'stack',
+        'discardPile',
+      ]
+
+      // Find the location containing the card with the matching instanceId
+      const updatedCards = { ...run.cards }
+      for (const location of locations) {
+        const cardIndex = updatedCards[location].findIndex((card) => card.instanceId === instanceId)
+        if (cardIndex !== -1) {
+          // Remove the card from this location
+          updatedCards[location] = [
+            ...updatedCards[location].slice(0, cardIndex),
+            ...updatedCards[location].slice(cardIndex + 1),
+          ]
+          break
+        }
+      }
+
+      return {
+        ...gameState,
+        game: {
+          ...gameState.game,
+          run: {
+            ...run,
+            cards: updatedCards,
           },
         },
       }
