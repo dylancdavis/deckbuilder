@@ -7,6 +7,8 @@
 
 .card-container {
   --card-width: var(--collection-card-width);
+  --card-gradient-start: #093153ff;
+  --card-gradient-end: #1077d2;
   width: var(--card-width);
   aspect-ratio: 5/7;
   border: var(--card-border);
@@ -85,7 +87,11 @@
   border: calc(var(--card-width) * 1 / 250) solid var(--inner-border-color);
   border-radius: calc(var(--card-width) * 16 / 250);
   background: #093153ff;
-  background: linear-gradient(0deg, #093153ff 0%, #1077d2 100%);
+  background: linear-gradient(
+    0deg,
+    var(--card-gradient-start, #093153ff) 0%,
+    var(--card-gradient-end, #1077d2) 100%
+  );
 }
 
 .card-svg {

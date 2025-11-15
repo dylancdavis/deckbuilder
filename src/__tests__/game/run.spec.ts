@@ -19,6 +19,10 @@ const baseRules: RulesCard = {
   id: 'starter-rules',
   name: 'Example Rules',
   type: 'rules',
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
   deckLimits: { size: [0, 0] },
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
   endConditions: { rounds: 1 },
@@ -39,6 +43,10 @@ const rulesWithAddedCards: RulesCard = {
   id: 'starter-rules',
   name: 'Example Rules',
   type: 'rules',
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
   deckLimits: { size: [0, 0] },
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
   endConditions: { rounds: 1 },

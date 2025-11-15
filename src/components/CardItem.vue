@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import type { Component } from 'vue'
+import LightningSvg from './LightningSvg.vue'
 import ScarabSvg from './ScarabSvg.vue'
-import type { Card, PlayableCard, RulesCard } from '@/utils/cards'
+import type { Card, CardArtId, PlayableCard, RulesCard } from '@/utils/cards'
 import { useTilt, type TiltOptions } from '@/composables/useTilt'
 
 interface Props {
@@ -28,10 +30,31 @@ function isRulesCard(card: Card): card is RulesCard {
 function isPlayableCard(card: Card): card is PlayableCard {
   return card.type === 'playable'
 }
+
+const defaultGradient: [string, string] = ['#093153ff', '#1077d2']
+const defaultImage: CardArtId = 'scarab'
+
+const cardImages: Record<CardArtId, Component> = {
+  scarab: ScarabSvg,
+  lightning: LightningSvg,
+}
+
+const cardStyle = computed(() => {
+  const gradient = props.card.art?.gradient ?? defaultGradient
+  return {
+    '--card-gradient-start': gradient[0],
+    '--card-gradient-end': gradient[1],
+  }
+})
+
+const cardImageComponent = computed(() => {
+  const imageId = props.card.art?.image ?? defaultImage
+  return cardImages[imageId] ?? ScarabSvg
+})
 </script>
 
 <template>
-  <div ref="cardRef" class="card-container">
+  <div ref="cardRef" class="card-container" :style="cardStyle">
     <div class="card-background">
       <div class="card-name">{{ card.name }}</div>
       <div class="card-content">
@@ -64,7 +87,7 @@ function isPlayableCard(card: Card): card is PlayableCard {
         </div>
         <template v-else>
           <div class="card-image">
-            <ScarabSvg />
+            <component :is="cardImageComponent" class="card-svg" />
           </div>
           <div v-if="isPlayableCard(card)" class="card-description">{{ card.description }}</div>
         </template>
