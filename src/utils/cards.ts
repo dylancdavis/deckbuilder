@@ -3,11 +3,19 @@ import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
+export type CardArtId = 'scarab' | 'lightning'
+
+export interface CardArt {
+  gradient: [string, string]
+  image: CardArtId
+}
+
 export interface Card {
   id: CardID
   name: string
   type: 'rules' | 'playable'
   tags?: string[]
+  art: CardArt
 }
 
 export interface PlayableCard extends Card {
@@ -47,6 +55,10 @@ export const score: PlayableCard = {
   effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
   cost: 0,
   tags: ['basic'],
+  art: {
+    gradient: ['#0f2027', '#2c5364'],
+    image: 'lightning',
+  },
 }
 
 export const collectBasic: PlayableCard = {
@@ -69,12 +81,20 @@ export const collectBasic: PlayableCard = {
   ],
   cost: 2,
   tags: ['basic'],
+  art: {
+    gradient: ['#3d1472', '#ff6ec7'],
+    image: 'scarab',
+  },
 }
 
 export const starterRules: RulesCard = {
   type: 'rules',
   id: 'starter-rules',
   name: 'Starter Rules',
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
   deckLimits: { size: [0, 4] },
   turnStructure: {
     drawAmount: 2,
@@ -101,6 +121,10 @@ export const dualScore: PlayableCard = {
   effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
   cost: 4,
   tags: ['basic'],
+  art: {
+    gradient: ['#1e3c72', '#2a5298'],
+    image: 'lightning',
+  },
 }
 
 export const saveReward: PlayableCard = {
@@ -129,6 +153,10 @@ export const saveReward: PlayableCard = {
   ],
   cost: 4,
   tags: ['basic'],
+  art: {
+    gradient: ['#355c7d', '#6c5b7b'],
+    image: 'scarab',
+  },
 }
 
 export const zeroReward: PlayableCard = {
@@ -147,6 +175,10 @@ export const zeroReward: PlayableCard = {
   ],
   cost: 4,
   tags: ['basic'],
+  art: {
+    gradient: ['#42275a', '#734b6d'],
+    image: 'scarab',
+  },
 }
 
 export const pointReset: PlayableCard = {
@@ -165,6 +197,10 @@ export const pointReset: PlayableCard = {
   ],
   cost: 6,
   tags: ['basic'],
+  art: {
+    gradient: ['#134e5e', '#71b280'],
+    image: 'scarab',
+  },
 }
 
 export const pointMultiply: PlayableCard = {
@@ -183,6 +219,10 @@ export const pointMultiply: PlayableCard = {
   ],
   cost: 0,
   tags: ['basic'],
+  art: {
+    gradient: ['#de6262', '#ffb88c'],
+    image: 'lightning',
+  },
 }
 
 export const scoreSurge: PlayableCard = {
@@ -208,6 +248,10 @@ export const scoreSurge: PlayableCard = {
   ],
   cost: 10,
   tags: ['basic'],
+  art: {
+    gradient: ['#4568dc', '#b06ab3'],
+    image: 'lightning',
+  },
 }
 
 export const scoreSynergy: PlayableCard = {
@@ -230,6 +274,10 @@ export const scoreSynergy: PlayableCard = {
   ],
   cost: 10,
   tags: ['basic'],
+  art: {
+    gradient: ['#a83279', '#d38312'],
+    image: 'scarab',
+  },
 }
 
 export const pointLoan: PlayableCard = {
@@ -256,6 +304,10 @@ export const pointLoan: PlayableCard = {
   ],
   cost: 10,
   tags: ['basic'],
+  art: {
+    gradient: ['#f7b733', '#fc4a1a'],
+    image: 'scarab',
+  },
 }
 
 export const debt: PlayableCard = {
@@ -266,6 +318,10 @@ export const debt: PlayableCard = {
   effects: [],
   cost: 0,
   tags: [],
+  art: {
+    gradient: ['#757f9a', '#d7dde8'],
+    image: 'scarab',
+  },
 }
 
 export const lastResort: PlayableCard = {
@@ -280,6 +336,10 @@ export const lastResort: PlayableCard = {
   ],
   cost: 12,
   tags: ['basic'],
+  art: {
+    gradient: ['#141e30', '#243b55'],
+    image: 'lightning',
+  },
 }
 
 export const rulesCards = {
