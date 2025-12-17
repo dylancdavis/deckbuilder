@@ -25,7 +25,7 @@ Always verify changes by running tests before committing.
 ### Testing
 
 - `npm run test:unit` - Run unit tests with Vitest
-- Test files are located in `src/__tests__/` with `.spec.ts` and `.spec.js` extensions
+- Test files are located in `src/__tests__/` with `.spec.ts` extension
 
 ## Architecture
 
@@ -48,7 +48,7 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 
 - Game state (collection, current run)
 - UI state (current view, selected deck)
-- View data (modals)
+- View data (modal view, card options, resolver)
 
 **View System**: The app renders different views based on `gameState.ui.currentView`:
 
