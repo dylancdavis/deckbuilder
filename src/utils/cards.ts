@@ -56,8 +56,8 @@ export const score: PlayableCard = {
   cost: 0,
   tags: ['basic'],
   art: {
-    gradient: ['#0f2027', '#2c5364'],
-    image: 'lightning',
+    gradient: ['#093153ff', '#1077d2'],
+    image: 'scarab',
   },
 }
 
