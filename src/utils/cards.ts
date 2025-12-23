@@ -3,7 +3,7 @@ import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
-export type CardArtId = 'scarab' | 'lightning'
+export type CardArtId = 'scarab' | 'lightning' | 'scarab-thick'
 
 export interface CardArt {
   gradient: [string, string]
