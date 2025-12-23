@@ -4,6 +4,7 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     fillColor?: string
+    fillGradient?: [string, string]
     borderColor?: string
     borderWidth?: number
     shadow?: boolean
@@ -16,6 +17,15 @@ const props = withDefaults(
   },
 )
 
+const gradientId = `lightning-gradient-${Math.random().toString(36).substr(2, 9)}`
+
+const fillValue = computed(() => {
+  if (props.fillGradient) {
+    return `url(#${gradientId})`
+  }
+  return props.fillColor
+})
+
 const pathStyle = computed(() => ({
   stroke: props.borderColor,
   strokeWidth: props.borderWidth,
@@ -24,7 +34,7 @@ const pathStyle = computed(() => ({
   strokeDashoffset: 0,
   strokeLinejoin: 'miter' as const,
   strokeMiterlimit: 4,
-  fill: props.fillColor,
+  fill: fillValue.value,
   fillRule: 'nonzero' as const,
   opacity: 1,
 }))
@@ -44,6 +54,12 @@ const svgStyle = computed(() => ({
     aria-labelledby="lightning-title lightning-desc"
     :style="svgStyle"
   >
+    <defs v-if="fillGradient">
+      <linearGradient :id="gradientId" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" :style="{ stopColor: fillGradient[0] }" />
+        <stop offset="100%" :style="{ stopColor: fillGradient[1] }" />
+      </linearGradient>
+    </defs>
     <title id="lightning-title">Lightning currency symbol</title>
     <desc id="lightning-desc">A lightning bolt icon.</desc>
     <path

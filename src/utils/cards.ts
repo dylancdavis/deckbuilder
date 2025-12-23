@@ -9,6 +9,7 @@ export interface CardArt {
   gradient: [string, string]
   image: CardArtId
   fillColor?: string
+  fillGradient?: [string, string]
   borderColor?: string
   borderWidth?: number
   shadow?: boolean
