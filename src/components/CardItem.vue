@@ -53,6 +53,13 @@ const cardImageComponent = computed(() => {
   const imageId = props.card.art?.image ?? defaultImage
   return cardImages[imageId] ?? ScarabSvg
 })
+
+const svgProps = computed(() => ({
+  fillColor: props.card.art?.fillColor ?? '#fff',
+  borderColor: props.card.art?.borderColor ?? '#000',
+  borderWidth: props.card.art?.borderWidth ?? 2,
+  shadow: props.card.art?.shadow ?? true,
+}))
 </script>
 
 <template>
@@ -89,7 +96,7 @@ const cardImageComponent = computed(() => {
         </div>
         <template v-else>
           <div class="card-image">
-            <component :is="cardImageComponent" class="card-svg" />
+            <component :is="cardImageComponent" v-bind="svgProps" />
           </div>
           <div v-if="isPlayableCard(card)" class="card-description">{{ card.description }}</div>
         </template>

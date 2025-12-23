@@ -8,6 +8,10 @@ export type CardArtId = 'scarab' | 'lightning' | 'scarab-thick'
 export interface CardArt {
   gradient: [string, string]
   image: CardArtId
+  fillColor?: string
+  borderColor?: string
+  borderWidth?: number
+  shadow?: boolean
 }
 
 export interface Card {
@@ -57,7 +61,7 @@ export const score: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#093153ff', '#1077d2'],
-    image: 'scarab',
+    image: 'scarab-thick',
   },
 }
 
