@@ -53,6 +53,7 @@ const cardImageComponent = computed(() => {
 })
 
 const svgProps = computed(() => ({
+  cardId: props.card.id,
   fillColor: props.card.art?.fillColor ?? '#fff',
   fillGradient: props.card.art?.fillGradient,
   borderColor: props.card.art?.borderColor ?? '#000',

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 
 const props = withDefaults(
   defineProps<{
+    cardId: string
     fillColor?: string
     fillGradient?: [string, string]
     borderColor?: string
@@ -17,7 +18,7 @@ const props = withDefaults(
   },
 )
 
-const gradientId = `scarab-gradient-${Math.random().toString(36).substr(2, 9)}`
+const gradientId = `scarab-gradient-${props.cardId}`
 
 const fillValue = computed(() => {
   if (props.fillGradient) {
