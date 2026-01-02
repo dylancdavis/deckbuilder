@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import type { Component } from 'vue'
 import LightningSvg from './LightningSvg.vue'
-import ScarabThickSvg from './ScarabThickSvg.vue'
+import ScarabSvg from './ScarabSvg.vue'
 import type { Card, CardArtId, PlayableCard, RulesCard } from '@/utils/cards'
 import { useTilt, type TiltOptions } from '@/composables/useTilt'
 
@@ -32,11 +32,11 @@ function isPlayableCard(card: Card): card is PlayableCard {
 }
 
 const defaultGradient: [string, string] = ['#093153ff', '#1077d2']
-const defaultImage: CardArtId = 'scarab-thick'
+const defaultImage: CardArtId = 'scarab'
 
 const cardImages: Record<CardArtId, Component> = {
   lightning: LightningSvg,
-  'scarab-thick': ScarabThickSvg,
+  scarab: ScarabSvg,
 }
 
 const cardStyle = computed(() => {
@@ -49,7 +49,7 @@ const cardStyle = computed(() => {
 
 const cardImageComponent = computed(() => {
   const imageId = props.card.art?.image ?? defaultImage
-  return cardImages[imageId] ?? ScarabThickSvg
+  return cardImages[imageId] ?? ScarabSvg
 })
 
 const svgProps = computed(() => ({

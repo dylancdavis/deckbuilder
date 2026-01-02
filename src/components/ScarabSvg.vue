@@ -17,7 +17,7 @@ const props = withDefaults(
   },
 )
 
-const gradientId = `scarab-thick-gradient-${Math.random().toString(36).substr(2, 9)}`
+const gradientId = `scarab-gradient-${Math.random().toString(36).substr(2, 9)}`
 
 const fillValue = computed(() => {
   if (props.fillGradient) {
@@ -44,7 +44,7 @@ const svgStyle = computed(() => ({
     xmlns="http://www.w3.org/2000/svg"
     viewBox="8 8 134 134"
     role="img"
-    aria-labelledby="scarab-thick-title scarab-thick-desc"
+    aria-labelledby="scarab-title scarab-desc"
     :style="svgStyle"
   >
     <defs v-if="fillGradient">
@@ -53,8 +53,8 @@ const svgStyle = computed(() => ({
         <stop offset="100%" :style="{ stopColor: fillGradient[1] }" />
       </linearGradient>
     </defs>
-    <title id="scarab-thick-title">Scarab thick currency symbol</title>
-    <desc id="scarab-thick-desc">
+    <title id="scarab-title">Scarab currency symbol</title>
+    <desc id="scarab-desc">
       A filled scarab beetle shape with a central circle and four extended arms at 45-degree
       angles.
     </desc>

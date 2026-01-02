@@ -3,7 +3,7 @@ import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
-export type CardArtId = 'lightning' | 'scarab-thick'
+export type CardArtId = 'lightning' | 'scarab'
 
 export interface CardArt {
   gradient: [string, string]
@@ -62,7 +62,7 @@ export const score: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#093153ff', '#1077d2'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -88,7 +88,7 @@ export const collectBasic: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#3d1472', '#ff6ec7'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -98,7 +98,7 @@ export const starterRules: RulesCard = {
   name: 'Starter Rules',
   art: {
     gradient: ['#4b4b4b', '#9e9e9e'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
   turnStructure: {
@@ -160,7 +160,7 @@ export const saveReward: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#355c7d', '#6c5b7b'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -182,7 +182,7 @@ export const zeroReward: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#42275a', '#734b6d'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -204,7 +204,7 @@ export const pointReset: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#134e5e', '#71b280'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -281,7 +281,7 @@ export const scoreSynergy: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#a83279', '#d38312'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -311,7 +311,7 @@ export const pointLoan: PlayableCard = {
   tags: ['basic'],
   art: {
     gradient: ['#f7b733', '#fc4a1a'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
@@ -325,7 +325,7 @@ export const debt: PlayableCard = {
   tags: [],
   art: {
     gradient: ['#757f9a', '#d7dde8'],
-    image: 'scarab-thick',
+    image: 'scarab',
   },
 }
 
