@@ -42,7 +42,7 @@ const svgStyle = computed(() => ({
   <svg
     class="card-svg"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 150 150"
+    viewBox="8 8 134 134"
     role="img"
     aria-labelledby="scarab-thick-title scarab-thick-desc"
     :style="svgStyle"
