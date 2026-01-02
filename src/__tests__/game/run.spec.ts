@@ -21,7 +21,7 @@ const baseRules: RulesCard = {
   type: 'rules',
   art: {
     gradient: ['#4b4b4b', '#9e9e9e'],
-    image: 'scarab',
+    image: 'scarab-thick',
   },
   deckLimits: { size: [0, 0] },
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
@@ -45,7 +45,7 @@ const rulesWithAddedCards: RulesCard = {
   type: 'rules',
   art: {
     gradient: ['#4b4b4b', '#9e9e9e'],
-    image: 'scarab',
+    image: 'scarab-thick',
   },
   deckLimits: { size: [0, 0] },
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },

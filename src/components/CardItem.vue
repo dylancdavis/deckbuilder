@@ -33,7 +33,7 @@ function isPlayableCard(card: Card): card is PlayableCard {
 }
 
 const defaultGradient: [string, string] = ['#093153ff', '#1077d2']
-const defaultImage: CardArtId = 'scarab'
+const defaultImage: CardArtId = 'scarab-thick'
 
 const cardImages: Record<CardArtId, Component> = {
   scarab: ScarabSvg,
