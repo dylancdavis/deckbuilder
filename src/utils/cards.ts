@@ -3,6 +3,8 @@ import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
+export type EffectTrigger = 'on-play'
+
 export type CardArtId = 'lightning' | 'scarab'
 
 export interface CardArt {
@@ -28,7 +30,7 @@ export interface PlayableCard extends Card {
   type: 'playable'
   description: string
   cost: number
-  effects: Effect[]
+  effects: Record<EffectTrigger, Effect[]>
   deckLimit?: number
   instanceId?: string
 }
@@ -57,7 +59,9 @@ export const score: PlayableCard = {
   id: 'score',
   name: 'Score',
   description: 'Gain 1 Point.',
-  effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+  effects: {
+    'on-play': [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+  },
   cost: 0,
   tags: ['basic'],
   art: {
@@ -71,19 +75,21 @@ export const collectBasic: PlayableCard = {
   id: 'collect-basic',
   name: 'Collect Basic',
   description: 'Collect a Basic Card.',
-  effects: [
-    {
-      type: 'card-choice',
-      params: {
-        options: 3,
-        tags: ['basic'],
-        then: (chosenCard) => ({
-          type: 'collect-card',
-          params: { cards: { [chosenCard]: 1 } },
-        }),
+  effects: {
+    'on-play': [
+      {
+        type: 'card-choice',
+        params: {
+          options: 3,
+          tags: ['basic'],
+          then: (chosenCard) => ({
+            type: 'collect-card',
+            params: { cards: { [chosenCard]: 1 } },
+          }),
+        },
       },
-    },
-  ],
+    ],
+  },
   cost: 2,
   tags: ['basic'],
   art: {
@@ -123,7 +129,9 @@ export const dualScore: PlayableCard = {
   name: 'Dual Score',
   description: 'Gain 2 Points. Deck Limit 2.',
   deckLimit: 2,
-  effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+  effects: {
+    'on-play': [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+  },
   cost: 4,
   tags: ['basic'],
   art: {
@@ -137,25 +145,27 @@ export const saveReward: PlayableCard = {
   id: 'save-reward',
   name: 'A Penny Saved',
   description: "If you haven't collected a card this round, gain 2 points.",
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        update: (current, run: Run) => {
-          // Check if any collect-card events occurred this round
-          const roundCardPlayEvents = run.events.filter(
-            (e) => e.type === 'card-play' && e.round === run.stats.rounds,
-          )
-          const cardCollectEvents = roundCardPlayEvents.some((e) => {
-            const card = playableCards[e.cardId]
-            return card.effects.some((eff) => eff.type === 'collect-card')
-          })
-          return cardCollectEvents ? current : current + 2
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          update: (current, run: Run) => {
+            // Check if any collect-card events occurred this round
+            const roundCardPlayEvents = run.events.filter(
+              (e) => e.type === 'card-play' && e.round === run.stats.rounds,
+            )
+            const cardCollectEvents = roundCardPlayEvents.some((e) => {
+              const card = playableCards[e.cardId]
+              return card.effects['on-play'].some((eff) => eff.type === 'collect-card')
+            })
+            return cardCollectEvents ? current : current + 2
+          },
         },
       },
-    },
-  ],
+    ],
+  },
   cost: 4,
   tags: ['basic'],
   art: {
@@ -169,15 +179,17 @@ export const zeroReward: PlayableCard = {
   id: 'zero-reward',
   name: 'Starting Surge',
   description: 'If you have 0 points, gain 6 points.',
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        update: (current) => (current === 0 ? 6 : current),
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          update: (current) => (current === 0 ? 6 : current),
+        },
       },
-    },
-  ],
+    ],
+  },
   cost: 4,
   tags: ['basic'],
   art: {
@@ -191,15 +203,17 @@ export const pointReset: PlayableCard = {
   id: 'point-reset',
   name: 'Point Reboot',
   description: 'Set your point total to 4.',
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        set: 4,
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          set: 4,
+        },
       },
-    },
-  ],
+    ],
+  },
   cost: 6,
   tags: ['basic'],
   art: {
@@ -213,15 +227,17 @@ export const pointMultiply: PlayableCard = {
   id: 'point-multiply',
   name: 'Point Multiplication',
   description: 'If you have 4 or less points, double them.',
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        update: (current) => (current <= 4 ? current * 2 : current),
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          update: (current) => (current <= 4 ? current * 2 : current),
+        },
       },
-    },
-  ],
+    ],
+  },
   cost: 0,
   tags: ['basic'],
   art: {
@@ -235,22 +251,24 @@ export const scoreSurge: PlayableCard = {
   id: 'score-surge',
   name: 'Score Surge',
   description: 'Gain 2 points (max 8) for each "Score" played this round.',
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        update: (current, run) => {
-          const currentRound = run.stats.rounds
-          const scoreCardsPlayedThisRound = run.events.filter(
-            (event) => event.type === 'card-play' && event.cardId === 'score' && event.round === currentRound
-          ).length
-          const pointsToGain = Math.min(scoreCardsPlayedThisRound * 2, 8)
-          return current + pointsToGain
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          update: (current, run) => {
+            const currentRound = run.stats.rounds
+            const scoreCardsPlayedThisRound = run.events.filter(
+              (event) => event.type === 'card-play' && event.cardId === 'score' && event.round === currentRound
+            ).length
+            const pointsToGain = Math.min(scoreCardsPlayedThisRound * 2, 8)
+            return current + pointsToGain
+          },
         },
       },
-    },
-  ],
+    ],
+  },
   cost: 10,
   tags: ['basic'],
   art: {
@@ -264,19 +282,21 @@ export const scoreSynergy: PlayableCard = {
   id: 'score-synergy',
   name: 'Score Synergy',
   description: 'Gain 1 point (max 6) for each "Score" in your deck.',
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        update: (current, run) => {
-          const scoreCardsInDeck = run.deck.cards['score'] || 0
-          const pointsToGain = Math.min(scoreCardsInDeck, 6)
-          return current + pointsToGain
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          update: (current, run) => {
+            const scoreCardsInDeck = run.deck.cards['score'] || 0
+            const pointsToGain = Math.min(scoreCardsInDeck, 6)
+            return current + pointsToGain
+          },
         },
       },
-    },
-  ],
+    ],
+  },
   cost: 10,
   tags: ['basic'],
   art: {
@@ -290,23 +310,25 @@ export const pointLoan: PlayableCard = {
   id: 'point-loan',
   name: 'Point Loan',
   description: 'Gain 6 points. Add a "Debt" card to your draw pile.',
-  effects: [
-    {
-      type: 'update-resource',
-      params: {
-        resource: Resource.POINTS,
-        delta: 6,
+  effects: {
+    'on-play': [
+      {
+        type: 'update-resource',
+        params: {
+          resource: Resource.POINTS,
+          delta: 6,
+        },
       },
-    },
-    {
-      type: 'add-cards',
-      params: {
-        location: 'drawPile',
-        cards: { debt: 1 },
-        mode: 'shuffle',
+      {
+        type: 'add-cards',
+        params: {
+          location: 'drawPile',
+          cards: { debt: 1 },
+          mode: 'shuffle',
+        },
       },
-    },
-  ],
+    ],
+  },
   cost: 10,
   tags: ['basic'],
   art: {
@@ -320,7 +342,9 @@ export const debt: PlayableCard = {
   id: 'debt',
   name: 'Debt',
   description: 'When you draw this, lose 6 points.',
-  effects: [],
+  effects: {
+    'on-play': [],
+  },
   cost: 0,
   tags: [],
   art: {
@@ -334,11 +358,13 @@ export const lastResort: PlayableCard = {
   id: 'last-resort',
   name: 'Last Resort',
   description: 'Gain 8 Points. Destroy this card.',
-  effects: [
-    { type: 'update-resource', params: { resource: Resource.POINTS, delta: 8 } },
-    { type: 'remove-card', params: { instanceId: 'self' } },
-    { type: 'destroy-card', params: { cards: { 'last-resort': 1 } } },
-  ],
+  effects: {
+    'on-play': [
+      { type: 'update-resource', params: { resource: Resource.POINTS, delta: 8 } },
+      { type: 'remove-card', params: { instanceId: 'self' } },
+      { type: 'destroy-card', params: { cards: { 'last-resort': 1 } } },
+    ],
+  },
   cost: 12,
   tags: ['basic'],
   art: {

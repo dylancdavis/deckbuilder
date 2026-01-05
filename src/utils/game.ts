@@ -135,7 +135,7 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
     }
   }
 
-  const cardEffects = effects ?? card.effects
+  const cardEffects = effects ?? card.effects['on-play']
 
   // Transform 'self' references in remove-card effects to the actual instanceId
   const transformedEffects = cardEffects.map(effect => {
