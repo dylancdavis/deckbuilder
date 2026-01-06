@@ -3,7 +3,7 @@ import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
-export type EffectTrigger = 'on-play'
+export type EffectTrigger = 'on-play' | 'on-draw'
 
 export type CardArtId = 'lightning' | 'scarab'
 
@@ -30,7 +30,7 @@ export interface PlayableCard extends Card {
   type: 'playable'
   description: string
   cost: number
-  effects: Record<EffectTrigger, Effect[]>
+  effects: Partial<Record<EffectTrigger, Effect[]>>
   deckLimit?: number
   instanceId?: string
 }
@@ -158,7 +158,7 @@ export const saveReward: PlayableCard = {
             )
             const cardCollectEvents = roundCardPlayEvents.some((e) => {
               const card = playableCards[e.cardId]
-              return card.effects['on-play'].some((eff) => eff.type === 'collect-card')
+              return card.effects['on-play']?.some((eff) => eff.type === 'collect-card')
             })
             return cardCollectEvents ? current : current + 2
           },
@@ -343,7 +343,7 @@ export const debt: PlayableCard = {
   name: 'Debt',
   description: 'When you draw this, lose 6 points.',
   effects: {
-    'on-play': [],
+    'on-draw': [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: -6 } }],
   },
   cost: 0,
   tags: [],

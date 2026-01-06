@@ -208,11 +208,8 @@ it('debt loses 6 points when drawn', () => {
 
   const result = drawCards(gameState, 1)
 
-  // TODO: Implement onDraw effect processing
-  // When onDraw effects are implemented, points should be 4
-  // For now, this test verifies that the card is drawn correctly
   expect(result.game.run!.cards.hand).toHaveLength(1)
   expect(result.game.run!.cards.hand[0].id).toBe('debt')
   expect(result.game.run!.cards.drawPile).toHaveLength(0)
-  // expect(result.game.run!.resources.points).toBe(4)
+  expect(result.game.run!.resources.points).toBe(4)
 })

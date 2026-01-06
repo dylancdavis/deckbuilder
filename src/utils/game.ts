@@ -2,7 +2,7 @@ import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID } from './cards.ts'
 import { getCardChoices } from './cards.ts'
-import { handleEffect, type Effect } from './effects.ts'
+import { handleEffect, handleEffects, type Effect } from './effects.ts'
 
 export type GameState = {
   game: {
@@ -51,44 +51,54 @@ export function openCardChoiceModal(
 
 /**
  * Pure function that draws n cards from the draw pile to hand.
- *
- * TODO: Process onDraw effects when drawing cards (e.g., debt card should lose 6 points)
+ * Processes on-draw effects for each card as it's drawn.
  *
  * @param gameState - The current game state
  * @param n - Number of cards to draw
- * @returns A new game state with cards moved from draw pile to hand
+ * @returns A new game state with cards moved from draw pile to hand and on-draw effects applied
  */
 export function drawCards(gameState: GameState, n: number): GameState {
-  const run = gameState.game.run
+  let currentState = gameState
+  const run = currentState.game.run
   if (!run) {
     throw new Error('Cannot draw cards: no active run')
   }
 
-  const drawPile = [...run.cards.drawPile]
-  const hand = [...run.cards.hand]
-
-  // Move up to n cards from draw pile to hand
-  for (let i = 0; i < n && drawPile.length > 0; i++) {
+  // Draw cards one at a time, processing on-draw effects for each
+  for (let i = 0; i < n && currentState.game.run!.cards.drawPile.length > 0; i++) {
+    const currentRun = currentState.game.run!
+    const drawPile = [...currentRun.cards.drawPile]
+    const hand = [...currentRun.cards.hand]
     const card = drawPile.shift() // Take from front of draw pile
+
     if (card) {
       hand.push(card) // Add to hand
+
+      // Update state with moved card
+      currentState = {
+        ...currentState,
+        game: {
+          ...currentState.game,
+          run: {
+            ...currentRun,
+            cards: {
+              ...currentRun.cards,
+              drawPile,
+              hand,
+            },
+          },
+        },
+      }
+
+      // Process on-draw effects for this card
+      const onDrawEffects = card.effects['on-draw']
+      if (onDrawEffects) {
+        currentState = handleEffects(currentState, onDrawEffects)
+      }
     }
   }
 
-  return {
-    ...gameState,
-    game: {
-      ...gameState.game,
-      run: {
-        ...run,
-        cards: {
-          ...run.cards,
-          drawPile,
-          hand,
-        },
-      },
-    },
-  }
+  return currentState
 }
 
 /**
@@ -135,7 +145,7 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
     }
   }
 
-  const cardEffects = effects ?? card.effects['on-play']
+  const cardEffects = effects ?? card.effects['on-play'] ?? []
 
   // Transform 'self' references in remove-card effects to the actual instanceId
   const transformedEffects = cardEffects.map(effect => {
