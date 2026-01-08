@@ -3,7 +3,7 @@ import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
 
-export type EffectTrigger = 'on-play' | 'on-draw'
+export type Trigger = 'on-play' | 'on-draw'
 
 export type CardArtId = 'lightning' | 'scarab'
 
@@ -30,7 +30,7 @@ export interface PlayableCard extends Card {
   type: 'playable'
   description: string
   cost: number
-  effects: Partial<Record<EffectTrigger, Effect[]>>
+  abilities: Partial<Record<Trigger, Effect[]>>
   deckLimit?: number
   instanceId?: string
 }
@@ -59,7 +59,7 @@ export const score: PlayableCard = {
   id: 'score',
   name: 'Score',
   description: 'Gain 1 Point.',
-  effects: {
+  abilities: {
     'on-play': [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
   },
   cost: 0,
@@ -75,7 +75,7 @@ export const collectBasic: PlayableCard = {
   id: 'collect-basic',
   name: 'Collect Basic',
   description: 'Collect a Basic Card.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'card-choice',
@@ -129,7 +129,7 @@ export const dualScore: PlayableCard = {
   name: 'Dual Score',
   description: 'Gain 2 Points. Deck Limit 2.',
   deckLimit: 2,
-  effects: {
+  abilities: {
     'on-play': [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
   },
   cost: 4,
@@ -145,7 +145,7 @@ export const saveReward: PlayableCard = {
   id: 'save-reward',
   name: 'A Penny Saved',
   description: "If you haven't collected a card this round, gain 2 points.",
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -158,7 +158,7 @@ export const saveReward: PlayableCard = {
             )
             const cardCollectEvents = roundCardPlayEvents.some((e) => {
               const card = playableCards[e.cardId]
-              return card.effects['on-play']?.some((eff) => eff.type === 'collect-card')
+              return card.abilities['on-play']?.some((eff) => eff.type === 'collect-card')
             })
             return cardCollectEvents ? current : current + 2
           },
@@ -179,7 +179,7 @@ export const zeroReward: PlayableCard = {
   id: 'zero-reward',
   name: 'Starting Surge',
   description: 'If you have 0 points, gain 6 points.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -203,7 +203,7 @@ export const pointReset: PlayableCard = {
   id: 'point-reset',
   name: 'Point Reboot',
   description: 'Set your point total to 4.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -227,7 +227,7 @@ export const pointMultiply: PlayableCard = {
   id: 'point-multiply',
   name: 'Point Multiplication',
   description: 'If you have 4 or less points, double them.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -251,7 +251,7 @@ export const scoreSurge: PlayableCard = {
   id: 'score-surge',
   name: 'Score Surge',
   description: 'Gain 2 points (max 8) for each "Score" played this round.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -282,7 +282,7 @@ export const scoreSynergy: PlayableCard = {
   id: 'score-synergy',
   name: 'Score Synergy',
   description: 'Gain 1 point (max 6) for each "Score" in your deck.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -310,7 +310,7 @@ export const pointLoan: PlayableCard = {
   id: 'point-loan',
   name: 'Point Loan',
   description: 'Gain 6 points. Add a "Debt" card to your draw pile.',
-  effects: {
+  abilities: {
     'on-play': [
       {
         type: 'update-resource',
@@ -342,7 +342,7 @@ export const debt: PlayableCard = {
   id: 'debt',
   name: 'Debt',
   description: 'When you draw this, lose 6 points.',
-  effects: {
+  abilities: {
     'on-draw': [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: -6 } }],
   },
   cost: 0,
@@ -358,7 +358,7 @@ export const lastResort: PlayableCard = {
   id: 'last-resort',
   name: 'Last Resort',
   description: 'Gain 8 Points. Destroy this card.',
-  effects: {
+  abilities: {
     'on-play': [
       { type: 'update-resource', params: { resource: Resource.POINTS, delta: 8 } },
       { type: 'remove-card', params: { instanceId: 'self' } },

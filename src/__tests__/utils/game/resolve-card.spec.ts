@@ -188,7 +188,7 @@ describe('resolveCard', () => {
     const cardWithSelfRemoval = {
       ...score,
       instanceId: 'card-1',
-      effects: {
+      abilities: {
         'on-play': [
           { type: 'update-resource' as const, params: { resource: Resource.POINTS, delta: 1 } },
           { type: 'remove-card' as const, params: { instanceId: 'self' as const } },

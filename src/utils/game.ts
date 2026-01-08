@@ -91,7 +91,7 @@ export function drawCards(gameState: GameState, n: number): GameState {
       }
 
       // Process on-draw effects for this card
-      const onDrawEffects = card.effects['on-draw']
+      const onDrawEffects = card.abilities['on-draw']
       if (onDrawEffects) {
         currentState = handleEffects(currentState, onDrawEffects)
       }
@@ -145,7 +145,7 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
     }
   }
 
-  const cardEffects = effects ?? card.effects['on-play'] ?? []
+  const cardEffects = effects ?? card.abilities['on-play'] ?? []
 
   // Transform 'self' references in remove-card effects to the actual instanceId
   const transformedEffects = cardEffects.map(effect => {
