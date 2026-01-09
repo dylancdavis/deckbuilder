@@ -4,7 +4,7 @@ import type { Effect } from './effects'
 import type { Run } from './run'
 import type { CardPlayEvent } from './event'
 
-export type Trigger = 'on-play' | 'on-draw'
+export type LegacyTrigger = 'on-play' | 'on-draw'
 
 export type CardArtId = 'lightning' | 'scarab'
 
@@ -31,7 +31,7 @@ export interface PlayableCard extends Card {
   type: 'playable'
   description: string
   cost: number
-  abilities: Partial<Record<Trigger, Effect[]>>
+  abilities: Partial<Record<LegacyTrigger, Effect[]>>
   deckLimit?: number
   instanceId?: string
 }
