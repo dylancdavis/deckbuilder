@@ -6,8 +6,9 @@ import type { Counter } from './counter'
 import { toArray, mergeCounters, subtractCounters } from './counter'
 import { playableCards, type CardID, type PlayableCardID } from './cards'
 import { Resource } from './resource'
-import type { Run } from './run'
+import type { Run, Location } from './run'
 import type { GameState } from './game'
+import type { CardMatcher } from './card-matchers'
 
 // Game locations where cards can be placed
 export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
@@ -65,6 +66,39 @@ export type RemoveCardEffect = {
   }
 }
 
+export type DrawCardsEffect = {
+  type: 'draw-cards'
+  params: {
+    amount: number
+  }
+}
+
+export type DiscardCardsEffect = {
+  type: 'discard-cards'
+  params: {
+    instanceIds?: string[]
+    amount?: number
+    matching?: CardMatcher
+  }
+}
+
+export type MoveCardEffect = {
+  type: 'move-card'
+  params: {
+    instanceId: string | 'self'
+    from: Location
+    to: Location
+    position?: 'top' | 'bottom' | 'shuffle'
+  }
+}
+
+export type RetriggerCardEffect = {
+  type: 'retrigger-card'
+  params: {
+    instanceId: string | 'self'
+  }
+}
+
 export type Effect =
   | AddCardsEffect
   | UpdateResourceEffect
@@ -72,6 +106,10 @@ export type Effect =
   | CardChoiceEffect
   | DestroyCardEffect
   | RemoveCardEffect
+  | DrawCardsEffect
+  | DiscardCardsEffect
+  | MoveCardEffect
+  | RetriggerCardEffect
 
 /**
  * Applies an effect to a game state, returning the updated game state.
