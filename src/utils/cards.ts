@@ -2,6 +2,7 @@ import { Resource } from './resource'
 import { keys, selectRandom, values } from './utils'
 import type { Effect } from './effects'
 import type { Run } from './run'
+import type { CardPlayEvent } from './event'
 
 export type Trigger = 'on-play' | 'on-draw'
 
@@ -153,9 +154,10 @@ export const saveReward: PlayableCard = {
           resource: Resource.POINTS,
           update: (current, run: Run) => {
             // Check if any collect-card events occurred this round
+            // TODO: Look into better type guarding
             const roundCardPlayEvents = run.events.filter(
               (e) => e.type === 'card-play' && e.round === run.stats.rounds,
-            )
+            ) as CardPlayEvent[]
             const cardCollectEvents = roundCardPlayEvents.some((e) => {
               const card = playableCards[e.cardId]
               return card.abilities['on-play']?.some((eff) => eff.type === 'collect-card')

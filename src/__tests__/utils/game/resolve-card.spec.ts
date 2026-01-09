@@ -93,6 +93,7 @@ describe('resolveCard', () => {
       round: 2,
       turn: 3,
       cardId: 'score',
+      instanceId: 'card-1',
     })
   })
 
