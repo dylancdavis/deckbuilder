@@ -20,7 +20,7 @@ import { openCardChoiceModal } from './game'
 /**
  * A card instance is a PlayableCard with a guaranteed instanceId.
  */
-type CardInstance = PlayableCard & { instanceId: string }
+export type CardInstance = PlayableCard & { instanceId: string }
 
 /**
  * Represents an ability waiting to be processed in the queue.
@@ -169,7 +169,7 @@ function resolveSelfReferences(effect: Effect, instanceId: string): Effect {
  * @param run - The current run state
  * @returns Array of matching card/ability pairs
  */
-function findMatchingAbilities(
+export function findMatchingAbilities(
   event: Event,
   run: Run,
 ): Array<{ card: CardInstance; ability: Ability }> {
@@ -201,7 +201,7 @@ function findMatchingAbilities(
  * @param run - The current run state
  * @returns true if the trigger matches the event
  */
-function matchesTrigger(
+export function matchesTrigger(
   event: Event,
   sourceCard: CardInstance,
   trigger: Trigger,
@@ -290,7 +290,7 @@ function matchesTarget(
  * @param run - The current run state
  * @returns true if the ability can be activated
  */
-function canActivate(trigger: Trigger, sourceCard: CardInstance, run: Run): boolean {
+export function canActivate(trigger: Trigger, sourceCard: CardInstance, run: Run): boolean {
   // Check resource costs
   if (trigger.costs) {
     for (const [resource, cost] of Object.entries(trigger.costs)) {
