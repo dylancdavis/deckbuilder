@@ -10,16 +10,13 @@ import type { Run, Location } from './run'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
 
-// Game locations where cards can be placed
-export type GameLocation = 'drawPile' | 'hand' | 'board' | 'discardPile'
-
 // Card placement modes when adding cards to locations
 export type PlacementMode = 'top' | 'bottom' | 'shuffle'
 
 export type AddCardsEffect = {
   type: 'add-cards'
   params: {
-    location: GameLocation
+    location: Location
     cards: Counter<PlayableCardID>
     mode?: PlacementMode
   }
