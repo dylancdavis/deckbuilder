@@ -41,7 +41,12 @@ export function moveCardByIndex(
   toIndex?: number,
 ) {
   const runCards = run.cards
-  const [newFrom, newTo] = moveItem(runCards[fromLocation], runCards[toLocation], fromIndex, toIndex)
+  const [newFrom, newTo] = moveItem(
+    runCards[fromLocation],
+    runCards[toLocation],
+    fromIndex,
+    toIndex,
+  )
 
   return {
     ...run,

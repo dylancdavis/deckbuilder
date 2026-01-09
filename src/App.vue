@@ -42,7 +42,6 @@ async function handleSelect(cardId: CardID) {
     ease: 'power2',
   })
 }
-
 </script>
 
 <template>
@@ -59,6 +58,9 @@ async function handleSelect(cardId: CardID) {
   </div>
 
   <!-- Modals -->
-  <CardChoiceModal v-if="modalView === 'card-choice'" :card-options="gameStore.cardOptions" :handle-select="handleSelect" />
-
+  <CardChoiceModal
+    v-if="modalView === 'card-choice'"
+    :card-options="gameStore.cardOptions"
+    :handle-select="handleSelect"
+  />
 </template>

@@ -36,7 +36,7 @@ export function openCardChoiceModal(
   gameState: GameState,
   options: number,
   tags: string[],
-  resolver: (game: GameState, chosenCard: CardID) => GameState
+  resolver: (game: GameState, chosenCard: CardID) => GameState,
 ): GameState {
   const choices = getCardChoices(options, tags)
   return {
@@ -112,22 +112,28 @@ export function drawCards(gameState: GameState, n: number): GameState {
  * @param instanceId - The instance ID of the card in the hand to play
  * @returns A new game state with the card played and effects applied
  */
-export function resolveCard(gameState: GameState, instanceId: string, effects?: Effect[]): GameState {
+export function resolveCard(
+  gameState: GameState,
+  instanceId: string,
+  effects?: Effect[],
+): GameState {
   const run = gameState.game.run as Run
 
   // Find card in either hand or stack
-  const cardInHand = run.cards.hand.find(card => card.instanceId === instanceId)
-  const cardInStack = run.cards.stack.find(card => card.instanceId === instanceId)
+  const cardInHand = run.cards.hand.find((card) => card.instanceId === instanceId)
+  const cardInStack = run.cards.stack.find((card) => card.instanceId === instanceId)
   const card = cardInHand ?? cardInStack
 
   if (!card) {
-    throw new Error(`Cannot resolve card: no card with instanceId ${instanceId} found in hand or stack`)
+    throw new Error(
+      `Cannot resolve card: no card with instanceId ${instanceId} found in hand or stack`,
+    )
   }
 
   // If card is in hand, move it to stack before processing effects
   let updatedGameState = gameState
   if (cardInHand) {
-    const newHand = run.cards.hand.filter(c => c.instanceId !== instanceId)
+    const newHand = run.cards.hand.filter((c) => c.instanceId !== instanceId)
     const newStack = [...run.cards.stack, card]
     updatedGameState = {
       ...gameState,
@@ -148,13 +154,13 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
   const cardEffects = effects ?? card.abilities['on-play'] ?? []
 
   // Transform 'self' references in remove-card effects to the actual instanceId
-  const transformedEffects = cardEffects.map(effect => {
+  const transformedEffects = cardEffects.map((effect) => {
     if (effect.type === 'remove-card' && effect.params.instanceId === 'self') {
       return {
         ...effect,
         params: {
-          instanceId: instanceId
-        }
+          instanceId: instanceId,
+        },
       }
     }
     return effect
@@ -162,7 +168,6 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
 
   // Loop through and apply each effect to the game state
   for (const effect of transformedEffects) {
-
     // In the choice case, just update the modal state and return early
     if (effect.type === 'card-choice') {
       const remainingEffects = transformedEffects.slice(transformedEffects.indexOf(effect) + 1)
@@ -174,7 +179,6 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
       }
 
       return openCardChoiceModal(updatedGameState, options, tags, resolver)
-
     }
     updatedGameState = handleEffect(updatedGameState, effect)
   }
@@ -183,10 +187,10 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
   const updatedRun = updatedGameState.game.run as Run
 
   // Check if the card is still in the stack (it may have been removed by an effect)
-  const cardStillInStack = updatedRun.cards.stack.some(c => c.instanceId === instanceId)
+  const cardStillInStack = updatedRun.cards.stack.some((c) => c.instanceId === instanceId)
 
   // Remove card from stack and add to discard pile (only if it's still in the stack)
-  const newStack = updatedRun.cards.stack.filter(c => c.instanceId !== instanceId)
+  const newStack = updatedRun.cards.stack.filter((c) => c.instanceId !== instanceId)
   const newDiscardPile = cardStillInStack
     ? [...updatedRun.cards.discardPile, card]
     : updatedRun.cards.discardPile
@@ -199,6 +203,7 @@ export function resolveCard(gameState: GameState, instanceId: string, effects?: 
       round: updatedRun.stats.rounds,
       turn: updatedRun.stats.turns,
       cardId: card.id,
+      instanceId: instanceId,
     },
   ]
 

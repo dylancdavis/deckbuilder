@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { moveCardByIndex, moveCards, populateDrawPile, processStartOfGame } from '../../utils/run.js'
+import {
+  moveCardByIndex,
+  moveCards,
+  populateDrawPile,
+  processStartOfGame,
+} from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
 import type { AddCardsEffect, RulesCard } from '../../utils/cards.ts'
 import type { Run } from '../../stores/game.ts'

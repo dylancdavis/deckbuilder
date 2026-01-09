@@ -149,14 +149,13 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function playCard(instanceId: string) {
-
     // Validation checks
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) {
       throw new Error('Cannot play card: no active run or rules card')
     }
 
-    const card = run.cards.hand.find(card => card.instanceId === instanceId)
+    const card = run.cards.hand.find((card) => card.instanceId === instanceId)
     if (!card) {
       throw new Error(`Cannot play card: no card with instanceId ${instanceId}`)
     }

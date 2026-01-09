@@ -260,7 +260,10 @@ export const scoreSurge: PlayableCard = {
           update: (current, run) => {
             const currentRound = run.stats.rounds
             const scoreCardsPlayedThisRound = run.events.filter(
-              (event) => event.type === 'card-play' && event.cardId === 'score' && event.round === currentRound
+              (event) =>
+                event.type === 'card-play' &&
+                event.cardId === 'score' &&
+                event.round === currentRound,
             ).length
             const pointsToGain = Math.min(scoreCardsPlayedThisRound * 2, 8)
             return current + pointsToGain

@@ -56,8 +56,7 @@ const svgStyle = computed(() => ({
     </defs>
     <title id="scarab-title">Scarab currency symbol</title>
     <desc id="scarab-desc">
-      A filled scarab beetle shape with a central circle and four extended arms at 45-degree
-      angles.
+      A filled scarab beetle shape with a central circle and four extended arms at 45-degree angles.
     </desc>
 
     <path
