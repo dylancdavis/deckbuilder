@@ -1,7 +1,3 @@
-/**
- * Effect processing utilities
- */
-
 import type { Counter } from './counter'
 import { toArray, mergeCounters, subtractCounters } from './counter'
 import { playableCards, type CardID, type PlayableCardID } from './cards'
