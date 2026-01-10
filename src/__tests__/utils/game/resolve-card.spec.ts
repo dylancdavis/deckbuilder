@@ -189,12 +189,15 @@ describe('resolveCard', () => {
     const cardWithSelfRemoval = {
       ...score,
       instanceId: 'card-1',
-      abilities: {
-        'on-play': [
-          { type: 'update-resource' as const, params: { resource: Resource.POINTS, delta: 1 } },
-          { type: 'remove-card' as const, params: { instanceId: 'self' as const } },
-        ],
-      },
+      abilities: [
+        {
+          trigger: { on: 'card-play' as const, target: 'self' as const },
+          effects: [
+            { type: 'update-resource' as const, params: { resource: Resource.POINTS, delta: 1 } },
+            { type: 'remove-card' as const, params: { instanceId: 'self' as const } },
+          ],
+        },
+      ],
     }
     const gameState = createTestGameState({
       cards: {

@@ -1,8 +1,28 @@
 import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
-import type { CardID } from './cards.ts'
+import type { CardID, PlayableCard } from './cards.ts'
 import { getCardChoices } from './cards.ts'
 import { handleEffect, handleEffects, type Effect } from './effects.ts'
+
+/**
+ * Extract on-play effects from a card's abilities.
+ * Looks for abilities with trigger { on: 'card-play', target: 'self' }
+ */
+function getOnPlayEffects(card: PlayableCard): Effect[] {
+  return card.abilities
+    .filter((ability) => ability.trigger.on === 'card-play' && ability.trigger.target === 'self')
+    .flatMap((ability) => ability.effects)
+}
+
+/**
+ * Extract on-draw effects from a card's abilities.
+ * Looks for abilities with trigger { on: 'card-draw', target: 'self' }
+ */
+function getOnDrawEffects(card: PlayableCard): Effect[] {
+  return card.abilities
+    .filter((ability) => ability.trigger.on === 'card-draw' && ability.trigger.target === 'self')
+    .flatMap((ability) => ability.effects)
+}
 
 export type GameState = {
   game: {
@@ -91,8 +111,8 @@ export function drawCards(gameState: GameState, n: number): GameState {
       }
 
       // Process on-draw effects for this card
-      const onDrawEffects = card.abilities['on-draw']
-      if (onDrawEffects) {
+      const onDrawEffects = getOnDrawEffects(card)
+      if (onDrawEffects.length > 0) {
         currentState = handleEffects(currentState, onDrawEffects)
       }
     }
@@ -151,10 +171,10 @@ export function resolveCard(
     }
   }
 
-  const cardEffects = effects ?? card.abilities['on-play'] ?? []
+  const cardEffects = effects ?? getOnPlayEffects(card)
 
   // Transform 'self' references in remove-card effects to the actual instanceId
-  const transformedEffects = cardEffects.map((effect) => {
+  const transformedEffects = cardEffects.map((effect: Effect) => {
     if (effect.type === 'remove-card' && effect.params.instanceId === 'self') {
       return {
         ...effect,
