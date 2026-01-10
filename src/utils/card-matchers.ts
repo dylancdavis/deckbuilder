@@ -62,13 +62,3 @@ export function matchesCard(card: MatchableCard, matcher: CardMatcher): boolean 
 
   return true
 }
-
-/**
- * Type guard to check if a TargetSpec is a CardMatcher object.
- *
- * @param target - The target specification to check
- * @returns true if the target is a CardMatcher object
- */
-export function isCardMatcher(target: TargetSpec): target is CardMatcher {
-  return typeof target === 'object' && target !== null
-}

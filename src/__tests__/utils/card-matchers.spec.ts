@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { matchesCard, isCardMatcher, type CardMatcher } from '../../utils/card-matchers'
+import { matchesCard, type CardMatcher } from '../../utils/card-matchers'
 import type { PlayableCard } from '../../utils/cards'
 
 // Helper to create a minimal test card
@@ -218,27 +218,5 @@ describe('matchesCard', () => {
 
       expect(matchesCard(card, matcher)).toBe(true)
     })
-  })
-})
-
-describe('isCardMatcher', () => {
-  it('returns true for object matcher', () => {
-    expect(isCardMatcher({ cardId: 'score' })).toBe(true)
-  })
-
-  it('returns true for empty object matcher', () => {
-    expect(isCardMatcher({})).toBe(true)
-  })
-
-  it('returns false for self', () => {
-    expect(isCardMatcher('self')).toBe(false)
-  })
-
-  it('returns false for any', () => {
-    expect(isCardMatcher('any')).toBe(false)
-  })
-
-  it('returns false for other', () => {
-    expect(isCardMatcher('other')).toBe(false)
   })
 })
