@@ -13,9 +13,10 @@ import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import type { Run, Location } from './run'
 import type { GameState } from './game'
-import { matchesCard, isCardMatcher, type TargetSpec } from './card-matchers'
+import { matchesCard, type TargetSpec } from './card-matchers'
 import { handleEffect, type Effect } from './effects'
 import { openCardChoiceModal } from './game'
+import { entries, values } from './utils'
 
 /**
  * A card using the new ability format (Ability[] instead of legacy trigger map).
@@ -169,13 +170,6 @@ function resolveSelfReferences(effect: Effect, instanceId: string): Effect {
 }
 
 /**
- * Check if a card uses the new ability format.
- */
-function hasNewAbilities(card: PlayableCard): boolean {
-  return Array.isArray(card.abilities)
-}
-
-/**
  * Find all abilities that match an event, in execution order.
  * Abilities are processed in the order cards appear in their locations.
  * Locations are checked in order: board, hand, stack, discardPile, drawPile.
@@ -196,13 +190,10 @@ export function findMatchingAbilities(
 
   for (const location of locations) {
     for (const card of run.cards[location]) {
-      // Skip cards using legacy ability format
-      if (!hasNewAbilities(card)) continue
-
-      // Cast to new format - hasNewAbilities verified this is safe
+      // Force casting for now
       const cardInstance = card as unknown as CardInstance
       for (const ability of cardInstance.abilities) {
-        if (matchesTrigger(event, cardInstance, ability.trigger, run)) {
+        if (matchesTrigger(event, cardInstance, location, ability.trigger, run)) {
           matches.push({ card: cardInstance, ability })
         }
       }
@@ -216,7 +207,7 @@ export function findMatchingAbilities(
  * Check if a trigger matches an event.
  *
  * @param event - The event to check
- * @param sourceCard - The card that has this ability
+ * @param sourceCard - The card that has this trigger
  * @param trigger - The trigger to evaluate
  * @param run - The current run state
  * @returns true if the trigger matches the event
@@ -224,19 +215,15 @@ export function findMatchingAbilities(
 export function matchesTrigger(
   event: Event,
   sourceCard: CardInstance,
+  cardLocation: Location,
   trigger: Trigger,
   run: Run,
 ): boolean {
   // 1. Event type must match
   if (event.type !== trigger.on) return false
 
-  // 2. Location requirement check
-  if (trigger.locations) {
-    const cardLocation = findCardLocation(sourceCard.instanceId, run)
-    if (!cardLocation || !trigger.locations.includes(cardLocation)) {
-      return false
-    }
-  }
+  // 2. If specified, must be in the right location
+  if (trigger.locations && !trigger.locations.includes(cardLocation)) return false
 
   // 3. For card-activate events, check costs and limits
   if (event.type === 'card-activate' && trigger.on === 'card-activate') {
@@ -252,7 +239,7 @@ export function matchesTrigger(
 
   // 5. Custom condition check
   if (trigger.when) {
-    const targetCard = isCardEvent(event) ? findCardByInstance(event.instanceId, run) : undefined
+    const targetCard = isCardEvent(event) ? findCard(event.instanceId, run) : undefined
     const context: TriggerContext = {
       event,
       sourceCard,
@@ -280,26 +267,19 @@ function matchesTarget(
   target: TargetSpec,
   run: Run,
 ): boolean {
-  if (target === 'self') {
-    return event.instanceId === sourceCard.instanceId
+  switch (target) {
+    case 'self':
+      return event.instanceId === sourceCard.instanceId
+    case 'other':
+      return event.instanceId !== sourceCard.instanceId
+    case 'any':
+      return true
   }
 
-  if (target === 'other') {
-    return event.instanceId !== sourceCard.instanceId
-  }
-
-  if (target === 'any') {
-    return true
-  }
-
-  // CardMatcher case
-  if (isCardMatcher(target)) {
-    const targetCard = findCardByInstance(event.instanceId, run)
-    if (!targetCard) return false
-    return matchesCard(targetCard, target)
-  }
-
-  return false
+  // Only other option is CardMatcher
+  const targetCard = findCard(event.instanceId, run)
+  if (!targetCard) return false
+  return matchesCard(targetCard, target)
 }
 
 /**
@@ -373,36 +353,32 @@ function getActivationCount(
  *
  * @param instanceId - The instance ID to find
  * @param run - The current run state
- * @returns The card if found, undefined otherwise
+ * @returns The card instance, or null if not found
  */
-function findCardByInstance(instanceId: string, run: Run): CardInstance | undefined {
-  const locations: Location[] = ['hand', 'board', 'stack', 'drawPile', 'discardPile']
-
-  for (const location of locations) {
-    const card = run.cards[location].find((c) => c.instanceId === instanceId)
+function findCard(instanceId: string, run: Run): CardInstance | undefined {
+  for (const cards of values(run.cards)) {
+    const card = cards.find((c) => c.instanceId === instanceId)
     if (card) return card as CardInstance
   }
-
   return undefined
 }
 
 /**
- * Find which location a card is in.
+ * Find a card by instance ID across all locations.
  *
  * @param instanceId - The instance ID to find
  * @param run - The current run state
- * @returns The location if found, undefined otherwise
+ * @returns A pair of the card instance and its found location, or null if not found
  */
-function findCardLocation(instanceId: string, run: Run): Location | undefined {
-  const locations: Location[] = ['hand', 'board', 'stack', 'drawPile', 'discardPile']
-
-  for (const location of locations) {
-    if (run.cards[location].some((c) => c.instanceId === instanceId)) {
-      return location
-    }
+function findCardWithLocation(
+  instanceId: string,
+  run: Run,
+): [CardInstance, Location] | [undefined, undefined] {
+  for (const [location, cards] of entries(run.cards)) {
+    const card = cards.find((c) => c.instanceId === instanceId)
+    if (card) return [card as CardInstance, location]
   }
-
-  return undefined
+  return [undefined, undefined]
 }
 
 /**
