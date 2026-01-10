@@ -119,31 +119,3 @@ export type CardEvent =
 export function isCardEvent(event: Event): event is CardEvent {
   return 'instanceId' in event
 }
-
-/**
- * Events related to turn/round/run lifecycle.
- */
-export type LifecycleEvent =
-  | TurnStartEvent
-  | TurnEndEvent
-  | RoundStartEvent
-  | RoundEndEvent
-  | RunStartEvent
-  | RunEndEvent
-
-/**
- * Type guard to check if an event is a lifecycle event.
- *
- * @param event - The event to check
- * @returns true if the event is a lifecycle event
- */
-export function isLifecycleEvent(event: Event): event is LifecycleEvent {
-  return (
-    event.type === 'turn-start' ||
-    event.type === 'turn-end' ||
-    event.type === 'round-start' ||
-    event.type === 'round-end' ||
-    event.type === 'run-start' ||
-    event.type === 'run-end'
-  )
-}

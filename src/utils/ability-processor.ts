@@ -10,7 +10,7 @@
 import type { Ability, Trigger, TriggerContext } from './ability'
 import type { PlayableCard } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
-import { isCardEvent, isLifecycleEvent } from './event'
+import { isCardEvent } from './event'
 import type { Run, Location } from './run'
 import type { GameState } from './game'
 import { matchesCard, isCardMatcher, type TargetSpec } from './card-matchers'
@@ -175,16 +175,21 @@ export function findMatchingAbilities(
 ): Array<{ card: CardInstance; ability: Ability }> {
   const matches: Array<{ card: CardInstance; ability: Ability }> = []
 
-  // Determine which cards to check based on event type
-  const cardsToCheck = getCardsForEventType(event, run)
+  // Check all locations in a deterministic order
+  // Board first (most common for persistent effects), then hand, then others
+  const locations: Location[] = ['board', 'hand', 'stack', 'discardPile', 'drawPile']
 
-  for (const card of cardsToCheck) {
-    // Skip cards without the new ability format
-    if (!Array.isArray(card.abilities)) continue
+  for (const location of locations) {
+    for (const card of run.cards[location]) {
+      // Skip cards using legacy ability format
+      if (!hasNewAbilities(card)) continue
 
-    for (const ability of card.abilities as Ability[]) {
-      if (matchesTrigger(event, card as CardInstance, ability.trigger, run)) {
-        matches.push({ card: card as CardInstance, ability })
+      // Cast to new format - hasNewAbilities verified this is safe
+      const cardInstance = card as unknown as CardInstance
+      for (const ability of cardInstance.abilities) {
+        if (matchesTrigger(event, cardInstance, ability.trigger, run)) {
+          matches.push({ card: cardInstance, ability })
+        }
       }
     }
   }
@@ -346,26 +351,6 @@ function getActivationCount(
     round: activations.filter((e) => e.round === currentRound).length,
     run: activations.length,
   }
-}
-
-/**
- * Get relevant cards to check based on event type.
- * For lifecycle events, only check board cards.
- * For card events, check hand and board.
- *
- * @param event - The event to get cards for
- * @param run - The current run state
- * @returns Array of cards to check for matching abilities
- */
-function getCardsForEventType(event: Event, run: Run): PlayableCard[] {
-  // For turn/round events, only check board cards
-  if (isLifecycleEvent(event)) {
-    return run.cards.board
-  }
-
-  // For card events, check hand and board
-  // (cards in hand can watch for other events)
-  return [...run.cards.hand, ...run.cards.board]
 }
 
 /**
