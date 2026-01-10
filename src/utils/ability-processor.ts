@@ -16,7 +16,7 @@ import type { GameState } from './game'
 import { matchesCard, type TargetSpec } from './card-matchers'
 import { handleEffect, type Effect } from './effects'
 import { openCardChoiceModal } from './game'
-import { entries, values } from './utils'
+import { values } from './utils'
 
 /**
  * A card using the new ability format (Ability[] instead of legacy trigger map).
