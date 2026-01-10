@@ -1,4 +1,4 @@
-import type { PlayableCard, PlayableCardID } from './cards'
+import type { PlayableCardID } from './cards'
 
 export type CardMatcher = {
   cardId?: PlayableCardID | PlayableCardID[]
@@ -17,6 +17,15 @@ export type CardMatcher = {
 export type TargetSpec = 'self' | 'any' | 'other' | CardMatcher
 
 /**
+ * Minimal card shape needed for matching.
+ */
+type MatchableCard = {
+  id: PlayableCardID
+  cost: number
+  tags?: string[]
+}
+
+/**
  * Evaluates whether a card matches the matcher criteria.
  * Returns true if the card satisfies all conditions in the matcher.
  *
@@ -24,7 +33,7 @@ export type TargetSpec = 'self' | 'any' | 'other' | CardMatcher
  * @param matcher - The matching criteria
  * @returns true if the card matches all criteria
  */
-export function matchesCard(card: PlayableCard, matcher: CardMatcher): boolean {
+export function matchesCard(card: MatchableCard, matcher: CardMatcher): boolean {
   // Check cardId match
   if (matcher.cardId !== undefined) {
     const ids = Array.isArray(matcher.cardId) ? matcher.cardId : [matcher.cardId]

@@ -18,9 +18,16 @@ import { handleEffect, type Effect } from './effects'
 import { openCardChoiceModal } from './game'
 
 /**
- * A card instance is a PlayableCard with a guaranteed instanceId.
+ * A card using the new ability format (Ability[] instead of legacy trigger map).
  */
-export type CardInstance = PlayableCard & { instanceId: string }
+export type NewPlayableCard = Omit<PlayableCard, 'abilities'> & {
+  abilities: Ability[]
+}
+
+/**
+ * A card instance is a NewPlayableCard with a guaranteed instanceId.
+ */
+export type CardInstance = NewPlayableCard & { instanceId: string }
 
 /**
  * Represents an ability waiting to be processed in the queue.
@@ -162,8 +169,16 @@ function resolveSelfReferences(effect: Effect, instanceId: string): Effect {
 }
 
 /**
+ * Check if a card uses the new ability format.
+ */
+function hasNewAbilities(card: PlayableCard): boolean {
+  return Array.isArray(card.abilities)
+}
+
+/**
  * Find all abilities that match an event, in execution order.
  * Abilities are processed in the order cards appear in their locations.
+ * Locations are checked in order: board, hand, stack, discardPile, drawPile.
  *
  * @param event - The event to match against
  * @param run - The current run state
