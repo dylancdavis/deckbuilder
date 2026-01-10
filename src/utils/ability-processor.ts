@@ -364,24 +364,6 @@ function findCard(instanceId: string, run: Run): CardInstance | undefined {
 }
 
 /**
- * Find a card by instance ID across all locations.
- *
- * @param instanceId - The instance ID to find
- * @param run - The current run state
- * @returns A pair of the card instance and its found location, or null if not found
- */
-function findCardWithLocation(
-  instanceId: string,
-  run: Run,
-): [CardInstance, Location] | [undefined, undefined] {
-  for (const [location, cards] of entries(run.cards)) {
-    const card = cards.find((c) => c.instanceId === instanceId)
-    if (card) return [card as CardInstance, location]
-  }
-  return [undefined, undefined]
-}
-
-/**
  * Determines if a card should go to the board (asset) or discard pile (action).
  * Derived from the card's abilities - if any ability has a board location
  * requirement, the card is an asset.
