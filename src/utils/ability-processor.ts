@@ -49,14 +49,23 @@ type EffectContext = {
 }
 
 /**
- * Given an `event` and `gameState`, triggers all relevant abilities
- * for that event.
+ * Given an `event` and `gameState`, adds event to run
+ * and triggers all relevant abilities
  */
 export function handleEvent(gameState: GameState, event: Event): GameState {
-  const run = gameState.game.run!
+  // First add event to the list
+  const updatedGameState = {
+    ...gameState,
+    game: {
+      ...gameState.game,
+      run: {
+        ...gameState.game.run!,
+        events: gameState.game.run!.events.concat(event),
+      },
+    },
+  }
 
-  // Find all abilities that match this event
-  const abilities = findMatchingAbilities(run, event)
+  const abilities = findMatchingAbilities(updatedGameState.game.run, event)
 
   // Build initial queue with all matched abilities
   const queue: AbilityQueueItem[] = abilities.map((match) => ({
@@ -65,7 +74,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
     effectIndex: 0,
   }))
 
-  // Process the queue
+  // Process effects of matching abilities
   return processAbilityQueue(gameState, queue, event)
 }
 
@@ -90,15 +99,16 @@ function processAbilityQueue(
     const item = queue[queueIndex]
     const effects = item.ability.effects
 
+    // Iterate effects, starting at the stored index
     for (let effectIndex = item.effectIndex; effectIndex < effects.length; effectIndex++) {
       const effect = effects[effectIndex]
 
       // Handle card-choice by capturing continuation and returning early
       if (effect.type === 'card-choice') {
-        // Build continuation: rest of current ability + remaining abilities in queue
-        const continuation: AbilityQueueItem[] = [
-          { ...item, effectIndex: effectIndex + 1 },
-          ...queue.slice(queueIndex + 1),
+        // Queue of rest of current ability + remaining abilities in queue
+        const remainingQueue: AbilityQueueItem[] = [
+          { ...item, effectIndex: effectIndex + 1 }, // saved effectIndex
+          ...queue.slice(queueIndex + 1), // rest of queue
         ]
 
         const { options, tags, then } = effect.params
@@ -108,7 +118,7 @@ function processAbilityQueue(
           const chosenEffect = then(chosenCard)
           const context: EffectContext = { sourceCard: item.card }
           const stateAfterChoice = handleEffectWithContext(gs, chosenEffect, context)
-          return processAbilityQueue(stateAfterChoice, continuation, event)
+          return processAbilityQueue(stateAfterChoice, remainingQueue, event)
         }
 
         // Note: The card being played remains in 'stack' while the modal is open.
@@ -117,7 +127,7 @@ function processAbilityQueue(
         return openCardChoiceModal(currentState, options, tags, resolver)
       }
 
-      // Process non-interactive effects immediately
+      // Non-choice actions can be resolved synchronously
       const context: EffectContext = { sourceCard: item.card }
       currentState = handleEffectWithContext(currentState, effect, context)
     }
@@ -201,7 +211,7 @@ export function findMatchingAbilities(
 }
 
 /**
- * Check if a trigger matches an event.
+ * Check if a specifies trigger should resolve for a given event.
  *
  * @param event - The event to check
  * @param sourceCard - The card that has this trigger

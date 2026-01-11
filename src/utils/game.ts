@@ -1,28 +1,9 @@
 import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID, PlayableCard } from './cards.ts'
+import type { CardDrawEvent, CardPlayEvent } from './event.ts'
 import { getCardChoices } from './cards.ts'
-import { handleEffect, handleEffects, type Effect } from './effects.ts'
-
-/**
- * Extract on-play effects from a card's abilities.
- * Looks for abilities with trigger { on: 'card-play', target: 'self' }
- */
-function getOnPlayEffects(card: PlayableCard): Effect[] {
-  return card.abilities
-    .filter((ability) => ability.trigger.on === 'card-play' && ability.trigger.target === 'self')
-    .flatMap((ability) => ability.effects)
-}
-
-/**
- * Extract on-draw effects from a card's abilities.
- * Looks for abilities with trigger { on: 'card-draw', target: 'self' }
- */
-function getOnDrawEffects(card: PlayableCard): Effect[] {
-  return card.abilities
-    .filter((ability) => ability.trigger.on === 'card-draw' && ability.trigger.target === 'self')
-    .flatMap((ability) => ability.effects)
-}
+import { handleEvent, isAsset } from './ability-processor.ts'
 
 export type GameState = {
   game: {
@@ -110,10 +91,27 @@ export function drawCards(gameState: GameState, n: number): GameState {
         },
       }
 
-      // Process on-draw effects for this card
-      const onDrawEffects = getOnDrawEffects(card)
-      if (onDrawEffects.length > 0) {
-        currentState = handleEffects(currentState, onDrawEffects)
+      // Create draw event and process abilities
+      const drawEvent: CardDrawEvent = {
+        type: 'card-draw',
+        cardId: card.id,
+        instanceId: card.instanceId!,
+        round: currentRun.stats.rounds,
+        turn: currentRun.stats.turns,
+      }
+
+      currentState = handleEvent(currentState, drawEvent)
+
+      // Log the event
+      currentState = {
+        ...currentState,
+        game: {
+          ...currentState.game,
+          run: {
+            ...currentState.game.run!,
+            events: [...currentState.game.run!.events, drawEvent],
+          },
+        },
       }
     }
   }
@@ -123,22 +121,18 @@ export function drawCards(gameState: GameState, n: number): GameState {
 
 /**
  * Pure function that processes playing a card from hand with the given instance ID.
- * Applies card effects, moves card to discard pile, and logs the event.
- *
- * Note: This does not handle choice effects or validation - those should be
- * handled by the caller (e.g., the store).
- *
+ * Moves the card to the stack, emits & process a card-play event, then returns with
+ * either the card resolved on the board or on the stack awaiting a choice event to resolve.
  * @param gameState - The current game state
  * @param instanceId - The instance ID of the card in the hand to play
  * @returns A new game state with the card played and effects applied
  */
-export function playCard(gameState: GameState, instanceId: string, effects?: Effect[]): GameState {
-  const run = gameState.game.run as Run
+export function playCard(gameState: GameState, instanceId: string): GameState {
+  const run = gameState.game.run!
+  let updatedGameState
 
   // Find card in either hand or stack
-  const cardInHand = run.cards.hand.find((card) => card.instanceId === instanceId)
-  const cardInStack = run.cards.stack.find((card) => card.instanceId === instanceId)
-  const card = cardInHand ?? cardInStack
+  const card = run.cards.hand.find((card) => card.instanceId === instanceId)
 
   if (!card) {
     throw new Error(
@@ -146,95 +140,86 @@ export function playCard(gameState: GameState, instanceId: string, effects?: Eff
     )
   }
 
-  // If card is in hand, move it to stack before processing effects
-  let updatedGameState = gameState
-  if (cardInHand) {
-    const newHand = run.cards.hand.filter((c) => c.instanceId !== instanceId)
-    const newStack = [...run.cards.stack, card]
-    updatedGameState = {
-      ...gameState,
-      game: {
-        ...gameState.game,
-        run: {
-          ...run,
-          cards: {
-            ...run.cards,
-            hand: newHand,
-            stack: newStack,
-          },
+  // 1. Move the card from hand to stack
+  const newHand = run.cards.hand.filter((c) => c.instanceId !== instanceId)
+  const newStack = run.cards.stack.concat(card)
+  updatedGameState = {
+    ...gameState,
+    game: {
+      ...gameState.game,
+      run: {
+        ...run,
+        cards: {
+          ...run.cards,
+          hand: newHand,
+          stack: newStack,
         },
+      },
+    },
+  }
+
+  const playEvent: CardPlayEvent = {
+    type: 'card-play',
+    cardId: card.id,
+    instanceId: instanceId,
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  // handleEvent logs event and processes all abilities
+  updatedGameState = handleEvent(updatedGameState, playEvent)
+
+  // Finalize the card play (move from stack to final destination)
+  // If a modal is open, wrap the resolver to finalize after continuation completes
+  return finalizeCardPlay(updatedGameState, instanceId, card)
+}
+
+/**
+ * Moves a played card from stack to its final destination (board or discard).
+ * If a modal is open (card-choice in progress), wraps the resolver to call
+ * this function after the continuation completes.
+ */
+function finalizeCardPlay(gameState: GameState, instanceId: string, card: PlayableCard): GameState {
+  // If modal is open, wrap the resolver to finalize after continuation
+  if (gameState.viewData.modalView === 'card-choice' && gameState.viewData.resolver) {
+    const originalResolver = gameState.viewData.resolver
+    const wrappedResolver = (gs: GameState, chosenCard: CardID) => {
+      const result = originalResolver(gs, chosenCard)
+      return finalizeCardPlay(result, instanceId, card)
+    }
+    return {
+      ...gameState,
+      viewData: {
+        ...gameState.viewData,
+        resolver: wrappedResolver,
       },
     }
   }
 
-  const cardEffects = effects ?? getOnPlayEffects(card)
+  // No modal - finalize now
+  const run = gameState.game.run as Run
+  const cardStillInStack = run.cards.stack.some((c) => c.instanceId === instanceId)
 
-  // Transform 'self' references in remove-card effects to the actual instanceId
-  const transformedEffects = cardEffects.map((effect: Effect) => {
-    if (effect.type === 'remove-card' && effect.params.instanceId === 'self') {
-      return {
-        ...effect,
-        params: {
-          instanceId: instanceId,
-        },
-      }
-    }
-    return effect
-  })
-
-  // Loop through and apply each effect to the game state
-  for (const effect of transformedEffects) {
-    // In the choice case, just update the modal state and return early
-    if (effect.type === 'card-choice') {
-      const remainingEffects = transformedEffects.slice(transformedEffects.indexOf(effect) + 1)
-      const { options, tags, then } = effect.params
-
-      const resolver = (gameState: GameState, chosenCard: CardID) => {
-        const newEffect = then(chosenCard)
-        return playCard(gameState, instanceId, [newEffect, ...remainingEffects])
-      }
-
-      return openCardChoiceModal(updatedGameState, options, tags, resolver)
-    }
-    updatedGameState = handleEffect(updatedGameState, effect)
+  if (!cardStillInStack) {
+    return gameState
   }
 
-  // Extract the updated run from the game state
-  const updatedRun = updatedGameState.game.run as Run
-
-  // Check if the card is still in the stack (it may have been removed by an effect)
-  const cardStillInStack = updatedRun.cards.stack.some((c) => c.instanceId === instanceId)
-
-  // Remove card from stack and add to discard pile (only if it's still in the stack)
-  const newStack = updatedRun.cards.stack.filter((c) => c.instanceId !== instanceId)
-  const newDiscardPile = cardStillInStack
-    ? [...updatedRun.cards.discardPile, card]
-    : updatedRun.cards.discardPile
-
-  // Log the card play event
-  const newEvents = [
-    ...updatedRun.events,
-    {
-      type: 'card-play' as const,
-      round: updatedRun.stats.rounds,
-      turn: updatedRun.stats.turns,
-      cardId: card.id,
-      instanceId: instanceId,
-    },
-  ]
+  // Determine destination based on card abilities
+  const destination = isAsset(card) ? 'board' : 'discardPile'
+  const newStack = run.cards.stack.filter((c) => c.instanceId !== instanceId)
+  const newDestination = [...run.cards[destination], card]
 
   return {
-    ...updatedGameState,
+    ...gameState,
     game: {
-      ...updatedGameState.game,
+      ...gameState.game,
       run: {
-        ...updatedRun,
+        ...run,
         cards: {
-          ...updatedRun.cards,
+          ...run.cards,
           stack: newStack,
-          discardPile: newDiscardPile,
+          [destination]: newDestination,
         },
-        events: newEvents,
       },
     },
   }
