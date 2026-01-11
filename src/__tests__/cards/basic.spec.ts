@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest'
-import { resolveCard, drawCards } from '../../utils/game'
+import { playCard, drawCards } from '../../utils/game'
 import {
   score,
   dualScore,
@@ -23,7 +23,7 @@ it('score gains 1 point', () => {
     resources: { points: 5 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(6)
 })
@@ -35,7 +35,7 @@ it('dual-score gains 2 points', () => {
     resources: { points: 5 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(7)
 })
@@ -47,7 +47,7 @@ it('point-reset sets points to 4', () => {
     resources: { points: 10 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(4)
 })
@@ -59,7 +59,7 @@ it('zero-reward gains 6 points when at 0 points', () => {
     resources: { points: 0 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(6)
 })
@@ -71,7 +71,7 @@ it('zero-reward does not change points when not at 0', () => {
     resources: { points: 5 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(5)
 })
@@ -83,7 +83,7 @@ it('point-multiply doubles points when at 0', () => {
     resources: { points: 0 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(0)
 })
@@ -95,7 +95,7 @@ it('point-multiply doubles points when at 2', () => {
     resources: { points: 2 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(4)
 })
@@ -107,7 +107,7 @@ it('point-multiply doubles points when at 4', () => {
     resources: { points: 4 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(8)
 })
@@ -119,7 +119,7 @@ it('point-multiply does not change points when above 4', () => {
     resources: { points: 10 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(10)
 })
@@ -131,7 +131,7 @@ it('point-loan gains 6 points and adds debt to draw pile', () => {
     resources: { points: 0 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(6)
   expect(result.game.run!.cards.drawPile).toHaveLength(1)
@@ -144,7 +144,7 @@ it('collect-basic presents card choice', () => {
     cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.viewData.modalView).toBe('card-choice')
   expect(result.viewData.cardOptions).toHaveLength(3)
@@ -163,7 +163,7 @@ it('score-surge gains points for each score played this round', () => {
     stats: { turns: 1, rounds: 1 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(6)
 })
@@ -181,7 +181,7 @@ it('score-synergy gains points for each score in deck', () => {
     },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(5)
 })
@@ -193,7 +193,7 @@ it('last-resort gains 8 points and destroys itself', () => {
     resources: { points: 0 },
   })
 
-  const result = resolveCard(gameState, 'card-1')
+  const result = playCard(gameState, 'card-1')
 
   expect(result.game.run!.resources.points).toBe(8)
   expect(result.game.run!.cards.discardPile).toHaveLength(0)

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { resolveCard } from '../../../utils/game'
+import { playCard } from '../../../utils/game'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from '../effects/shared'
 import { Resource } from '../../../utils/resource'
 
-describe('resolveCard', () => {
+describe('playCard', () => {
   it('plays a card by instance ID', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const card2 = { ...score, instanceId: 'card-2' }
@@ -18,7 +18,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-1')
+    const result = playCard(gameState, 'card-1')
 
     expect(result.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.run!.cards.hand[0].instanceId).toBe('card-2')
@@ -39,7 +39,7 @@ describe('resolveCard', () => {
       },
     })
 
-    expect(() => resolveCard(gameState, 'nonexistent-id')).toThrow(
+    expect(() => playCard(gameState, 'nonexistent-id')).toThrow(
       'Cannot resolve card: no card with instanceId nonexistent-id found in hand or stack',
     )
   })
@@ -59,7 +59,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-1')
+    const result = playCard(gameState, 'card-1')
 
     // Score card gives 1 point
     expect(result.game.run!.resources.points).toBe(1)
@@ -85,7 +85,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-1')
+    const result = playCard(gameState, 'card-1')
 
     expect(result.game.run!.events).toHaveLength(1)
     expect(result.game.run!.events[0]).toEqual({
@@ -111,7 +111,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-2')
+    const result = playCard(gameState, 'card-2')
 
     expect(result.game.run!.cards.hand).toHaveLength(2)
     expect(result.game.run!.cards.hand[0].instanceId).toBe('card-1')
@@ -137,7 +137,7 @@ describe('resolveCard', () => {
     const originalStackLength = gameState.game.run!.cards.stack.length
     const originalDiscardLength = gameState.game.run!.cards.discardPile.length
 
-    resolveCard(gameState, 'card-1')
+    playCard(gameState, 'card-1')
 
     expect(gameState.game.run!.cards.hand).toHaveLength(originalHandLength)
     expect(gameState.game.run!.cards.stack).toHaveLength(originalStackLength)
@@ -158,7 +158,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-1')
+    const result = playCard(gameState, 'card-1')
 
     expect(result.game.run!.cards.discardPile).toHaveLength(2)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('existing')
@@ -177,7 +177,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-1')
+    const result = playCard(gameState, 'card-1')
 
     expect(result.game.run!.cards.hand).toHaveLength(0)
     expect(result.game.run!.cards.stack).toHaveLength(0)
@@ -212,7 +212,7 @@ describe('resolveCard', () => {
       },
     })
 
-    const result = resolveCard(gameState, 'card-1')
+    const result = playCard(gameState, 'card-1')
 
     // Effect should have been applied
     expect(result.game.run!.resources.points).toBe(1)
