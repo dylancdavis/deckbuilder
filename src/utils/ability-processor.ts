@@ -368,6 +368,6 @@ function findCard(instanceId: string, run: Run): CardInstance | undefined {
  * @param card - The card to check
  * @returns true if the card has board-based abilities
  */
-export function hasBoardAbilities(card: PlayableCard): boolean {
+export function isAsset(card: PlayableCard): boolean {
   return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
 }
