@@ -53,6 +53,11 @@ type EffectContext = {
  * and triggers all relevant abilities
  */
 export function handleEvent(gameState: GameState, event: Event): GameState {
+  // No-op if there's no active run
+  if (!gameState.game.run) {
+    return gameState
+  }
+
   // First add event to the list
   const updatedGameState = {
     ...gameState,
@@ -75,7 +80,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   }))
 
   // Process effects of matching abilities
-  return processAbilityQueue(gameState, queue, event)
+  return processAbilityQueue(updatedGameState, queue, event)
 }
 
 /**

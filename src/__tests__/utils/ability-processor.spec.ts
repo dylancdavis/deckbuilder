@@ -3,8 +3,8 @@ import {
   matchesTrigger,
   findMatchingAbilities,
   canActivate,
-  processAbilities,
-  hasBoardAbilities,
+  handleEvent,
+  isAsset,
   type CardInstance,
 } from '../../utils/ability-processor'
 import type { Ability, Trigger } from '../../utils/ability'
@@ -616,7 +616,7 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     expect(matches).toHaveLength(1)
     expect(matches[0].card).toBe(card)
@@ -641,7 +641,7 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     expect(matches).toHaveLength(2)
   })
@@ -668,7 +668,7 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [card1, card2], board: [], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     expect(matches).toHaveLength(2)
   })
@@ -695,7 +695,7 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [handCard], board: [boardCard], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     // Both hand and board cards can respond to lifecycle events
     // Location filtering is done via trigger.locations, not event type
@@ -716,7 +716,7 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [handCard], board: [], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     // Hand card has ability that requires board location, so it doesn't match
     expect(matches).toHaveLength(0)
@@ -740,7 +740,7 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [handCard], board: [boardCard], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     expect(matches).toHaveLength(2)
   })
@@ -759,19 +759,19 @@ describe('findMatchingAbilities', () => {
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
     })
 
-    const matches = findMatchingAbilities(event, run)
+    const matches = findMatchingAbilities(run, event)
 
     expect(matches).toHaveLength(0)
   })
 })
 
-describe('processAbilities', () => {
+describe('handleEvent', () => {
   it('returns unchanged state when no run exists', () => {
     const gameState = createTestGameState()
     gameState.game.run = null
     const event = createCardPlayEvent('card-1')
 
-    const result = processAbilities(gameState, event)
+    const result = handleEvent(gameState, event)
 
     expect(result).toBe(gameState)
   })
@@ -791,7 +791,7 @@ describe('processAbilities', () => {
     })
     const event = createCardPlayEvent('card-1')
 
-    const result = processAbilities(gameState, event)
+    const result = handleEvent(gameState, event)
 
     expect(result.game.run!.resources.points).toBe(15)
   })
@@ -814,7 +814,7 @@ describe('processAbilities', () => {
     })
     const event = createCardPlayEvent('card-1')
 
-    const result = processAbilities(gameState, event)
+    const result = handleEvent(gameState, event)
 
     expect(result.game.run!.resources.points).toBe(8)
   })
@@ -842,7 +842,7 @@ describe('processAbilities', () => {
     })
     const event = createCardPlayEvent('card-3')
 
-    const result = processAbilities(gameState, event)
+    const result = handleEvent(gameState, event)
 
     expect(result.game.run!.resources.points).toBe(3)
   })
@@ -856,7 +856,7 @@ describe('processAbilities', () => {
           params: {
             options: 3,
             tags: ['basic'],
-            then: (cardId) => ({ type: 'collect-card', params: { cards: { [cardId]: 1 } } }),
+            choiceHandler: (cardId) => [{ type: 'collect-card', params: { cards: { [cardId]: 1 } } }],
           },
         },
       ],
@@ -870,7 +870,7 @@ describe('processAbilities', () => {
     })
     const event = createCardPlayEvent('card-1')
 
-    const result = processAbilities(gameState, event)
+    const result = handleEvent(gameState, event)
 
     expect(result.viewData.modalView).toBe('card-choice')
     expect(result.viewData.resolver).not.toBeNull()
@@ -890,14 +890,14 @@ describe('processAbilities', () => {
     })
     const event = createCardPlayEvent('card-1')
 
-    const result = processAbilities(gameState, event)
+    const result = handleEvent(gameState, event)
 
     // Card should be removed
     expect(result.game.run!.cards.hand).toHaveLength(0)
   })
 })
 
-describe('hasBoardAbilities', () => {
+describe('isAsset', () => {
   it('returns true when card has ability with board location', () => {
     const ability: Ability = {
       trigger: { on: 'turn-start', locations: ['board'] },
@@ -908,7 +908,7 @@ describe('hasBoardAbilities', () => {
       abilities: [ability] as unknown as PlayableCard['abilities'],
     })
 
-    expect(hasBoardAbilities(card)).toBe(true)
+    expect(isAsset(card)).toBe(true)
   })
 
   it('returns true when any ability has board location', () => {
@@ -925,7 +925,7 @@ describe('hasBoardAbilities', () => {
       abilities: [ability1, ability2] as unknown as PlayableCard['abilities'],
     })
 
-    expect(hasBoardAbilities(card)).toBe(true)
+    expect(isAsset(card)).toBe(true)
   })
 
   it('returns false when no ability has board location', () => {
@@ -938,7 +938,7 @@ describe('hasBoardAbilities', () => {
       abilities: [ability] as unknown as PlayableCard['abilities'],
     })
 
-    expect(hasBoardAbilities(card)).toBe(false)
+    expect(isAsset(card)).toBe(false)
   })
 
   it('returns false when card has no abilities', () => {
@@ -947,7 +947,7 @@ describe('hasBoardAbilities', () => {
       abilities: [] as unknown as PlayableCard['abilities'],
     })
 
-    expect(hasBoardAbilities(card)).toBe(false)
+    expect(isAsset(card)).toBe(false)
   })
 
   it('returns true when location includes board among others', () => {
@@ -960,6 +960,6 @@ describe('hasBoardAbilities', () => {
       abilities: [ability] as unknown as PlayableCard['abilities'],
     })
 
-    expect(hasBoardAbilities(card)).toBe(true)
+    expect(isAsset(card)).toBe(true)
   })
 })

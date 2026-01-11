@@ -131,13 +131,11 @@ export function playCard(gameState: GameState, instanceId: string): GameState {
   const run = gameState.game.run!
   let updatedGameState
 
-  // Find card in either hand or stack
+  // Find card in hand
   const card = run.cards.hand.find((card) => card.instanceId === instanceId)
 
   if (!card) {
-    throw new Error(
-      `Cannot resolve card: no card with instanceId ${instanceId} found in hand or stack`,
-    )
+    throw new Error(`Cannot play card: no card with instanceId ${instanceId} found in hand`)
   }
 
   // 1. Move the card from hand to stack

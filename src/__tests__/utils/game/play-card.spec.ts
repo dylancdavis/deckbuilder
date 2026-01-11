@@ -40,7 +40,7 @@ describe('playCard', () => {
     })
 
     expect(() => playCard(gameState, 'nonexistent-id')).toThrow(
-      'Cannot resolve card: no card with instanceId nonexistent-id found in hand or stack',
+      'Cannot play card: no card with instanceId nonexistent-id found in hand',
     )
   })
 
@@ -163,26 +163,6 @@ describe('playCard', () => {
     expect(result.game.run!.cards.discardPile).toHaveLength(2)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('existing')
     expect(result.game.run!.cards.discardPile[1].instanceId).toBe('card-1')
-  })
-
-  it('can resolve card from stack (for continuation after choice)', () => {
-    const card1 = { ...score, instanceId: 'card-1' }
-    const gameState = createTestGameState({
-      cards: {
-        drawPile: [],
-        hand: [],
-        board: [],
-        stack: [card1],
-        discardPile: [],
-      },
-    })
-
-    const result = playCard(gameState, 'card-1')
-
-    expect(result.game.run!.cards.hand).toHaveLength(0)
-    expect(result.game.run!.cards.stack).toHaveLength(0)
-    expect(result.game.run!.cards.discardPile).toHaveLength(1)
-    expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
   })
 
   it("transforms 'self' in remove-card effect to card's instanceId", () => {
