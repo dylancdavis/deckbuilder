@@ -47,6 +47,11 @@ export type CardActivateEvent = BaseEvent & {
   abilityIndex: number
 }
 
+export type CardChoiceEvent = BaseEvent & {
+  type: 'card-choice'
+  cardId: PlayableCardID
+}
+
 export type TurnStartEvent = BaseEvent & {
   type: 'turn-start'
 }
