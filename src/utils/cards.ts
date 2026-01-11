@@ -87,10 +87,12 @@ export const collectBasic: PlayableCard = {
           params: {
             options: 3,
             tags: ['basic'],
-            choiceHandler: (chosenCard) => ({
-              type: 'collect-card',
-              params: { cards: { [chosenCard]: 1 } },
-            }),
+            choiceHandler: (chosenCard) => [
+              {
+                type: 'collect-card',
+                params: { cards: { [chosenCard]: 1 } },
+              },
+            ],
           },
         },
       ],

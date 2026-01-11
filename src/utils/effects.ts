@@ -48,7 +48,7 @@ export type CardChoiceEffect = {
   params: {
     options: number
     tags: string[]
-    choiceHandler: (chosenCard: CardID) => Effect
+    choiceHandler: (chosenCard: CardID) => Effect[]
   }
 }
 

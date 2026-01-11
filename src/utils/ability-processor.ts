@@ -115,9 +115,12 @@ function processAbilityQueue(
 
         // Resolver continues processing after user makes a choice
         const resolver = (gs: GameState, chosenCard: Parameters<typeof choiceHandler>[0]) => {
-          const chosenEffect = choiceHandler(chosenCard)
+          const choiceEffects = choiceHandler(chosenCard)
           const context: EffectContext = { sourceCard: item.card }
-          const stateAfterChoice = handleEffectWithContext(gs, chosenEffect, context)
+          let stateAfterChoice = gs
+          for (const effect of choiceEffects) {
+            stateAfterChoice = handleEffectWithContext(gs, effect, context)
+          }
           return processAbilityQueue(stateAfterChoice, remainingQueue, event)
         }
 
