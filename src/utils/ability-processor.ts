@@ -49,12 +49,8 @@ type EffectContext = {
 }
 
 /**
- * Core function to process abilities for a given event.
- * Finds all matching abilities and processes them via the queue system.
- *
- * @param gameState - The current game state
- * @param event - The event that occurred
- * @returns Updated game state after processing all matching abilities
+ * Given an `event` and `gameState`, triggers all relevant abilities
+ * for that event.
  */
 export function processAbilities(gameState: GameState, event: Event): GameState {
   const run = gameState.game.run
@@ -187,6 +183,8 @@ export function findMatchingAbilities(
   // Check all locations in a deterministic order
   // Board first (most common for persistent effects), then hand, then others
   const locations: Location[] = ['board', 'hand', 'stack', 'discardPile', 'drawPile']
+
+  // TODO: also check rules card
 
   for (const location of locations) {
     for (const card of run.cards[location]) {
