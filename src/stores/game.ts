@@ -7,7 +7,7 @@ import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import { Resource } from '@/utils/resource.ts'
-import { resolveCard, drawCards as drawCardsPure, type GameState } from '@/utils/game.ts'
+import { playCard, drawCards as drawCardsPure, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -148,7 +148,7 @@ export const useGameStore = defineStore('game', () => {
     return newDeckKey
   }
 
-  function playCard(instanceId: string) {
+  function tryPlayCard(instanceId: string) {
     // Validation checks
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) {
@@ -174,7 +174,7 @@ export const useGameStore = defineStore('game', () => {
     }
 
     // Use pure function to process card play and non-choice effects
-    gameState.value = resolveCard(gameState.value, instanceId)
+    gameState.value = playCard(gameState.value, instanceId)
   }
 
   function nextTurn() {
@@ -268,7 +268,7 @@ export const useGameStore = defineStore('game', () => {
     cardOptions,
     selectDeck,
     startRun,
-    playCard,
+    tryPlayCard,
     nextTurn,
     startNewRound,
     endRun,

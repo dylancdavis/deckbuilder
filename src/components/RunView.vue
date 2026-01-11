@@ -107,7 +107,7 @@ async function playCard(instanceId: string) {
   const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
 
   // Make the state change
-  gameStore.playCard(instanceId)
+  gameStore.tryPlayCard(instanceId)
 
   // Wait for Vue to re-render
   await nextTick()

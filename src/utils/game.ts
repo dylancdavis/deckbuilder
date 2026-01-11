@@ -132,11 +132,7 @@ export function drawCards(gameState: GameState, n: number): GameState {
  * @param instanceId - The instance ID of the card in the hand to play
  * @returns A new game state with the card played and effects applied
  */
-export function resolveCard(
-  gameState: GameState,
-  instanceId: string,
-  effects?: Effect[],
-): GameState {
+export function playCard(gameState: GameState, instanceId: string, effects?: Effect[]): GameState {
   const run = gameState.game.run as Run
 
   // Find card in either hand or stack
@@ -195,7 +191,7 @@ export function resolveCard(
 
       const resolver = (gameState: GameState, chosenCard: CardID) => {
         const newEffect = then(chosenCard)
-        return resolveCard(gameState, instanceId, [newEffect, ...remainingEffects])
+        return playCard(gameState, instanceId, [newEffect, ...remainingEffects])
       }
 
       return openCardChoiceModal(updatedGameState, options, tags, resolver)
