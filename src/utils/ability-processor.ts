@@ -129,8 +129,8 @@ function processAbilityQueue(
           const choiceEffects = choiceHandler(chosenCard)
           const context: EffectContext = { sourceCard: item.card }
           let stateAfterChoice = gs
-          for (const effect of choiceEffects) {
-            stateAfterChoice = handleEffectWithContext(gs, effect, context)
+          for (const choiceEffect of choiceEffects) {
+            stateAfterChoice = handleEffectWithContext(stateAfterChoice, choiceEffect, context)
           }
           return processAbilityQueue(stateAfterChoice, remainingQueue, event)
         }
