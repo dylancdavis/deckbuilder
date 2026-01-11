@@ -52,15 +52,14 @@ type EffectContext = {
  * Given an `event` and `gameState`, triggers all relevant abilities
  * for that event.
  */
-export function processAbilities(gameState: GameState, event: Event): GameState {
-  const run = gameState.game.run
-  if (!run) return gameState
+export function handleEvent(gameState: GameState, event: Event): GameState {
+  const run = gameState.game.run!
 
   // Find all abilities that match this event
-  const matches = findMatchingAbilities(event, run)
+  const abilities = findMatchingAbilities(run, event)
 
   // Build initial queue with all matched abilities
-  const queue: AbilityQueueItem[] = matches.map((match) => ({
+  const queue: AbilityQueueItem[] = abilities.map((match) => ({
     card: match.card,
     ability: match.ability,
     effectIndex: 0,
@@ -175,8 +174,8 @@ function resolveSelfReferences(effect: Effect, instanceId: string): Effect {
  * @returns Array of matching card/ability pairs
  */
 export function findMatchingAbilities(
-  event: Event,
   run: Run,
+  event: Event,
 ): Array<{ card: CardInstance; ability: Ability }> {
   const matches: Array<{ card: CardInstance; ability: Ability }> = []
 
