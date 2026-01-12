@@ -417,9 +417,174 @@ export const lastResort: PlayableCard = {
   },
 }
 
+// Test rules card with no limits for manual testing
+export const testRules: RulesCard = {
+  type: 'rules',
+  id: 'test-rules',
+  name: 'Test Rules',
+  art: {
+    gradient: ['#ff0000', '#00ff00'],
+    image: 'lightning',
+  },
+  deckLimits: { size: [0, 100] },
+  turnStructure: {
+    drawAmount: 5,
+    playAmount: 'any',
+    discardAmount: 'all',
+  },
+  endConditions: { rounds: 10 },
+  effects: {
+    gameStart: [
+      {
+        type: 'add-cards',
+        params: {
+          location: 'drawPile',
+          cards: {
+            score: 2,
+            'collect-basic': 2,
+            'double-choice': 2,
+            'choice-draw': 2,
+            'draw-watcher': 1,
+            'draw-bonus': 1,
+          },
+        },
+      },
+    ],
+  },
+}
+
 export const rulesCards = {
   'starter-rules': starterRules,
+  'test-rules': testRules,
 } as const
+
+// === TEST CARDS FOR PROBLEMATIC SCENARIOS ===
+
+// Test: Two card-choices in sequence on the same card
+export const doubleChoice: PlayableCard = {
+  type: 'playable',
+  id: 'double-choice',
+  name: 'Double Choice',
+  description: 'Choose a basic card to collect, then choose another.',
+  abilities: [
+    {
+      trigger: { on: 'card-play', target: 'self' },
+      effects: [
+        {
+          type: 'card-choice',
+          params: {
+            options: 3,
+            tags: ['basic'],
+            choiceHandler: (chosenCard) => [
+              { type: 'collect-card', params: { cards: { [chosenCard]: 1 } } },
+            ],
+          },
+        },
+        {
+          type: 'card-choice',
+          params: {
+            options: 3,
+            tags: ['basic'],
+            choiceHandler: (chosenCard) => [
+              { type: 'collect-card', params: { cards: { [chosenCard]: 1 } } },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#ff6b6b', '#feca57'],
+    image: 'lightning',
+  },
+}
+
+// Test: Card-choice where the effect gains points (simple effect after choice)
+export const choiceDraw: PlayableCard = {
+  type: 'playable',
+  id: 'choice-draw',
+  name: 'Choice & Gain',
+  description: 'Choose a card to collect, then gain 2 points.',
+  abilities: [
+    {
+      trigger: { on: 'card-play', target: 'self' },
+      effects: [
+        {
+          type: 'card-choice',
+          params: {
+            options: 3,
+            tags: ['basic'],
+            choiceHandler: (chosenCard) => [
+              { type: 'collect-card', params: { cards: { [chosenCard]: 1 } } },
+              { type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#48dbfb', '#0abde3'],
+    image: 'scarab',
+  },
+}
+
+// Test: On-board card that triggers a choice when any card is drawn
+export const drawWatcher: PlayableCard = {
+  type: 'playable',
+  id: 'draw-watcher',
+  name: 'Draw Watcher',
+  description: 'While on board: When you draw any card, choose a basic card to collect.',
+  abilities: [
+    {
+      trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
+      effects: [
+        {
+          type: 'card-choice',
+          params: {
+            options: 2,
+            tags: ['basic'],
+            choiceHandler: (chosenCard) => [
+              { type: 'collect-card', params: { cards: { [chosenCard]: 1 } } },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#5f27cd', '#341f97'],
+    image: 'scarab',
+  },
+}
+
+// Test: Simpler asset card that gives points when you draw
+export const drawBonus: PlayableCard = {
+  type: 'playable',
+  id: 'draw-bonus',
+  name: 'Draw Bonus',
+  description: 'While on board: When you draw any card, gain 1 point.',
+  abilities: [
+    {
+      trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
+      effects: [
+        { type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#10ac84', '#1dd1a1'],
+    image: 'scarab',
+  },
+}
 
 export const playableCards = {
   score: score,
@@ -434,6 +599,11 @@ export const playableCards = {
   'point-loan': pointLoan,
   debt: debt,
   'last-resort': lastResort,
+  // Test cards
+  'double-choice': doubleChoice,
+  'choice-draw': choiceDraw,
+  'draw-watcher': drawWatcher,
+  'draw-bonus': drawBonus,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }

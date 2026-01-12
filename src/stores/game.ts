@@ -22,6 +22,12 @@ const initialCollectionCards: Counter<CardID> = {
   'point-loan': 4,
   'last-resort': 4,
   'starter-rules': 1,
+  // Test cards
+  'test-rules': 1,
+  'double-choice': 4,
+  'choice-draw': 4,
+  'draw-watcher': 4,
+  'draw-bonus': 4,
 }
 
 export const useGameStore = defineStore('game', () => {
