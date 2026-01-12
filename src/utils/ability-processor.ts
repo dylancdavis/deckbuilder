@@ -100,17 +100,6 @@ function processAbilityQueue(
 ): GameState {
   let currentState = gameState
 
-  // If a nested effect already opened a modal, wrap its resolver to continue our queue after.
-  // This handles the case where processing an effect triggers a new event that has a card-choice.
-  if (currentState.viewData.modalView === 'card-choice' && currentState.viewData.resolver) {
-    const innerResolver = currentState.viewData.resolver
-    const wrappedResolver: typeof innerResolver = (gs, choice) => {
-      const afterInner = innerResolver(gs, choice)
-      return processAbilityQueue(afterInner, queue, event)
-    }
-    return { ...currentState, viewData: { ...currentState.viewData, resolver: wrappedResolver } }
-  }
-
   for (let queueIndex = 0; queueIndex < queue.length; queueIndex++) {
     const item = queue[queueIndex]
     const effects = item.ability.effects
