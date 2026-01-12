@@ -81,14 +81,6 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function closeModal() {
-    gameState.value.viewData = {
-      modalView: null,
-      cardOptions: [],
-      resolver: null,
-    }
-  }
-
   function drawCards(n: number) {
     gameState.value = drawCardsPure(gameState.value, n)
   }
@@ -273,7 +265,6 @@ export const useGameStore = defineStore('game', () => {
     startNewRound,
     endRun,
     gainResource,
-    closeModal,
     drawCards,
     changeDeckName,
     addCardToDeck,

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game'
 import { cards, type CardID } from '@/utils/cards'
 import CardItem from './CardItem.vue'
 import { TILT_PRESETS } from '@/composables/useTilt'
@@ -11,24 +10,16 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const gameStore = useGameStore()
-
 function selectCard(cardId: CardID) {
   props.handleSelect(cardId)
-  gameStore.closeModal()
-}
-
-function closeModal() {
-  gameStore.closeModal()
 }
 </script>
 
 <template>
-  <div class="modal-overlay" @click="closeModal">
+  <div class="modal-overlay">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
         <h2>Choose a Card</h2>
-        <button class="close-button" @click="closeModal">×</button>
       </div>
       <div class="card-options">
         <div
