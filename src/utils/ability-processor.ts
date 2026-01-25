@@ -59,7 +59,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   }
 
   // First add event to the list
-  const updatedGameState = {
+  const gameWithEventLogged = {
     ...gameState,
     game: {
       ...gameState.game,
@@ -70,7 +70,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
     },
   }
 
-  const abilities = findMatchingAbilities(updatedGameState.game.run, event)
+  const abilities = findMatchingAbilities(gameWithEventLogged.game.run, event)
 
   // Build initial queue with all matched abilities
   const queue: AbilityQueueItem[] = abilities.map((match) => ({
@@ -80,7 +80,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   }))
 
   // Process effects of matching abilities
-  return processAbilityQueue(updatedGameState, queue, event)
+  return processAbilityQueue(gameWithEventLogged, queue, event)
 }
 
 /**
