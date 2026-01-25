@@ -38,6 +38,18 @@ export type CardRemoveEvent = BaseEvent & {
   fromLocation: Location
 }
 
+export type CardAddEvent = BaseEvent & {
+  type: 'card-add'
+  cardId: PlayableCardID
+  instanceId: string
+  toLocation: Location
+}
+
+export type CardDestroyEvent = BaseEvent & {
+  type: 'card-destroy'
+  cardId: CardID
+}
+
 // Caused by manual interaction with a card
 export type CardActivateEvent = BaseEvent & {
   type: 'card-activate'
@@ -90,6 +102,8 @@ export type Event =
   | CardDiscardEvent
   | CardCollectEvent
   | CardRemoveEvent
+  | CardAddEvent
+  | CardDestroyEvent
   | CardActivateEvent
   | TurnStartEvent
   | TurnEndEvent
@@ -112,6 +126,7 @@ export type CardEvent =
   | CardPlayEvent
   | CardDiscardEvent
   | CardRemoveEvent
+  | CardAddEvent
   | CardActivateEvent
 
 /**

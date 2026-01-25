@@ -5,7 +5,14 @@ import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
-import type { CardCollectEvent, Event, ResourceChangeEvent } from './event'
+import type {
+  CardAddEvent,
+  CardCollectEvent,
+  CardDestroyEvent,
+  CardRemoveEvent,
+  Event,
+  ResourceChangeEvent,
+} from './event'
 
 // Card placement modes when adding cards to locations
 export type PlacementMode = 'top' | 'bottom' | 'shuffle'
@@ -170,6 +177,18 @@ export function handleEffect(
       const newCardArr =
         mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
 
+      const round = gameState.game.run!.stats.rounds
+      const turn = gameState.game.run!.stats.turns
+
+      const events: CardAddEvent[] = cardsToAdd.map((card) => ({
+        type: 'card-add',
+        cardId: card.id,
+        instanceId: card.instanceId,
+        toLocation: location,
+        round,
+        turn,
+      }))
+
       return {
         game: {
           ...gameState,
@@ -184,7 +203,7 @@ export function handleEffect(
             },
           },
         },
-        events: [],
+        events,
       }
     }
     case 'collect-card': {
@@ -217,6 +236,18 @@ export function handleEffect(
     }
     case 'destroy-card': {
       const { cards } = effect.params
+
+      const destroyedCardIds = toArray(cards)
+      const round = gameState.game.run!.stats.rounds
+      const turn = gameState.game.run!.stats.turns
+
+      const events: CardDestroyEvent[] = destroyedCardIds.map((cardId) => ({
+        type: 'card-destroy',
+        cardId,
+        round,
+        turn,
+      }))
+
       return {
         game: {
           ...gameState,
@@ -228,7 +259,7 @@ export function handleEffect(
             },
           },
         },
-        events: [],
+        events,
       }
     }
     case 'remove-card': {
@@ -236,9 +267,23 @@ export function handleEffect(
 
       // Find the location containing the card with the matching instanceId
       const updatedCards = { ...run.cards }
+      let removedCard: CardRemoveEvent | null = null
+
       for (const location of locations) {
         const cardIndex = updatedCards[location].findIndex((card) => card.instanceId === instanceId)
         if (cardIndex !== -1) {
+          const card = updatedCards[location][cardIndex]
+
+          // Create event for the removed card
+          removedCard = {
+            type: 'card-remove',
+            cardId: card.id,
+            instanceId: card.instanceId,
+            fromLocation: location,
+            round: gameState.game.run!.stats.rounds,
+            turn: gameState.game.run!.stats.turns,
+          }
+
           // Remove the card from this location
           updatedCards[location] = [
             ...updatedCards[location].slice(0, cardIndex),
@@ -259,7 +304,7 @@ export function handleEffect(
             },
           },
         },
-        events: [],
+        events: removedCard ? [removedCard] : [],
       }
     }
     default: {
