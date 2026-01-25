@@ -2,7 +2,7 @@ import type { Counter } from './counter'
 import { toArray, mergeCounters, subtractCounters } from './counter'
 import { playableCards, type CardID, type PlayableCardID } from './cards'
 import { Resource } from './resource'
-import type { Run, Location } from './run'
+import { type Run, type Location, locations } from './run'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
 
@@ -194,13 +194,6 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
     }
     case 'remove-card': {
       const { instanceId } = effect.params
-      const locations: Array<keyof typeof run.cards> = [
-        'drawPile',
-        'hand',
-        'board',
-        'stack',
-        'discardPile',
-      ]
 
       // Find the location containing the card with the matching instanceId
       const updatedCards = { ...run.cards }

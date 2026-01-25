@@ -11,7 +11,7 @@ import type { Ability, Trigger, TriggerContext } from './ability'
 import type { PlayableCard } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
-import type { Run, Location } from './run'
+import { type Run, type Location, locations } from './run'
 import type { GameState } from './game'
 import { matchesCard, type TargetSpec } from './card-matchers'
 import { handleEffect, type Effect } from './effects'
@@ -197,12 +197,7 @@ export function findMatchingAbilities(
 ): Array<{ card: CardInstance; ability: Ability }> {
   const matches: Array<{ card: CardInstance; ability: Ability }> = []
 
-  // Check all locations in a deterministic order
-  // Board first (most common for persistent effects), then hand, then others
-  const locations: Location[] = ['board', 'hand', 'stack', 'discardPile', 'drawPile']
-
   // TODO: also check rules card
-
   for (const location of locations) {
     for (const card of run.cards[location]) {
       // Force casting for now

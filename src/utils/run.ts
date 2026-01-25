@@ -29,6 +29,8 @@ export type Run = {
   events: Event[]
 }
 
+export const locations: Location[] = ['board', 'hand', 'stack', 'discardPile', 'drawPile']
+
 /**
  * Move a card by its index in a location to another location.
  * If `toIndex` is not specified, it is added to the end of the array (the top of a pile).
