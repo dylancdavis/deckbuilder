@@ -15,7 +15,7 @@ describe('CollectCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ score: 1 })
+    expect(result.game.game.collection.cards).toEqual({ score: 1 })
   })
 
   it('adds multiple copies of a single card to collection', () => {
@@ -29,7 +29,7 @@ describe('CollectCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ 'dual-score': 3 })
+    expect(result.game.game.collection.cards).toEqual({ 'dual-score': 3 })
   })
 
   it('adds multiple different cards to collection', () => {
@@ -43,7 +43,7 @@ describe('CollectCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({
+    expect(result.game.game.collection.cards).toEqual({
       score: 2,
       'collect-basic': 1,
       'dual-score': 1,
@@ -63,7 +63,7 @@ describe('CollectCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({
+    expect(result.game.game.collection.cards).toEqual({
       score: 7, // 5 + 2
       'point-reset': 1,
       'dual-score': 1,
@@ -81,7 +81,7 @@ describe('CollectCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ 'starter-rules': 1 })
+    expect(result.game.game.collection.cards).toEqual({ 'starter-rules': 1 })
   })
 
   it('works when collection is initially empty', () => {
@@ -97,7 +97,7 @@ describe('CollectCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ score: 3 })
+    expect(result.game.game.collection.cards).toEqual({ score: 3 })
   })
 
   it('does not mutate original game state', () => {
@@ -128,7 +128,7 @@ describe('CollectCardEffect', () => {
     const result = handleEffect(gameState, effect)
 
     // Run state should be unchanged
-    expect(result.game.run!.resources.points).toBe(10)
-    expect(result.game.run!.cards.drawPile).toEqual([])
+    expect(result.game.game.run!.resources.points).toBe(10)
+    expect(result.game.game.run!.cards.drawPile).toEqual([])
   })
 })

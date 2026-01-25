@@ -15,7 +15,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(8)
+      expect(result.game.game.run!.resources.points).toBe(8)
     })
 
     it('subtracts with negative delta', () => {
@@ -27,7 +27,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(6)
+      expect(result.game.game.run!.resources.points).toBe(6)
     })
 
     it('handles zero delta', () => {
@@ -39,7 +39,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(7)
+      expect(result.game.game.run!.resources.points).toBe(7)
     })
   })
 
@@ -53,7 +53,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(4)
+      expect(result.game.game.run!.resources.points).toBe(4)
     })
 
     it('sets resource to zero', () => {
@@ -65,7 +65,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(0)
+      expect(result.game.game.run!.resources.points).toBe(0)
     })
   })
 
@@ -82,7 +82,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(8)
+      expect(result.game.game.run!.resources.points).toBe(8)
     })
 
     it('update function receives run as second parameter', () => {
@@ -100,7 +100,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(3)
+      expect(result.game.game.run!.resources.points).toBe(3)
     })
 
     it('update function can conditionally modify value', () => {
@@ -115,7 +115,7 @@ describe('UpdateResourceEffect', () => {
 
       const result = handleEffect(gameState, effect)
 
-      expect(result.game.run!.resources.points).toBe(6)
+      expect(result.game.game.run!.resources.points).toBe(6)
     })
   })
 

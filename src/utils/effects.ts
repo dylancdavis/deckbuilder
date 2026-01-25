@@ -105,10 +105,13 @@ export type Effect =
   | RetriggerCardEffect
 
 /**
- * Applies an effect to a game state, returning the updated game state.
- * This is a pure function that does not mutate the original game state.
+ * Handles a given effect and updates the event log if the effect successfully generated events.
+ * Returns the new GameState and any generated events.
  */
-export function handleEffect(gameState: GameState, effect: Effect): GameState {
+export function handleEffect(
+  gameState: GameState,
+  effect: Effect,
+): { game: GameState; events: Event[] } {
   const run = gameState.game.run
   if (!run) {
     throw new Error('No active run in game state')
@@ -128,17 +131,20 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
       }
 
       return {
-        ...gameState,
         game: {
-          ...gameState.game,
-          run: {
-            ...run,
-            resources: {
-              ...run.resources,
-              [effect.params.resource]: newAmount,
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              resources: {
+                ...run.resources,
+                [effect.params.resource]: newAmount,
+              },
             },
           },
         },
+        events: [],
       }
     }
     case 'add-cards': {
@@ -153,43 +159,52 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
         mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
 
       return {
-        ...gameState,
         game: {
-          ...gameState.game,
-          run: {
-            ...run,
-            cards: {
-              ...run.cards,
-              [location]: newCardArr,
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: {
+                ...run.cards,
+                [location]: newCardArr,
+              },
             },
           },
         },
+        events: [],
       }
     }
     case 'collect-card': {
       const { cards } = effect.params
       return {
-        ...gameState,
         game: {
-          ...gameState.game,
-          collection: {
-            ...gameState.game.collection,
-            cards: mergeCounters(gameState.game.collection.cards, cards),
+          ...gameState,
+          game: {
+            ...gameState.game,
+            collection: {
+              ...gameState.game.collection,
+              cards: mergeCounters(gameState.game.collection.cards, cards),
+            },
           },
         },
+        events: [],
       }
     }
     case 'destroy-card': {
       const { cards } = effect.params
       return {
-        ...gameState,
         game: {
-          ...gameState.game,
-          collection: {
-            ...gameState.game.collection,
-            cards: subtractCounters(gameState.game.collection.cards, cards),
+          ...gameState,
+          game: {
+            ...gameState.game,
+            collection: {
+              ...gameState.game.collection,
+              cards: subtractCounters(gameState.game.collection.cards, cards),
+            },
           },
         },
+        events: [],
       }
     }
     case 'remove-card': {
@@ -210,14 +225,17 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
       }
 
       return {
-        ...gameState,
         game: {
-          ...gameState.game,
-          run: {
-            ...run,
-            cards: updatedCards,
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: updatedCards,
+            },
           },
         },
+        events: [],
       }
     }
     default: {
@@ -230,5 +248,8 @@ export function handleEffect(gameState: GameState, effect: Effect): GameState {
  * Applies multiple effects to a game state sequentially, returning the final game state.
  */
 export function handleEffects(gameState: GameState, effects: Effect[]): GameState {
-  return effects.reduce((currentState, effect) => handleEffect(currentState, effect), gameState)
+  return effects.reduce(
+    (currentState, effect) => handleEffect(currentState, effect).game,
+    gameState,
+  )
 }

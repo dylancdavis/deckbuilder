@@ -17,7 +17,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ score: 2, 'dual-score': 2 })
+    expect(result.game.game.collection.cards).toEqual({ score: 2, 'dual-score': 2 })
   })
 
   it('removes all copies of a card when count matches', () => {
@@ -33,7 +33,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ 'dual-score': 2 })
+    expect(result.game.game.collection.cards).toEqual({ 'dual-score': 2 })
   })
 
   it('removes card completely when count exceeds available', () => {
@@ -49,7 +49,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ 'dual-score': 1 })
+    expect(result.game.game.collection.cards).toEqual({ 'dual-score': 1 })
   })
 
   it('removes multiple different cards from collection', () => {
@@ -65,7 +65,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({
+    expect(result.game.game.collection.cards).toEqual({
       score: 3,
       'collect-basic': 2,
     })
@@ -84,7 +84,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ score: 3 })
+    expect(result.game.game.collection.cards).toEqual({ score: 3 })
   })
 
   it('can remove rules cards', () => {
@@ -100,7 +100,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({ 'starter-rules': 1, score: 1 })
+    expect(result.game.game.collection.cards).toEqual({ 'starter-rules': 1, score: 1 })
   })
 
   it('results in empty collection when all cards removed', () => {
@@ -116,7 +116,7 @@ describe('DestroyCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.collection.cards).toEqual({})
+    expect(result.game.game.collection.cards).toEqual({})
   })
 
   it('does not mutate original game state', () => {
@@ -149,7 +149,7 @@ describe('DestroyCardEffect', () => {
     const result = handleEffect(gameState, effect)
 
     // Run state should be unchanged
-    expect(result.game.run!.resources.points).toBe(10)
-    expect(result.game.run!.cards.drawPile).toEqual([])
+    expect(result.game.game.run!.resources.points).toBe(10)
+    expect(result.game.game.run!.cards.drawPile).toEqual([])
   })
 })

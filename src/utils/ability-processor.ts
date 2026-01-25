@@ -159,7 +159,7 @@ function handleEffectWithContext(
 ): GameState {
   // Transform 'self' references to actual instanceId
   const resolvedEffect = resolveSelfReferences(effect, context.sourceCard.instanceId)
-  return handleEffect(gameState, resolvedEffect)
+  return handleEffect(gameState, resolvedEffect).game
 }
 
 /**

@@ -28,9 +28,9 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.drawPile).toHaveLength(2)
-    expect(result.game.run!.cards.drawPile[0].instanceId).toBe('card-1')
-    expect(result.game.run!.cards.drawPile[1].instanceId).toBe('card-3')
+    expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
+    expect(result.game.game.run!.cards.drawPile[0].instanceId).toBe('card-1')
+    expect(result.game.game.run!.cards.drawPile[1].instanceId).toBe('card-3')
   })
 
   it('removes card from hand by instanceId', () => {
@@ -55,8 +55,8 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.hand).toHaveLength(1)
-    expect(result.game.run!.cards.hand[0].instanceId).toBe('card-2')
+    expect(result.game.game.run!.cards.hand).toHaveLength(1)
+    expect(result.game.game.run!.cards.hand[0].instanceId).toBe('card-2')
   })
 
   it('removes card from board by instanceId', () => {
@@ -78,7 +78,7 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.board).toHaveLength(0)
+    expect(result.game.game.run!.cards.board).toHaveLength(0)
   })
 
   it('removes card from stack by instanceId', () => {
@@ -100,7 +100,7 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.stack).toHaveLength(0)
+    expect(result.game.game.run!.cards.stack).toHaveLength(0)
   })
 
   it('removes card from discardPile by instanceId', () => {
@@ -125,8 +125,8 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.discardPile).toHaveLength(1)
-    expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
+    expect(result.game.game.run!.cards.discardPile).toHaveLength(1)
+    expect(result.game.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
   })
 
   it('removes only the first matching card when multiple locations have cards', () => {
@@ -148,9 +148,9 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.drawPile).toHaveLength(0)
-    expect(result.game.run!.cards.hand).toHaveLength(1)
-    expect(result.game.run!.cards.board).toHaveLength(1)
+    expect(result.game.game.run!.cards.drawPile).toHaveLength(0)
+    expect(result.game.game.run!.cards.hand).toHaveLength(1)
+    expect(result.game.game.run!.cards.board).toHaveLength(1)
   })
 
   it('does not remove any cards if instanceId is not found', () => {
@@ -172,8 +172,8 @@ describe('RemoveCardEffect', () => {
 
     const result = handleEffect(gameState, effect)
 
-    expect(result.game.run!.cards.drawPile).toHaveLength(1)
-    expect(result.game.run!.cards.hand).toHaveLength(1)
+    expect(result.game.game.run!.cards.drawPile).toHaveLength(1)
+    expect(result.game.game.run!.cards.hand).toHaveLength(1)
   })
 
   it('does not mutate original game state', () => {
