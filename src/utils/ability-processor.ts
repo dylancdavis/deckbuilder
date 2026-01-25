@@ -16,7 +16,7 @@ import type { GameState } from './game'
 import { matchesCard, type TargetSpec } from './card-matchers'
 import { handleEffect, type Effect } from './effects'
 import { openCardChoiceModal } from './game'
-import { values } from './utils'
+import { values, entries } from './utils'
 
 /**
  * A card using the new ability format (Ability[] instead of legacy trigger map).
@@ -359,7 +359,27 @@ function getActivationCount(
 }
 
 /**
- * Find a card by instance ID across all locations.
+ * Searches all locations for a card by instance ID, returning the card and where it was found.
+ *
+ * @param instanceId - The instance ID to find
+ * @param run - The current run state
+ * @returns Object with location, index, and card instance, or undefined if not found
+ */
+export function locateCard(
+  instanceId: string,
+  run: Run,
+): { location: Location; index: number; card: CardInstance } | undefined {
+  for (const [location, cards] of entries(run.cards)) {
+    const index = cards.findIndex((c) => c.instanceId === instanceId)
+    if (index !== -1) {
+      return { location, index, card: cards[index] as CardInstance }
+    }
+  }
+  return undefined
+}
+
+/**
+ * Searches all locations for a card by instance ID, returning the card.
  *
  * @param instanceId - The instance ID to find
  * @param run - The current run state
