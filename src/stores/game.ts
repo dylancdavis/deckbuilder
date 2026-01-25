@@ -80,13 +80,6 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.game.run = null
   }
 
-  function gainResource(resourceName: Resource, amount: number) {
-    if (gameState.value.game.run) {
-      gameState.value.game.run.resources[resourceName] =
-        (gameState.value.game.run.resources[resourceName] || 0) + amount
-    }
-  }
-
   function drawCards(n: number) {
     gameState.value = drawCardsPure(gameState.value, n)
   }
@@ -270,7 +263,6 @@ export const useGameStore = defineStore('game', () => {
     nextTurn,
     startNewRound,
     endRun,
-    gainResource,
     drawCards,
     changeDeckName,
     addCardToDeck,
