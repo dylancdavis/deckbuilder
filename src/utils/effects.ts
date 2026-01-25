@@ -120,15 +120,26 @@ export function handleEffect(
 
   switch (effect.type) {
     case 'update-resource': {
-      const currentAmount = run.resources[effect.params.resource] || 0
-      let newAmount: number
+      const resource = effect.params.resource
+      const oldValue = run.resources[resource]
+      let newValue: number
 
       if ('delta' in effect.params) {
-        newAmount = currentAmount + effect.params.delta
+        newValue = oldValue + effect.params.delta
       } else if ('set' in effect.params) {
-        newAmount = effect.params.set
+        newValue = effect.params.set
       } else {
-        newAmount = effect.params.update(currentAmount, run)
+        newValue = effect.params.update(oldValue, run)
+      }
+
+      const event: ResourceChangeEvent = {
+        type: 'resource-change',
+        resource,
+        oldValue,
+        newValue,
+        delta: newValue - oldValue,
+        round: gameState.game.run!.stats.rounds,
+        turn: gameState.game.run!.stats.turns,
       }
 
       return {
@@ -140,12 +151,12 @@ export function handleEffect(
               ...run,
               resources: {
                 ...run.resources,
-                [effect.params.resource]: newAmount,
+                [effect.params.resource]: newValue,
               },
             },
           },
         },
-        events: [],
+        events: [event],
       }
     }
     case 'add-cards': {
