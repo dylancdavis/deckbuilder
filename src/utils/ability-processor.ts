@@ -19,16 +19,9 @@ import { openCardChoiceModal } from './game'
 import { values, entries } from './utils'
 
 /**
- * A card using the new ability format (Ability[] instead of legacy trigger map).
- */
-export type NewPlayableCard = Omit<PlayableCard, 'abilities'> & {
-  abilities: Ability[]
-}
-
-/**
  * A card instance is a NewPlayableCard with a guaranteed instanceId.
  */
-export type CardInstance = NewPlayableCard & { instanceId: string }
+export type CardInstance = PlayableCard & { instanceId: string }
 
 /**
  * Represents an ability waiting to be processed in the queue.
