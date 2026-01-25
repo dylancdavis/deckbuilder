@@ -4,7 +4,7 @@ import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import CardBack from './CardBack.vue'
 import FlashValue from './FlashValue.vue'
-import type { PlayableCard } from '@/utils/cards'
+import type { CardInstance } from '@/utils/cards'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
 import { TILT_PRESETS } from '@/composables/useTilt'
@@ -66,7 +66,7 @@ const nextTurnButtonText = computed(() => {
 
 const MAX_DRAW_PILE_SIZE = 3
 
-function drawPile(cards: PlayableCard[]) {
+function drawPile(cards: CardInstance[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   // Show the top cards from the draw pile (the ones that would be drawn next)
   const visibleCards = cards.slice(0, pileSize).reverse()
@@ -76,7 +76,7 @@ function drawPile(cards: PlayableCard[]) {
   }
 }
 
-function discardPile(cards: PlayableCard[]) {
+function discardPile(cards: CardInstance[]) {
   const pileSize = Math.min(cards.length, MAX_DRAW_PILE_SIZE)
   return {
     pileSize,

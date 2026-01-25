@@ -32,7 +32,10 @@ export interface PlayableCard extends Card {
   cost: number
   abilities: Ability[]
   deckLimit?: number
-  instanceId?: string
+}
+
+export interface CardInstance extends PlayableCard {
+  instanceId: string
 }
 
 export interface RulesCard extends Card {
@@ -573,9 +576,7 @@ export const drawBonus: PlayableCard = {
   abilities: [
     {
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
-      effects: [
-        { type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } },
-      ],
+      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
   ],
   cost: 0,

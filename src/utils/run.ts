@@ -4,7 +4,7 @@
 
 import { moveItem, moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
-import { playableCards, type PlayableCard, type PlayableCardID } from './cards.ts'
+import { playableCards, type CardInstance, type PlayableCardID } from './cards.ts'
 import { handleEffects } from './effects.ts'
 import type { GameState } from './game.ts'
 import type { Deck } from './deck.ts'
@@ -14,11 +14,11 @@ import type { Event } from './event.ts'
 export type Location = 'drawPile' | 'hand' | 'board' | 'stack' | 'discardPile'
 
 export type RunCards = {
-  drawPile: PlayableCard[]
-  hand: PlayableCard[]
-  board: PlayableCard[]
-  stack: PlayableCard[]
-  discardPile: PlayableCard[]
+  drawPile: CardInstance[]
+  hand: CardInstance[]
+  board: CardInstance[]
+  stack: CardInstance[]
+  discardPile: CardInstance[]
 }
 
 export type Run = {

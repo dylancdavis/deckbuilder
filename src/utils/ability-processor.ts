@@ -8,7 +8,7 @@
  */
 
 import type { Ability, Trigger, TriggerContext } from './ability'
-import type { PlayableCard } from './cards'
+import type { CardInstance, PlayableCard } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
@@ -17,11 +17,6 @@ import { matchesCard, type TargetSpec } from './card-matchers'
 import { handleEffect, type Effect } from './effects'
 import { openCardChoiceModal } from './game'
 import { values, entries } from './utils'
-
-/**
- * A card instance is a NewPlayableCard with a guaranteed instanceId.
- */
-export type CardInstance = PlayableCard & { instanceId: string }
 
 /**
  * Represents an ability waiting to be processed in the queue.

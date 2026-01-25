@@ -5,10 +5,9 @@ import {
   canActivate,
   handleEvent,
   isAsset,
-  type CardInstance,
 } from '../../utils/ability-processor'
 import type { Ability, Trigger } from '../../utils/ability'
-import type { PlayableCard } from '../../utils/cards'
+import type { CardInstance, PlayableCard } from '../../utils/cards'
 import type {
   CardPlayEvent,
   CardDrawEvent,
@@ -856,7 +855,9 @@ describe('handleEvent', () => {
           params: {
             options: 3,
             tags: ['basic'],
-            choiceHandler: (cardId) => [{ type: 'collect-card', params: { cards: { [cardId]: 1 } } }],
+            choiceHandler: (cardId) => [
+              { type: 'collect-card', params: { cards: { [cardId]: 1 } } },
+            ],
           },
         },
       ],
