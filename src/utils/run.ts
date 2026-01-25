@@ -13,13 +13,7 @@ import type { Event } from './event.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'stack' | 'discardPile'
 
-export type RunCards = {
-  drawPile: CardInstance[]
-  hand: CardInstance[]
-  board: CardInstance[]
-  stack: CardInstance[]
-  discardPile: CardInstance[]
-}
+export type RunCards = Record<Location, CardInstance[]>
 
 export type Run = {
   deck: Deck
