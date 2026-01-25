@@ -29,7 +29,6 @@ export type CardDiscardEvent = BaseEvent & {
 export type CardCollectEvent = BaseEvent & {
   type: 'card-collect'
   cardId: CardID
-  amount: number
 }
 
 export type CardRemoveEvent = BaseEvent & {

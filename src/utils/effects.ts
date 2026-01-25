@@ -5,7 +5,7 @@ import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
-import type { Event, ResourceChangeEvent } from './event'
+import type { CardCollectEvent, Event, ResourceChangeEvent } from './event'
 
 // Card placement modes when adding cards to locations
 export type PlacementMode = 'top' | 'bottom' | 'shuffle'
@@ -189,6 +189,18 @@ export function handleEffect(
     }
     case 'collect-card': {
       const { cards } = effect.params
+
+      const collectedCardIds = toArray(cards)
+      const round = gameState.game.run!.stats.rounds
+      const turn = gameState.game.run!.stats.turns
+
+      const events: CardCollectEvent[] = collectedCardIds.map((cardId) => ({
+        type: 'card-collect',
+        cardId,
+        round,
+        turn,
+      }))
+
       return {
         game: {
           ...gameState,
@@ -200,7 +212,7 @@ export function handleEffect(
             },
           },
         },
-        events: [],
+        events,
       }
     }
     case 'destroy-card': {
