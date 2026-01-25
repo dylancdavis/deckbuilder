@@ -5,6 +5,7 @@ import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
+import type { Event, ResourceChangeEvent } from './event'
 
 // Card placement modes when adding cards to locations
 export type PlacementMode = 'top' | 'bottom' | 'shuffle'
