@@ -1,7 +1,7 @@
 import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID, PlayableCard } from './cards.ts'
-import type { CardDrawEvent, CardPlayEvent } from './event.ts'
+import type { CardDrawEvent, CardPlayEvent, Event } from './event.ts'
 import { getCardChoices } from './cards.ts'
 import { handleEvent, isAsset } from './ability-processor.ts'
 
@@ -218,6 +218,19 @@ function finalizeCardPlay(gameState: GameState, instanceId: string, card: Playab
           stack: newStack,
           [destination]: newDestination,
         },
+      },
+    },
+  }
+}
+
+export function logEvent(gameState: GameState, event: Event) {
+  return {
+    ...gameState,
+    game: {
+      ...gameState.game,
+      run: {
+        ...gameState.game.run!,
+        events: gameState.game.run!.events.concat(event),
       },
     },
   }

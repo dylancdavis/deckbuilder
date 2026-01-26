@@ -15,7 +15,7 @@ import { type Run, type Location, locations } from './run'
 import type { GameState } from './game'
 import { matchesCard, type TargetSpec } from './card-matchers'
 import { handleEffect, type Effect } from './effects'
-import { openCardChoiceModal } from './game'
+import { logEvent, openCardChoiceModal } from './game'
 import { values, entries } from './utils'
 
 /**
@@ -46,21 +46,9 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
     return gameState
   }
 
-  // First add event to the list
-  const gameWithEventLogged = {
-    ...gameState,
-    game: {
-      ...gameState.game,
-      run: {
-        ...gameState.game.run!,
-        events: gameState.game.run!.events.concat(event),
-      },
-    },
-  }
-
+  const gameWithEventLogged = logEvent(gameState, event)
   const abilities = findMatchingAbilities(gameWithEventLogged.game.run, event)
 
-  // Build initial queue with all matched abilities
   const queue: AbilityQueueItem[] = abilities.map((match) => ({
     card: match.card,
     ability: match.ability,
