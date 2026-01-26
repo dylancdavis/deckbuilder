@@ -176,11 +176,9 @@ export function findMatchingAbilities(
   // TODO: also check rules card
   for (const location of locations) {
     for (const card of run.cards[location]) {
-      // Force casting for now
-      const cardInstance = card as unknown as CardInstance
-      for (const ability of cardInstance.abilities) {
-        if (matchesTrigger(event, cardInstance, location, ability.trigger, run)) {
-          matches.push({ card: cardInstance, ability })
+      for (const ability of card.abilities) {
+        if (matchesTrigger(event, card, location, ability.trigger, run)) {
+          matches.push({ card: card, ability })
         }
       }
     }
@@ -190,10 +188,11 @@ export function findMatchingAbilities(
 }
 
 /**
- * Check if a specifies trigger should resolve for a given event.
+ * Check if a specifies trigger on a card should resolve for an event.
  *
  * @param event - The event to check
- * @param sourceCard - The card that has this trigger
+ * @param sourceCard - The card to check
+ * @param cardLocation - The location of the card being checked
  * @param trigger - The trigger to evaluate
  * @param run - The current run state
  * @returns true if the trigger matches the event
