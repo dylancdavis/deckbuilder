@@ -62,25 +62,17 @@ export type CardChoiceEffect = {
 
 export type RemoveCardEffect = {
   type: 'remove-card'
-  params: {
-    instanceId: string | 'self'
-  }
+  params: { instanceId: string | 'self' } | { matching: CardMatcher }
 }
 
 export type DrawCardsEffect = {
   type: 'draw-cards'
-  params: {
-    amount: number
-  }
+  params: { amount: number }
 }
 
 export type DiscardCardsEffect = {
   type: 'discard-cards'
-  params: {
-    instanceIds?: string[]
-    amount?: number
-    matching?: CardMatcher
-  }
+  params: { instanceIds: string[] } | { amount: number } | { matching: CardMatcher }
 }
 
 export type MoveCardEffect = {
