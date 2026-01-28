@@ -72,7 +72,7 @@ export type DrawCardsEffect = {
 
 export type DiscardCardsEffect = {
   type: 'discard-cards'
-  params: { instanceIds: string[] } | { amount: number } | { matching: CardMatcher }
+  params: { instanceIds: string[] } | { amount: number | 'all' } | { matching: CardMatcher }
 }
 
 export type MoveCardEffect = {
