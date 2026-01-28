@@ -5,6 +5,44 @@ import type { Run } from './run'
 import type { CardPlayEvent } from './event'
 import type { Ability } from './ability'
 
+/**
+ * Core game flow abilities that handle implicit turn/round transitions.
+ * These can be added to any rules card to implement standard game flow.
+ */
+export const coreGameFlowAbilities: Ability[] = [
+  // On turn-end with cards in draw pile -> start new turn
+  {
+    trigger: {
+      on: 'turn-end',
+      when: (ctx) => ctx.run.cards.drawPile.length > 0,
+    },
+    effects: [{ type: 'turn-start', params: {} }],
+  },
+  // On turn-end with empty draw pile -> end round
+  {
+    trigger: {
+      on: 'turn-end',
+      when: (ctx) => ctx.run.cards.drawPile.length === 0,
+    },
+    effects: [{ type: 'round-end', params: {} }],
+  },
+  // On round-end -> refresh deck (reshuffle all cards)
+  {
+    trigger: { on: 'round-end' },
+    effects: [{ type: 'refresh-deck', params: {} }],
+  },
+  // On round-end (after refresh) -> start new round
+  {
+    trigger: { on: 'round-end' },
+    effects: [{ type: 'round-start', params: {} }],
+  },
+  // On round-start -> start new turn
+  {
+    trigger: { on: 'round-start' },
+    effects: [{ type: 'turn-start', params: {} }],
+  },
+]
+
 export type CardArtId = 'lightning' | 'scarab'
 
 export interface CardArt {
@@ -55,6 +93,7 @@ export interface RulesCard extends Card {
   effects: {
     gameStart: Effect[]
   }
+  abilities: Ability[]
 }
 
 export const score: PlayableCard = {
@@ -132,6 +171,23 @@ export const starterRules: RulesCard = {
       },
     ],
   },
+  abilities: [
+    ...coreGameFlowAbilities,
+    // Turn structure
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { amount: 'all' } }],
+    },
+    // Run end condition - end after first (and only) round
+    {
+      trigger: { on: 'round-end' },
+      effects: [{ type: 'run-end', params: {} }],
+    },
+  ],
 }
 
 export const dualScore: PlayableCard = {
@@ -454,6 +510,26 @@ export const testRules: RulesCard = {
       },
     ],
   },
+  abilities: [
+    ...coreGameFlowAbilities,
+    // Turn structure
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 5 } }],
+    },
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { amount: 'all' } }],
+    },
+    // Run end condition
+    {
+      trigger: {
+        on: 'round-end',
+        when: (ctx) => ctx.event.round >= 10,
+      },
+      effects: [{ type: 'run-end', params: {} }],
+    },
+  ],
 }
 
 export const rulesCards = {
