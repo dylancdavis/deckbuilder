@@ -92,6 +92,42 @@ export type RetriggerCardEffect = {
   }
 }
 
+// Lifecycle effects
+export type TurnStartEffect = {
+  type: 'turn-start'
+  params: Record<string, never>
+}
+
+export type TurnEndEffect = {
+  type: 'turn-end'
+  params: Record<string, never>
+}
+
+export type RoundStartEffect = {
+  type: 'round-start'
+  params: Record<string, never>
+}
+
+export type RoundEndEffect = {
+  type: 'round-end'
+  params: Record<string, never>
+}
+
+export type RunStartEffect = {
+  type: 'run-start'
+  params: Record<string, never>
+}
+
+export type RunEndEffect = {
+  type: 'run-end'
+  params: Record<string, never>
+}
+
+export type RefreshDeckEffect = {
+  type: 'refresh-deck'
+  params: Record<string, never>
+}
+
 export type Effect =
   | AddCardsEffect
   | UpdateResourceEffect
@@ -103,6 +139,13 @@ export type Effect =
   | DiscardCardsEffect
   | MoveCardEffect
   | RetriggerCardEffect
+  | TurnStartEffect
+  | TurnEndEffect
+  | RoundStartEffect
+  | RoundEndEffect
+  | RunStartEffect
+  | RunEndEffect
+  | RefreshDeckEffect
 
 /**
  * Handles a given effect and updates the event log if the effect successfully generated events.
@@ -297,6 +340,132 @@ export function handleEffect(
           },
         },
         events: removedCard ? [removedCard] : [],
+      }
+    }
+    case 'turn-start': {
+      const newTurn = run.stats.turns + 1
+      const event: Event = {
+        type: 'turn-start',
+        round: run.stats.rounds,
+        turn: newTurn,
+      }
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              stats: {
+                ...run.stats,
+                turns: newTurn,
+              },
+            },
+          },
+        },
+        events: [event],
+      }
+    }
+    case 'turn-end': {
+      const event: Event = {
+        type: 'turn-end',
+        round: run.stats.rounds,
+        turn: run.stats.turns,
+      }
+
+      return {
+        game: gameState,
+        events: [event],
+      }
+    }
+    case 'round-start': {
+      const newRound = run.stats.rounds + 1
+      const event: Event = {
+        type: 'round-start',
+        round: newRound,
+        turn: 0,
+      }
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              stats: {
+                ...run.stats,
+                rounds: newRound,
+                turns: 0,
+              },
+            },
+          },
+        },
+        events: [event],
+      }
+    }
+    case 'round-end': {
+      const event: Event = {
+        type: 'round-end',
+        round: run.stats.rounds,
+        turn: run.stats.turns,
+      }
+
+      return {
+        game: gameState,
+        events: [event],
+      }
+    }
+    case 'run-start': {
+      const event: Event = {
+        type: 'run-start',
+        round: run.stats.rounds,
+        turn: run.stats.turns,
+      }
+
+      return {
+        game: gameState,
+        events: [event],
+      }
+    }
+    case 'run-end': {
+      const event: Event = {
+        type: 'run-end',
+        round: run.stats.rounds,
+        turn: run.stats.turns,
+      }
+
+      return {
+        game: gameState,
+        events: [event],
+      }
+    }
+    case 'refresh-deck': {
+      // Collect all cards from hand, board, and discard pile
+      const allCards = [...run.cards.hand, ...run.cards.board, ...run.cards.discardPile]
+
+      // Shuffle the collected cards
+      allCards.sort(() => Math.random() - 0.5)
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: {
+                ...run.cards,
+                drawPile: allCards,
+                hand: [],
+                board: [],
+                discardPile: [],
+              },
+            },
+          },
+        },
+        events: [],
       }
     }
     default: {
