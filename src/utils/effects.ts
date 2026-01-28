@@ -298,6 +298,8 @@ export function handleEffect(
       }
     }
     case 'remove-card': {
+      if ('matching' in effect.params) throw new Error('Card matcher removal not yet implemented')
+
       const { instanceId } = effect.params
 
       // Find the location containing the card with the matching instanceId
