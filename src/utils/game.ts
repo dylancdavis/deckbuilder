@@ -54,35 +54,49 @@ export function openCardChoiceModal(
 /**
  * Pure function that draws n cards from the draw pile to hand.
  * Processes on-draw effects for each card as it's drawn.
+ * If an ability opens a modal mid-draw, wraps the resolver to continue drawing afterward.
  *
  * @param gameState - The current game state
  * @param n - Number of cards to draw
  * @returns A new game state with cards moved from draw pile to hand and on-draw effects applied
  */
 export function drawCards(gameState: GameState, n: number): GameState {
-  debugger
-  let currentState = gameState
-  if (!currentState.game.run) {
+  if (!gameState.game.run) {
     throw new Error('Cannot draw cards: no active run')
   }
 
-  // Draw cards one at a time, processing on-draw effects for each
-  for (let i = 0; i < n && currentState.game.run!.cards.drawPile.length > 0; i++) {
-    // Use handleEffect to draw one card
-    const { game: newState, events } = handleEffect(currentState, {
-      type: 'draw-cards',
-      params: { amount: 1 },
-    })
-    currentState = newState
-
-    // Process abilities and log events for each drawn card
-    for (const event of events) {
-      currentState = handleEvent(currentState, event)
-      currentState = logEvent(currentState, event)
-    }
+  if (n <= 0 || gameState.game.run.cards.drawPile.length === 0) {
+    return gameState
   }
 
-  return currentState
+  // Process a single card draw
+  const { game: newState, events } = handleEffect(gameState, {
+    type: 'draw-cards',
+    params: { amount: 1 },
+  })
+  const currentState = events.reduce((state, event) => handleEvent(state, event), newState)
+
+  if (n === 1) return currentState
+
+  const isMakingChoice =
+    currentState.viewData.modalView === 'card-choice' && currentState.viewData.resolver
+
+  // Directly recurse in the non-choice case
+  if (!isMakingChoice) return drawCards(currentState, n - 1)
+
+  // Otherwise wrap the current resolver in a recurse call
+  const originalResolver = currentState.viewData.resolver! // forced because ts doesn't infer the const
+  const wrappedResolver = (gs: GameState, chosenCard: CardID) => {
+    const result = originalResolver(gs, chosenCard)
+    return drawCards(result, n - 1)
+  }
+  return {
+    ...currentState,
+    viewData: {
+      ...currentState.viewData,
+      resolver: wrappedResolver,
+    },
+  }
 }
 
 /**
