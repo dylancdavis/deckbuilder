@@ -157,9 +157,7 @@ export function handleEffect(
   effect: Effect,
 ): { game: GameState; events: Event[] } {
   const run = gameState.game.run
-  if (!run) {
-    throw new Error('No active run in game state')
-  }
+  if (!run) throw new Error('No active run in game state')
 
   switch (effect.type) {
     case 'update-resource': {
