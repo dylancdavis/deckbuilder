@@ -146,15 +146,15 @@ function handleEffectWithContext(
  * @returns The effect with 'self' replaced by the actual instanceId
  */
 function resolveSelfReferences(effect: Effect, instanceId: string): Effect {
-  if (effect.type === 'remove-card' && effect.params.instanceId === 'self') {
+  if ('instanceId' in effect.params && effect.params.instanceId === 'self') {
     return {
       ...effect,
       params: {
+        ...effect.params,
         instanceId: instanceId,
       },
-    }
+    } as Effect
   }
-  // Add more 'self' resolution cases as needed for other effect types
   return effect
 }
 
