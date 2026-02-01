@@ -6,7 +6,6 @@ import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/car
 import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
-import { Resource } from '@/utils/resource.ts'
 import { playCard, drawCards as drawCardsPure, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {

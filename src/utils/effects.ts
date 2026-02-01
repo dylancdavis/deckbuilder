@@ -9,6 +9,7 @@ import type {
   CardAddEvent,
   CardCollectEvent,
   CardDestroyEvent,
+  CardDrawEvent,
   CardRemoveEvent,
   Event,
   ResourceChangeEvent,
@@ -468,6 +469,41 @@ export function handleEffect(
           },
         },
         events: [],
+      }
+    }
+    case 'draw-cards': {
+      const { amount } = effect.params
+      const drawPile = run.cards.drawPile
+      const cardsToDraw = drawPile.slice(0, amount)
+      const remainingDrawPile = drawPile.slice(amount)
+
+      const round = gameState.game.run!.stats.rounds
+      const turn = gameState.game.run!.stats.turns
+
+      const events: CardDrawEvent[] = cardsToDraw.map((card) => ({
+        type: 'card-draw',
+        cardId: card.id,
+        instanceId: card.instanceId,
+        round,
+        turn,
+      }))
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: {
+                ...run.cards,
+                drawPile: remainingDrawPile,
+                hand: [...run.cards.hand, ...cardsToDraw],
+              },
+            },
+          },
+        },
+        events,
       }
     }
     default: {

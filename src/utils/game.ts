@@ -1,9 +1,10 @@
 import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID, PlayableCard } from './cards.ts'
-import type { CardDrawEvent, CardPlayEvent, Event } from './event.ts'
+import type { CardPlayEvent, Event } from './event.ts'
 import { getCardChoices } from './cards.ts'
 import { handleEvent, isAsset } from './ability-processor.ts'
+import { handleEffect } from './effects.ts'
 
 export type GameState = {
   game: {
@@ -59,60 +60,25 @@ export function openCardChoiceModal(
  * @returns A new game state with cards moved from draw pile to hand and on-draw effects applied
  */
 export function drawCards(gameState: GameState, n: number): GameState {
+  debugger
   let currentState = gameState
-  const run = currentState.game.run
-  if (!run) {
+  if (!currentState.game.run) {
     throw new Error('Cannot draw cards: no active run')
   }
 
   // Draw cards one at a time, processing on-draw effects for each
   for (let i = 0; i < n && currentState.game.run!.cards.drawPile.length > 0; i++) {
-    const currentRun = currentState.game.run!
-    const drawPile = [...currentRun.cards.drawPile]
-    const hand = [...currentRun.cards.hand]
-    const card = drawPile.shift() // Take from front of draw pile
+    // Use handleEffect to draw one card
+    const { game: newState, events } = handleEffect(currentState, {
+      type: 'draw-cards',
+      params: { amount: 1 },
+    })
+    currentState = newState
 
-    if (card) {
-      hand.push(card) // Add to hand
-
-      // Update state with moved card
-      currentState = {
-        ...currentState,
-        game: {
-          ...currentState.game,
-          run: {
-            ...currentRun,
-            cards: {
-              ...currentRun.cards,
-              drawPile,
-              hand,
-            },
-          },
-        },
-      }
-
-      // Create draw event and process abilities
-      const drawEvent: CardDrawEvent = {
-        type: 'card-draw',
-        cardId: card.id,
-        instanceId: card.instanceId!,
-        round: currentRun.stats.rounds,
-        turn: currentRun.stats.turns,
-      }
-
-      currentState = handleEvent(currentState, drawEvent)
-
-      // Log the event
-      currentState = {
-        ...currentState,
-        game: {
-          ...currentState.game,
-          run: {
-            ...currentState.game.run!,
-            events: [...currentState.game.run!.events, drawEvent],
-          },
-        },
-      }
+    // Process abilities and log events for each drawn card
+    for (const event of events) {
+      currentState = handleEvent(currentState, event)
+      currentState = logEvent(currentState, event)
     }
   }
 
