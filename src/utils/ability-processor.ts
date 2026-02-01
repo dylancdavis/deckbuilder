@@ -41,10 +41,7 @@ type EffectContext = {
  * and triggers all relevant abilities
  */
 export function handleEvent(gameState: GameState, event: Event): GameState {
-  // No-op if there's no active run
-  if (!gameState.game.run) {
-    return gameState
-  }
+  if (!gameState.game.run) throw new Error('Cannot handle event with no run')
 
   const gameWithEventLogged = logEvent(gameState, event)
   const abilities = findMatchingAbilities(gameWithEventLogged.game.run, event)
