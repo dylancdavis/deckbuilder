@@ -61,13 +61,9 @@ export function openCardChoiceModal(
  * @returns A new game state with cards moved from draw pile to hand and on-draw effects applied
  */
 export function drawCards(gameState: GameState, n: number): GameState {
-  if (!gameState.game.run) {
-    throw new Error('Cannot draw cards: no active run')
-  }
-
-  if (n <= 0 || gameState.game.run.cards.drawPile.length === 0) {
-    return gameState
-  }
+  // Trivial cases
+  if (!gameState.game.run) throw new Error('Cannot draw cards: no active run')
+  if (n <= 0 || gameState.game.run.cards.drawPile.length === 0) return gameState
 
   // Process a single card draw
   const { game: newState, events } = handleEffect(gameState, {
