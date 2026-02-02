@@ -13,6 +13,8 @@ import type {
   CardRemoveEvent,
   Event,
   ResourceChangeEvent,
+  TurnEndEvent,
+  TurnStartEvent,
 } from './event'
 
 // Card placement modes when adding cards to locations
@@ -156,8 +158,10 @@ export function handleEffect(
   gameState: GameState,
   effect: Effect,
 ): { game: GameState; events: Event[] } {
+  if (!gameState.game.run) throw new Error('No active run in game state')
   const run = gameState.game.run
-  if (!run) throw new Error('No active run in game state')
+  const round = run.stats.rounds
+  const turn = run.stats.turns
 
   switch (effect.type) {
     case 'update-resource': {
@@ -179,8 +183,8 @@ export function handleEffect(
         oldValue,
         newValue,
         delta: newValue - oldValue,
-        round: gameState.game.run!.stats.rounds,
-        turn: gameState.game.run!.stats.turns,
+        round,
+        turn,
       }
 
       return {
@@ -210,9 +214,6 @@ export function handleEffect(
       const existingCards = run.cards[location]
       const newCardArr =
         mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
-
-      const round = gameState.game.run!.stats.rounds
-      const turn = gameState.game.run!.stats.turns
 
       const events: CardAddEvent[] = cardsToAdd.map((card) => ({
         type: 'card-add',
@@ -244,8 +245,6 @@ export function handleEffect(
       const { cards } = effect.params
 
       const collectedCardIds = toArray(cards)
-      const round = gameState.game.run!.stats.rounds
-      const turn = gameState.game.run!.stats.turns
 
       const events: CardCollectEvent[] = collectedCardIds.map((cardId) => ({
         type: 'card-collect',
@@ -272,8 +271,6 @@ export function handleEffect(
       const { cards } = effect.params
 
       const destroyedCardIds = toArray(cards)
-      const round = gameState.game.run!.stats.rounds
-      const turn = gameState.game.run!.stats.turns
 
       const events: CardDestroyEvent[] = destroyedCardIds.map((cardId) => ({
         type: 'card-destroy',
@@ -316,8 +313,8 @@ export function handleEffect(
             cardId: card.id,
             instanceId: card.instanceId,
             fromLocation: location,
-            round: gameState.game.run!.stats.rounds,
-            turn: gameState.game.run!.stats.turns,
+            round,
+            turn,
           }
 
           // Remove the card from this location
@@ -344,10 +341,10 @@ export function handleEffect(
       }
     }
     case 'turn-start': {
-      const newTurn = run.stats.turns + 1
-      const event: Event = {
+      const newTurn = turn + 1
+      const event: TurnStartEvent = {
         type: 'turn-start',
-        round: run.stats.rounds,
+        round: round,
         turn: newTurn,
       }
 
@@ -369,10 +366,10 @@ export function handleEffect(
       }
     }
     case 'turn-end': {
-      const event: Event = {
+      const event: TurnEndEvent = {
         type: 'turn-end',
-        round: run.stats.rounds,
-        turn: run.stats.turns,
+        round,
+        turn,
       }
 
       return {
@@ -381,7 +378,7 @@ export function handleEffect(
       }
     }
     case 'round-start': {
-      const newRound = run.stats.rounds + 1
+      const newRound = round + 1
       const event: Event = {
         type: 'round-start',
         round: newRound,
@@ -409,8 +406,8 @@ export function handleEffect(
     case 'round-end': {
       const event: Event = {
         type: 'round-end',
-        round: run.stats.rounds,
-        turn: run.stats.turns,
+        round,
+        turn,
       }
 
       return {
@@ -421,8 +418,8 @@ export function handleEffect(
     case 'run-start': {
       const event: Event = {
         type: 'run-start',
-        round: run.stats.rounds,
-        turn: run.stats.turns,
+        round,
+        turn,
       }
 
       return {
@@ -433,8 +430,8 @@ export function handleEffect(
     case 'run-end': {
       const event: Event = {
         type: 'run-end',
-        round: run.stats.rounds,
-        turn: run.stats.turns,
+        round,
+        turn,
       }
 
       return {
@@ -466,6 +463,7 @@ export function handleEffect(
             },
           },
         },
+        // TODO: Add a refresh deck event
         events: [],
       }
     }
@@ -474,9 +472,6 @@ export function handleEffect(
       const drawPile = run.cards.drawPile
       const cardsToDraw = drawPile.slice(0, amount)
       const remainingDrawPile = drawPile.slice(amount)
-
-      const round = gameState.game.run!.stats.rounds
-      const turn = gameState.game.run!.stats.turns
 
       const events: CardDrawEvent[] = cardsToDraw.map((card) => ({
         type: 'card-draw',
