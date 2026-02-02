@@ -765,14 +765,12 @@ describe('findMatchingAbilities', () => {
 })
 
 describe('handleEvent', () => {
-  it('returns unchanged state when no run exists', () => {
+  it('throws when no run exists', () => {
     const gameState = createTestGameState()
     gameState.game.run = null
     const event = createCardPlayEvent('card-1')
 
-    const result = handleEvent(gameState, event)
-
-    expect(result).toBe(gameState)
+    expect(() => handleEvent(gameState, event)).toThrow('Cannot handle event with no run')
   })
 
   it('applies update-resource effects', () => {
