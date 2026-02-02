@@ -87,6 +87,10 @@ export type RunEndEvent = BaseEvent & {
   type: 'run-end'
 }
 
+export type DeckRefreshEvent = BaseEvent & {
+  type: 'deck-refresh'
+}
+
 export type ResourceChangeEvent = BaseEvent & {
   type: 'resource-change'
   resource: Resource
@@ -111,6 +115,7 @@ export type Event =
   | RoundEndEvent
   | RunStartEvent
   | RunEndEvent
+  | DeckRefreshEvent
   | ResourceChangeEvent
 
 /**

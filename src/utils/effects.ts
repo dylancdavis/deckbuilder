@@ -11,6 +11,7 @@ import type {
   CardDestroyEvent,
   CardDrawEvent,
   CardRemoveEvent,
+  DeckRefreshEvent,
   Event,
   ResourceChangeEvent,
   TurnEndEvent,
@@ -446,6 +447,12 @@ export function handleEffect(
       // Shuffle the collected cards
       allCards.sort(() => Math.random() - 0.5)
 
+      const event: DeckRefreshEvent = {
+        type: 'deck-refresh',
+        round: run.stats.rounds,
+        turn: run.stats.turns,
+      }
+
       return {
         game: {
           ...gameState,
@@ -463,8 +470,7 @@ export function handleEffect(
             },
           },
         },
-        // TODO: Add a refresh deck event
-        events: [],
+        events: [event],
       }
     }
     case 'draw-cards': {
