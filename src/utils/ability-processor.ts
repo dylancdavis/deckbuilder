@@ -19,20 +19,20 @@ import { logEvent, openCardChoiceModal } from './game'
 import { values, entries } from './utils'
 
 /**
- * Represents a single effect waiting to be processed in the queue.
- * Each effect from an ability becomes its own queue item.
- */
-type EffectQueueItem = {
-  sourceCard: CardInstance
-  effect: Effect
-}
-
-/**
  * Context passed to handleEffect for resolving 'self' references
  * and providing source card information.
  */
 type EffectContext = {
   sourceCard: CardInstance
+}
+
+/**
+ * Represents a single effect waiting to be processed in the queue.
+ * Each effect from an ability becomes its own queue item.
+ */
+type EffectQueueItem = {
+  context: EffectContext
+  effect: Effect
 }
 
 /**
@@ -48,7 +48,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   // Flatten abilities into individual effect queue items
   const queue: EffectQueueItem[] = abilities.flatMap((match) =>
     match.ability.effects.map((effect) => ({
-      sourceCard: match.card,
+      context: { sourceCard: match.card },
       effect,
     })),
   )
@@ -74,11 +74,10 @@ function processEffectQueue(
   let currentState = gameState
 
   for (let i = 0; i < queue.length; i++) {
-    const { sourceCard, effect } = queue[i]
+    const { context, effect } = queue[i]
 
     // Non-choice effects are non-blocking and can be resolved directly
     if (effect.type !== 'card-choice') {
-      const context: EffectContext = { sourceCard }
       currentState = handleEffectWithContext(currentState, effect, context)
       continue
     }
@@ -91,7 +90,7 @@ function processEffectQueue(
     const resolver = (gs: GameState, chosenCard: Parameters<typeof choiceHandler>[0]) => {
       const choiceEffects = choiceHandler(chosenCard)
       // Prepend choice-generated effects to the remaining queue
-      const choiceItems: EffectQueueItem[] = choiceEffects.map((e) => ({ sourceCard, effect: e }))
+      const choiceItems: EffectQueueItem[] = choiceEffects.map((e) => ({ context, effect: e }))
       return processEffectQueue(gs, [...choiceItems, ...remainingQueue], event)
     }
 
