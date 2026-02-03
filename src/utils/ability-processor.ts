@@ -133,8 +133,8 @@ function handleEffectWithContext(
   context: EffectContext,
 ): GameState {
   // Transform 'self' references to actual instanceId
-  const resolvedEffect = resolveSelfReferences(effect, context.sourceCard.instanceId)
-  return handleEffect(gameState, resolvedEffect).game
+  const transformedEffect = transformSelfReferences(effect, context.sourceCard.instanceId)
+  return handleEffect(gameState, transformedEffect).game
 }
 
 /**
@@ -144,7 +144,7 @@ function handleEffectWithContext(
  * @param instanceId - The instanceId to use for 'self'
  * @returns The effect with 'self' replaced by the actual instanceId
  */
-function resolveSelfReferences(effect: Effect, instanceId: string): Effect {
+function transformSelfReferences(effect: Effect, instanceId: string): Effect {
   if ('instanceId' in effect.params && effect.params.instanceId === 'self') {
     return {
       ...effect,
