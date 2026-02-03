@@ -74,7 +74,7 @@ function processEffectQueue(gameState: GameState, queue: EffectQueueItem[]): Gam
 
     // Non-choice effects are non-blocking and can be resolved directly
     if (effect.type !== 'card-choice') {
-      currentState = handleEffectWithContext(currentState, effect, context).game
+      currentState = resolveEffect(currentState, effect, context)
       continue
     }
 
@@ -116,6 +116,20 @@ function handleEffectWithContext(
   // Transform 'self' references to actual instanceId
   const transformedEffect = transformSelfReferences(effect, context.sourceCard.instanceId)
   return handleEffect(gameState, transformedEffect)
+}
+
+/**
+ * Resolves an effect fully, including cascading any events it produces.
+ * This is the high-level entry point for effect processing during ability resolution.
+ *
+ * @param gameState - The current game state
+ * @param effect - The effect to resolve
+ * @param context - Context containing the source card and triggering event
+ * @returns Updated game state after effect and all cascaded events are resolved
+ */
+function resolveEffect(gameState: GameState, effect: Effect, context: EffectContext): GameState {
+  const { game, events } = handleEffectWithContext(gameState, effect, context)
+  return events.reduce((state, event) => handleEvent(state, event), game)
 }
 
 /**

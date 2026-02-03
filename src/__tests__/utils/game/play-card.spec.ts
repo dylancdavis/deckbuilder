@@ -87,13 +87,23 @@ describe('playCard', () => {
 
     const result = playCard(gameState, 'card-1')
 
-    expect(result.game.run!.events).toHaveLength(1)
+    expect(result.game.run!.events).toHaveLength(2)
     expect(result.game.run!.events[0]).toEqual({
       type: 'card-play',
       round: 2,
       turn: 3,
       cardId: 'score',
       instanceId: 'card-1',
+    })
+    // The score card's effect triggers a resource-change event
+    expect(result.game.run!.events[1]).toEqual({
+      type: 'resource-change',
+      round: 2,
+      turn: 3,
+      resource: 'points',
+      oldValue: 0,
+      newValue: 1,
+      delta: 1,
     })
   })
 
