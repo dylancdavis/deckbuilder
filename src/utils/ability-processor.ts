@@ -120,7 +120,8 @@ function processAbilityQueue(
 }
 
 /**
- * Wrapper around handleEffect that resolves 'self' references to actual instanceIds.
+ * Wrapper around handleEffect to resolve dynamic references.
+ * Currently just 'self' references but will be expanded
  *
  * @param gameState - The current game state
  * @param effect - The effect to process
