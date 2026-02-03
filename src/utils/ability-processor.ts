@@ -19,13 +19,12 @@ import { logEvent, openCardChoiceModal } from './game'
 import { values, entries } from './utils'
 
 /**
- * Represents an ability waiting to be processed in the queue.
- * Tracks which effect to start from (for resuming after card-choice).
+ * Represents a single effect waiting to be processed in the queue.
+ * Each effect from an ability becomes its own queue item.
  */
-type AbilityQueueItem = {
+type EffectQueueItem = {
   sourceCard: CardInstance
-  ability: Ability
-  effectIndex: number
+  effect: Effect
 }
 
 /**
@@ -46,74 +45,60 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   const gameWithEventLogged = logEvent(gameState, event)
   const abilities = findMatchingAbilities(gameWithEventLogged.game.run, event)
 
-  const queue: AbilityQueueItem[] = abilities.map((match) => ({
-    sourceCard: match.card,
-    ability: match.ability,
-    effectIndex: 0,
-  }))
+  // Flatten abilities into individual effect queue items
+  const queue: EffectQueueItem[] = abilities.flatMap((match) =>
+    match.ability.effects.map((effect) => ({
+      sourceCard: match.card,
+      effect,
+    })),
+  )
 
-  // Process effects of matching abilities
-  return processAbilityQueue(gameWithEventLogged, queue, event)
+  return processEffectQueue(gameWithEventLogged, queue, event)
 }
 
 /**
- * Processes a queue of abilities, handling card-choice by capturing continuations.
- * This function can be called initially by processAbilities, or by a resolver
+ * Processes a queue of effects, handling card-choice by capturing continuations.
+ * This function can be called initially by handleEvent, or by a resolver
  * after a card-choice has been made.
  *
  * @param gameState - The current game state
- * @param queue - The queue of abilities to process
+ * @param queue - The queue of effects to process
  * @param event - The event that triggered this processing
  * @returns Updated game state after processing the queue
  */
-function processAbilityQueue(
+function processEffectQueue(
   gameState: GameState,
-  queue: AbilityQueueItem[],
+  queue: EffectQueueItem[],
   event: Event,
 ): GameState {
   let currentState = gameState
 
-  for (let queueIndex = 0; queueIndex < queue.length; queueIndex++) {
-    const item = queue[queueIndex]
-    const effects = item.ability.effects
-    const sourceCard = item.sourceCard
+  for (let i = 0; i < queue.length; i++) {
+    const { sourceCard, effect } = queue[i]
 
-    // Iterate effects, starting at the stored index
-    for (let effectIndex = item.effectIndex; effectIndex < effects.length; effectIndex++) {
-      const effect = effects[effectIndex]
-
-      // Trivial case: non-choice effects are non-blocking and can be resolved directly
-      if (effect.type !== 'card-choice') {
-        const context: EffectContext = { sourceCard }
-        currentState = handleEffectWithContext(currentState, effect, context)
-        continue
-      }
-
-      // Handle card-choice by capturing continuation and returning early
-      // Queue of rest of current ability + remaining abilities in queue
-      const remainingQueue: AbilityQueueItem[] = [
-        { ...item, effectIndex: effectIndex + 1 }, // saved effectIndex
-        ...queue.slice(queueIndex + 1), // rest of queue
-      ]
-
-      const { options, tags, choiceHandler } = effect.params
-
-      // Resolver continues processing after user makes a choice
-      const resolver = (gs: GameState, chosenCard: Parameters<typeof choiceHandler>[0]) => {
-        const choiceEffects = choiceHandler(chosenCard)
-        const context: EffectContext = { sourceCard }
-        let stateAfterChoice = gs
-        for (const choiceEffect of choiceEffects) {
-          stateAfterChoice = handleEffectWithContext(stateAfterChoice, choiceEffect, context)
-        }
-        return processAbilityQueue(stateAfterChoice, remainingQueue, event)
-      }
-
-      // Note: The card being played remains in 'stack' while the modal is open.
-      // It stays in this limbo state until all abilities (including continuations
-      // after card-choice) complete, then moves to board or discard.
-      return openCardChoiceModal(currentState, options, tags, resolver)
+    // Non-choice effects are non-blocking and can be resolved directly
+    if (effect.type !== 'card-choice') {
+      const context: EffectContext = { sourceCard }
+      currentState = handleEffectWithContext(currentState, effect, context)
+      continue
     }
+
+    // Handle card-choice by capturing continuation and returning early
+    const remainingQueue = queue.slice(i + 1)
+    const { options, tags, choiceHandler } = effect.params
+
+    // Resolver continues processing after user makes a choice
+    const resolver = (gs: GameState, chosenCard: Parameters<typeof choiceHandler>[0]) => {
+      const choiceEffects = choiceHandler(chosenCard)
+      // Prepend choice-generated effects to the remaining queue
+      const choiceItems: EffectQueueItem[] = choiceEffects.map((e) => ({ sourceCard, effect: e }))
+      return processEffectQueue(gs, [...choiceItems, ...remainingQueue], event)
+    }
+
+    // Note: The card being played remains in 'stack' while the modal is open.
+    // It stays in this limbo state until all abilities (including continuations
+    // after card-choice) complete, then moves to board or discard.
+    return openCardChoiceModal(currentState, options, tags, resolver)
   }
 
   return currentState
