@@ -74,7 +74,7 @@ function processEffectQueue(gameState: GameState, queue: EffectQueueItem[]): Gam
 
     // Non-choice effects are non-blocking and can be resolved directly
     if (effect.type !== 'card-choice') {
-      currentState = handleEffectWithContext(currentState, effect, context)
+      currentState = handleEffectWithContext(currentState, effect, context).game
       continue
     }
 
@@ -106,16 +106,16 @@ function processEffectQueue(gameState: GameState, queue: EffectQueueItem[]): Gam
  * @param gameState - The current game state
  * @param effect - The effect to process
  * @param context - Context containing the source card
- * @returns Updated game state after processing the effect
+ * @returns Updated game state and any events produced by the effect
  */
 function handleEffectWithContext(
   gameState: GameState,
   effect: Effect,
   context: EffectContext,
-): GameState {
+): { game: GameState; events: Event[] } {
   // Transform 'self' references to actual instanceId
   const transformedEffect = transformSelfReferences(effect, context.sourceCard.instanceId)
-  return handleEffect(gameState, transformedEffect).game
+  return handleEffect(gameState, transformedEffect)
 }
 
 /**
