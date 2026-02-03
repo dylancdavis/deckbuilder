@@ -23,7 +23,7 @@ import { values, entries } from './utils'
  * Tracks which effect to start from (for resuming after card-choice).
  */
 type AbilityQueueItem = {
-  card: CardInstance
+  sourceCard: CardInstance
   ability: Ability
   effectIndex: number
 }
@@ -47,7 +47,7 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   const abilities = findMatchingAbilities(gameWithEventLogged.game.run, event)
 
   const queue: AbilityQueueItem[] = abilities.map((match) => ({
-    card: match.card,
+    sourceCard: match.card,
     ability: match.ability,
     effectIndex: 0,
   }))
@@ -76,6 +76,7 @@ function processAbilityQueue(
   for (let queueIndex = 0; queueIndex < queue.length; queueIndex++) {
     const item = queue[queueIndex]
     const effects = item.ability.effects
+    const sourceCard = item.sourceCard
 
     // Iterate effects, starting at the stored index
     for (let effectIndex = item.effectIndex; effectIndex < effects.length; effectIndex++) {
@@ -94,7 +95,7 @@ function processAbilityQueue(
         // Resolver continues processing after user makes a choice
         const resolver = (gs: GameState, chosenCard: Parameters<typeof choiceHandler>[0]) => {
           const choiceEffects = choiceHandler(chosenCard)
-          const context: EffectContext = { sourceCard: item.card }
+          const context: EffectContext = { sourceCard }
           let stateAfterChoice = gs
           for (const choiceEffect of choiceEffects) {
             stateAfterChoice = handleEffectWithContext(stateAfterChoice, choiceEffect, context)
@@ -109,7 +110,7 @@ function processAbilityQueue(
       }
 
       // Non-choice actions can be resolved synchronously
-      const context: EffectContext = { sourceCard: item.card }
+      const context: EffectContext = { sourceCard }
       currentState = handleEffectWithContext(currentState, effect, context)
     }
   }
