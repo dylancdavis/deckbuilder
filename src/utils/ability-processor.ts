@@ -24,6 +24,7 @@ import { values, entries } from './utils'
  */
 type EffectContext = {
   sourceCard: CardInstance
+  event: Event
 }
 
 /**
@@ -48,12 +49,12 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
   // Flatten abilities into individual effect queue items
   const queue: EffectQueueItem[] = abilities.flatMap((match) =>
     match.ability.effects.map((effect) => ({
-      context: { sourceCard: match.card },
+      context: { sourceCard: match.card, event },
       effect,
     })),
   )
 
-  return processEffectQueue(gameWithEventLogged, queue, event)
+  return processEffectQueue(gameWithEventLogged, queue)
 }
 
 /**
@@ -63,14 +64,9 @@ export function handleEvent(gameState: GameState, event: Event): GameState {
  *
  * @param gameState - The current game state
  * @param queue - The queue of effects to process
- * @param event - The event that triggered this processing
  * @returns Updated game state after processing the queue
  */
-function processEffectQueue(
-  gameState: GameState,
-  queue: EffectQueueItem[],
-  event: Event,
-): GameState {
+function processEffectQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
   let currentState = gameState
 
   for (let i = 0; i < queue.length; i++) {
@@ -91,7 +87,7 @@ function processEffectQueue(
       const choiceEffects = choiceHandler(chosenCard)
       // Prepend choice-generated effects to the remaining queue
       const choiceItems: EffectQueueItem[] = choiceEffects.map((e) => ({ context, effect: e }))
-      return processEffectQueue(gs, [...choiceItems, ...remainingQueue], event)
+      return processEffectQueue(gs, [...choiceItems, ...remainingQueue])
     }
 
     // Note: The card being played remains in 'stack' while the modal is open.
