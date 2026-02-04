@@ -505,6 +505,9 @@ export const testRules: RulesCard = {
             'choice-draw': 2,
             'draw-watcher': 1,
             'draw-bonus': 1,
+            'lucky-draw': 2,
+            'point-draw': 1,
+            'draw-bonus-plus': 1,
           },
         },
       },
@@ -663,6 +666,73 @@ export const drawBonus: PlayableCard = {
   },
 }
 
+// Test: Triggers when this card itself is drawn
+export const luckyDraw: PlayableCard = {
+  type: 'playable',
+  id: 'lucky-draw',
+  name: 'Lucky Draw',
+  description: 'When you draw this, gain 1 point.',
+  abilities: [
+    {
+      trigger: { on: 'card-draw', target: 'self' },
+      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#f5af19', '#f12711'],
+    image: 'lightning',
+  },
+}
+
+// Test: Draw a card when you gain points (while on board)
+export const pointDraw: PlayableCard = {
+  type: 'playable',
+  id: 'point-draw',
+  name: 'Point Draw',
+  description: 'While on board: When you gain points, draw a card.',
+  abilities: [
+    {
+      trigger: {
+        on: 'resource-change',
+        locations: ['board'],
+        when: (ctx) => {
+          const event = ctx.event as { resource: string; delta: number }
+          return event.resource === Resource.POINTS && event.delta > 0
+        },
+      },
+      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#667eea', '#764ba2'],
+    image: 'lightning',
+  },
+}
+
+// Test: Gain 2 points when you draw any card (while on board)
+export const drawBonusPlus: PlayableCard = {
+  type: 'playable',
+  id: 'draw-bonus-plus',
+  name: 'Draw Bonus+',
+  description: 'While on board: When you draw any card, gain 2 points.',
+  abilities: [
+    {
+      trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
+      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#11998e', '#38ef7d'],
+    image: 'scarab',
+  },
+}
+
 export const playableCards = {
   score: score,
   'collect-basic': collectBasic,
@@ -681,6 +751,9 @@ export const playableCards = {
   'choice-draw': choiceDraw,
   'draw-watcher': drawWatcher,
   'draw-bonus': drawBonus,
+  'lucky-draw': luckyDraw,
+  'point-draw': pointDraw,
+  'draw-bonus-plus': drawBonusPlus,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }
