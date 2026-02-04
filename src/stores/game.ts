@@ -6,7 +6,7 @@ import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/car
 import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
-import { playCard, drawCards as drawCardsPure, type GameState } from '@/utils/game.ts'
+import { playCard, drawCards, type GameState } from '@/utils/game.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -200,7 +200,7 @@ export const useGameStore = defineStore('game', () => {
       startNewRound()
     } else {
       // Draw new cards from draw pile to hand
-      gameState.value = drawCardsPure(gameState.value, turnStructure.drawAmount)
+      gameState.value = drawCards(gameState.value, turnStructure.drawAmount)
     }
   }
 
@@ -236,7 +236,7 @@ export const useGameStore = defineStore('game', () => {
 
     // Draw starting hand for new round
     const turnStructure = run.deck.rulesCard.turnStructure
-    gameState.value = drawCardsPure(gameState.value, turnStructure.drawAmount)
+    gameState.value = drawCards(gameState.value, turnStructure.drawAmount)
   }
 
   return {
