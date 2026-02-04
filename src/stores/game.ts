@@ -79,10 +79,6 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.game.run = null
   }
 
-  function drawCards(n: number) {
-    gameState.value = drawCardsPure(gameState.value, n)
-  }
-
   function changeDeckName(oldName: string, newName: string) {
     if (gameState.value.game.collection.decks[oldName]) {
       gameState.value.game.collection.decks[oldName].name = newName
@@ -204,7 +200,7 @@ export const useGameStore = defineStore('game', () => {
       startNewRound()
     } else {
       // Draw new cards from draw pile to hand
-      drawCards(turnStructure.drawAmount)
+      gameState.value = drawCardsPure(gameState.value, turnStructure.drawAmount)
     }
   }
 
@@ -240,7 +236,7 @@ export const useGameStore = defineStore('game', () => {
 
     // Draw starting hand for new round
     const turnStructure = run.deck.rulesCard.turnStructure
-    drawCards(turnStructure.drawAmount)
+    gameState.value = drawCardsPure(gameState.value, turnStructure.drawAmount)
   }
 
   return {
@@ -262,7 +258,6 @@ export const useGameStore = defineStore('game', () => {
     nextTurn,
     startNewRound,
     endRun,
-    drawCards,
     changeDeckName,
     addCardToDeck,
     removeCardFromDeck,
