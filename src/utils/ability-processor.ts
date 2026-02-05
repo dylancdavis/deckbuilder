@@ -8,7 +8,7 @@
  */
 
 import type { Ability, Trigger, TriggerContext } from './ability'
-import type { CardInstance, PlayableCard, RulesCard } from './cards'
+import { rulesCardIds, type CardInstance, type PlayableCard, type RulesCard } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
@@ -169,6 +169,12 @@ export function findMatchingAbilities(
 ): Array<{ card: CardInstance | RulesCard; ability: Ability }> {
   const matches: Array<{ card: CardInstance | RulesCard; ability: Ability }> = []
 
+  const rulesCard = run.deck.rulesCard!
+  for (const ability of rulesCard.abilities) {
+    if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run))
+      matches.push({ card: rulesCard, ability })
+  }
+
   // TODO: also check rules card
   for (const location of locations) {
     for (const card of run.cards[location]) {
@@ -195,7 +201,7 @@ export function findMatchingAbilities(
  */
 export function matchesTrigger(
   event: Event,
-  sourceCard: CardInstance,
+  sourceCard: CardInstance | RulesCard,
   cardLocation: Location,
   trigger: Trigger,
   run: Run,
@@ -207,12 +213,16 @@ export function matchesTrigger(
   if (trigger.locations && !trigger.locations.includes(cardLocation)) return false
 
   // 3. For card-activate events, check costs and limits
-  if (event.type === 'card-activate' && trigger.on === 'card-activate') {
+  if (
+    event.type === 'card-activate' &&
+    trigger.on === 'card-activate' &&
+    sourceCard.type === 'playable'
+  ) {
     if (!canActivate(trigger, sourceCard, run)) return false
   }
 
   // 4. Target matching (for card-related events)
-  if (isCardEvent(event) && trigger.target) {
+  if (isCardEvent(event) && trigger.target && sourceCard.type === 'playable') {
     if (!matchesTarget(event, sourceCard, trigger.target, run)) {
       return false
     }

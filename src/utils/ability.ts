@@ -1,6 +1,6 @@
 import type { Effect } from './effects'
 import type { Event, EventType } from './event'
-import type { CardInstance } from './cards'
+import type { CardInstance, RulesCard } from './cards'
 import type { Run, Location } from './run'
 import type { Resource } from './resource'
 import type { TargetSpec } from './card-matchers'
@@ -26,7 +26,7 @@ export type Trigger = {
 
 export type TriggerContext = {
   event: Event
-  sourceCard: CardInstance // Card with ability to be triggered
+  sourceCard: CardInstance | RulesCard // Card with ability to be triggered
   targetCard?: CardInstance // If applicable, data for card referred to in event
   run: Run
 }
