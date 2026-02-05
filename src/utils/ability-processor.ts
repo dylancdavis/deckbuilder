@@ -8,7 +8,7 @@
  */
 
 import type { Ability, Trigger, TriggerContext } from './ability'
-import type { CardInstance, PlayableCard } from './cards'
+import type { CardInstance, PlayableCard, RulesCard } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
@@ -23,7 +23,7 @@ import { values, entries } from './utils'
  * and providing source card information.
  */
 type EffectContext = {
-  sourceCard: CardInstance
+  sourceCard: CardInstance | RulesCard
   event: Event
 }
 
@@ -113,6 +113,8 @@ function handleEffectWithContext(
   effect: Effect,
   context: EffectContext,
 ): { game: GameState; events: Event[] } {
+  // No need to do self-resolution on rules cards
+  if (context.sourceCard.type === 'rules') return handleEffect(gameState, effect)
   // Transform 'self' references to actual instanceId
   const transformedEffect = transformSelfReferences(effect, context.sourceCard.instanceId)
   return handleEffect(gameState, transformedEffect)
@@ -164,8 +166,8 @@ function transformSelfReferences(effect: Effect, instanceId: string): Effect {
 export function findMatchingAbilities(
   run: Run,
   event: Event,
-): Array<{ card: CardInstance; ability: Ability }> {
-  const matches: Array<{ card: CardInstance; ability: Ability }> = []
+): Array<{ card: CardInstance | RulesCard; ability: Ability }> {
+  const matches: Array<{ card: CardInstance | RulesCard; ability: Ability }> = []
 
   // TODO: also check rules card
   for (const location of locations) {
