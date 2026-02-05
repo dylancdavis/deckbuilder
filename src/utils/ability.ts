@@ -14,7 +14,7 @@ export type Ability = {
 export type Trigger = {
   on: EventType
   target?: TargetSpec
-  locations?: Location[] // if omitted, implies all locations
+  locations?: Location[] // List of locations for which the card containing the ability can trigger it from. If omitted, implies all locations
   when?: (context: TriggerContext) => boolean // additional conditional check
   costs?: Partial<Record<Resource, number>>
   limit?: {
