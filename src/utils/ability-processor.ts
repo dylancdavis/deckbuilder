@@ -8,7 +8,7 @@
  */
 
 import type { Ability, Trigger, TriggerContext } from './ability'
-import { rulesCardIds, type CardInstance, type PlayableCard, type RulesCard } from './cards'
+import { type CardInstance, type PlayableCard, type RulesCard } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
