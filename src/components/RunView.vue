@@ -140,7 +140,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           :data-flip-id="card.instanceId"
           :tilt="TILT_PRESETS.minimal"
         />
-        <span class="pile-badge">
+        <span class="pile-badge" data-testid="draw-pile-count">
           <FlashValue :value="drawPileData.pileSize" base-color="white" />
         </span>
       </div>
@@ -162,6 +162,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             v-for="card in run.cards.hand"
             :key="card.instanceId || card.name"
             :data-flip-id="card.instanceId"
+            data-testid="hand-card"
             class="flip-card"
             :class="{ 'card-disabled': !canPlayCard }"
             @click="canPlayCard && card.instanceId && playCard(card.instanceId)"
