@@ -41,6 +41,7 @@ const addThreeScore: AddCardsEffect = {
   params: {
     location: 'drawPile',
     cards: { score: 3 },
+    mode: 'shuffle',
   },
 }
 
@@ -169,10 +170,4 @@ describe('processStartOfGame', () => {
     expect(idCounter).toEqual({ a: 3, b: 2, c: 1, score: 3 })
   })
 
-  it('preserves original draw order when cards are added', () => {
-    const gameState = wrapInGameState(populatedHandRun)
-    const result = processStartOfGame(gameState)
-    const originalCards = result.game.run!.cards.drawPile.filter((card) => !(card.id === 'score'))
-    expect(originalCards).toEqual(populatedHandRun.cards.drawPile)
-  })
 })

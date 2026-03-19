@@ -1,6 +1,6 @@
 import type { Counter } from './counter'
 import { toArray, mergeCounters, subtractCounters } from './counter'
-import { playableCards, type CardID, type PlayableCardID } from './cards'
+import { playableCards, type CardID, type CardInstance, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
 import { shuffle } from './utils'
@@ -27,7 +27,7 @@ export type AddCardsEffect = {
   params: {
     location: Location
     cards: Counter<PlayableCardID>
-    mode?: PlacementMode
+    mode: PlacementMode
   }
 }
 
@@ -214,8 +214,14 @@ export function handleEffect(
         instanceId: crypto.randomUUID(),
       }))
       const existingCards = run.cards[location]
-      const newCardArr =
-        mode === 'top' ? [...cardsToAdd, ...existingCards] : [...existingCards, ...cardsToAdd]
+      let newCardArr: CardInstance[]
+      if (mode === 'top') {
+        newCardArr = [...cardsToAdd, ...existingCards]
+      } else if (mode === 'bottom') {
+        newCardArr = [...existingCards, ...cardsToAdd]
+      } else {
+        newCardArr = shuffle([...existingCards, ...cardsToAdd])
+      }
 
       const events: CardAddEvent[] = cardsToAdd.map((card) => ({
         type: 'card-add',

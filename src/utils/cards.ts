@@ -167,7 +167,7 @@ export const starterRules: RulesCard = {
     gameStart: [
       {
         type: 'add-cards',
-        params: { location: 'drawPile', cards: { score: 7, 'collect-basic': 1 } },
+        params: { location: 'drawPile', cards: { score: 7, 'collect-basic': 1 }, mode: 'shuffle' },
       },
     ],
   },
@@ -509,6 +509,7 @@ export const testRules: RulesCard = {
             'point-draw': 1,
             'draw-bonus-plus': 1,
           },
+          mode: 'shuffle',
         },
       },
     ],

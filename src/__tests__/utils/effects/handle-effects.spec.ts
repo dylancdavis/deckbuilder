@@ -53,7 +53,7 @@ describe('handleEffects - sequential processing', () => {
       },
       {
         type: 'add-cards',
-        params: { location: 'drawPile', cards: { debt: 1 } },
+        params: { location: 'drawPile', cards: { debt: 1 }, mode: 'shuffle' },
       },
     ] as (UpdateResourceEffect | AddCardsEffect)[]
 

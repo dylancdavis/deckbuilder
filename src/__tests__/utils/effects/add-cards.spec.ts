@@ -12,6 +12,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'drawPile',
         cards: { score: 1 },
+        mode: 'shuffle',
       },
     }
 
@@ -29,6 +30,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'drawPile',
         cards: { score: 3, 'collect-basic': 1 },
+        mode: 'shuffle',
       },
     }
 
@@ -48,6 +50,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'hand',
         cards: { 'dual-score': 2 },
+        mode: 'shuffle',
       },
     }
 
@@ -64,6 +67,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'board',
         cards: { score: 1 },
+        mode: 'shuffle',
       },
     }
 
@@ -79,6 +83,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'discardPile',
         cards: { score: 1 },
+        mode: 'shuffle',
       },
     }
 
@@ -87,11 +92,12 @@ describe('AddCardsEffect', () => {
     expect(result.game.game.run!.cards.discardPile).toHaveLength(1)
   })
 
-  it('adds cards to end of existing pile (default mode)', () => {
+  it('adds cards to bottom of existing pile when mode is "bottom"', () => {
     const gameState = createTestGameState({
       cards: {
         drawPile: [{ ...dualScore, instanceId: 'foobar' }],
         hand: [],
+        stack: [],
         board: [],
         discardPile: [],
       },
@@ -101,6 +107,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'drawPile',
         cards: { score: 1 },
+        mode: 'bottom',
       },
     }
 
@@ -116,6 +123,7 @@ describe('AddCardsEffect', () => {
       cards: {
         drawPile: [{ ...dualScore, instanceId: 'foobar' }],
         hand: [],
+        stack: [],
         board: [],
         discardPile: [],
       },
@@ -143,6 +151,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'drawPile',
         cards: { score: 3 },
+        mode: 'shuffle',
       },
     }
 
@@ -160,6 +169,7 @@ describe('AddCardsEffect', () => {
       params: {
         location: 'drawPile',
         cards: { score: 1 },
+        mode: 'shuffle',
       },
     }
 
