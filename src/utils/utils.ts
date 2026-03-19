@@ -93,9 +93,20 @@ export function push<T>(array: T[], item: T, n: number = 1) {
 }
 
 /**
+ * Returns a new shuffled copy of an array using Fisher-Yates.
+ */
+export function shuffle<T>(arr: T[]): T[] {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
+/**
  * Returns an array of `n` random items from an array at random
  */
 export function selectRandom<T>(arr: T[], n?: number) {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, n)
+  return shuffle(arr).slice(0, n)
 }

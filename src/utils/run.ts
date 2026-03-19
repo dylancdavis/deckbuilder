@@ -2,7 +2,7 @@
  * Game run utility functions
  */
 
-import { moveItem, moveItems } from './utils.ts'
+import { moveItem, moveItems, shuffle } from './utils.ts'
 import { toArray } from './counter.ts'
 import { playableCards, type CardInstance, type PlayableCardID } from './cards.ts'
 import { handleEffects } from './effects.ts'
@@ -76,9 +76,8 @@ export function moveCards(run: Run, fromLocation: Location, toLocation: Location
  * Populates a run's draw pile with cards from the deck's counter.
  */
 export function populateDrawPile(run: Run): Run {
-  const idsToAdd: PlayableCardID[] = toArray(run.deck.cards)
-  idsToAdd.sort(() => Math.random() - 0.5) // shuffle
-  const cardsToAdd = idsToAdd.map((id) => ({
+  const shuffledIds: PlayableCardID[] = shuffle(toArray(run.deck.cards))
+  const cardsToAdd = shuffledIds.map((id) => ({
     ...playableCards[id],
     instanceId: crypto.randomUUID(),
   }))
@@ -87,7 +86,6 @@ export function populateDrawPile(run: Run): Run {
     ...run,
     cards: {
       ...run.cards,
-      // TODO: Use a proper shuffle function
       drawPile: cardsToAdd,
     },
   }

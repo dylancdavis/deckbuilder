@@ -3,6 +3,7 @@ import { toArray, mergeCounters, subtractCounters } from './counter'
 import { playableCards, type CardID, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
+import { shuffle } from './utils'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
 import type {
@@ -207,7 +208,7 @@ export function handleEffect(
     }
     case 'add-cards': {
       const { location, cards, mode } = effect.params
-      const shuffledIDs = toArray(cards).sort(() => Math.random() - 0.5)
+      const shuffledIDs = shuffle(toArray(cards))
       const cardsToAdd = shuffledIDs.map((id) => ({
         ...playableCards[id],
         instanceId: crypto.randomUUID(),
