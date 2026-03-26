@@ -16,7 +16,7 @@ function selectCard(cardId: CardID) {
 </script>
 
 <template>
-  <div class="modal-overlay">
+  <div class="modal-overlay" data-testid="card-choice-modal">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
         <h2>Choose a Card</h2>
@@ -26,6 +26,7 @@ function selectCard(cardId: CardID) {
           v-for="cardId in props.cardOptions"
           :key="cardId"
           class="card-option"
+          data-testid="card-option"
           @click="selectCard(cardId)"
         >
           <CardItem :card="cards[cardId]" :tilt="TILT_PRESETS.collection" />

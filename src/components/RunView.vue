@@ -151,7 +151,12 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
       <!-- Board Display -->
       <div class="hand-group">
         <div class="empty-pile">
-          <CardItem v-for="card in run.cards.board" :key="card.name" :card="card" />
+          <CardItem
+            v-for="card in run.cards.board"
+            :key="card.name"
+            :card="card"
+            data-testid="board-card"
+          />
         </div>
       </div>
 
@@ -192,7 +197,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
         >
           <CardItem :card="card" :tilt="TILT_PRESETS.minimal" />
         </div>
-        <span class="pile-badge">
+        <span class="pile-badge" data-testid="discard-pile-count">
           <FlashValue :value="discardPileData.pileSize" base-color="white" />
         </span>
       </div>
@@ -201,10 +206,13 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
       <div class="round-info-panel">
         <div class="stats-chips">
           <div class="chip chip-counter chip-wide">
-            <span>Round <FlashValue :value="run.stats.rounds" /></span>
-            <span>Turn <FlashValue :value="run.stats.turns" /></span>
+            <span data-testid="round-display">Round <FlashValue :value="run.stats.rounds" /></span>
+            <span data-testid="turn-display">Turn <FlashValue :value="run.stats.turns" /></span>
           </div>
-          <div class="chip chip-counter chip-wide chip-cards-played">
+          <div
+            class="chip chip-counter chip-wide chip-cards-played"
+            data-testid="cards-played-display"
+          >
             <span>Cards Played</span>
             <span v-if="run.deck.rulesCard?.turnStructure.playAmount === 'any'">
               <FlashValue :value="cardsPlayedThisTurn" />
@@ -215,7 +223,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             </span>
           </div>
           <div class="resources-grid">
-            <div class="chip chip-resource chip-wide">
+            <div class="chip chip-resource chip-wide" data-testid="points-display">
               <span>Points</span>
               <FlashValue
                 :value="run.resources.points"
@@ -226,6 +234,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           </div>
         </div>
         <button
+          data-testid="next-turn-btn"
           class="next-turn-btn"
           :class="{
             'next-turn-btn--highlighted': noActionsLeft && !isEndOfRun,
