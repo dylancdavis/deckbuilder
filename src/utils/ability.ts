@@ -10,12 +10,14 @@ export type Ability = {
   effects: Effect[]
 }
 
-// Describes the conditions for ability triggering
+/** Describes the event that triggers this ability, plus additional conditionals. */
 export type Trigger = {
   on: EventType
   target?: TargetSpec
-  locations?: Location[] // List of locations for which the card containing the ability can trigger it from. If omitted, implies all locations
-  when?: (context: TriggerContext) => boolean // additional conditional check
+  /** List of locations for which the card containing the ability can trigger it from. If omitted, implies all locations */
+  locations?: Location[]
+  /** Additional conditional check, using trigger context */
+  when?: (context: TriggerContext) => boolean
   costs?: Partial<Record<Resource, number>>
   limit?: {
     perTurn?: number
@@ -26,7 +28,9 @@ export type Trigger = {
 
 export type TriggerContext = {
   event: Event
-  sourceCard: CardInstance | RulesCard // Card with ability to be triggered
-  targetCard?: CardInstance // If applicable, data for card referred to in event
+  /** Card with ability to be triggered */
+  sourceCard: CardInstance | RulesCard
+  /** If applicable, data for card referred to in event */
+  targetCard?: CardInstance
   run: Run
 }
