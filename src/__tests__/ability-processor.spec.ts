@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { handleEvent, findMatchingAbilities } from '../utils/ability-processor'
+import { handleEvent } from '../utils/ability-processor'
 import type { GameState } from '../utils/game'
 import type { Run } from '../utils/run'
 import type { CardPlayEvent } from '../utils/event'
-import { doubleChoice } from '../utils/cards'
+import { doubleChoice, starterRules } from '../utils/cards'
 
 function createTestRun(cards: Partial<Run['cards']> = {}): Run {
   return {
     deck: {
       name: 'Test Deck',
-      rulesCard: null,
+      rulesCard: starterRules,
       cards: {},
       editable: false,
     },

@@ -696,9 +696,8 @@ describe('findMatchingAbilities', () => {
 
     const matches = findMatchingAbilities(run, event)
 
-    // Both hand and board cards can respond to lifecycle events
-    // Location filtering is done via trigger.locations, not event type
-    expect(matches).toHaveLength(2)
+    // Board card, hand card, rules card
+    expect(matches).toHaveLength(3)
   })
 
   it('respects trigger.locations for lifecycle events', () => {
@@ -717,8 +716,8 @@ describe('findMatchingAbilities', () => {
 
     const matches = findMatchingAbilities(run, event)
 
-    // Hand card has ability that requires board location, so it doesn't match
-    expect(matches).toHaveLength(0)
+    // Only match rules card. Card in hand only has a board-specific trigger
+    expect(matches).toHaveLength(1)
   })
 
   it('checks hand and board cards for card events', () => {
