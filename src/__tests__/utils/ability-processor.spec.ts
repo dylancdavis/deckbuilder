@@ -608,7 +608,7 @@ describe('findMatchingAbilities', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const event = createCardPlayEvent('card-1')
     const run = createTestRun({
@@ -633,7 +633,7 @@ describe('findMatchingAbilities', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability1, ability2] as unknown as PlayableCard['abilities'],
+      abilities: [ability1, ability2],
     })
     const event = createCardPlayEvent('card-1')
     const run = createTestRun({
@@ -656,11 +656,11 @@ describe('findMatchingAbilities', () => {
     }
     const card1 = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability1] as unknown as PlayableCard['abilities'],
+      abilities: [ability1],
     })
     const card2 = createTestCard({
       instanceId: 'card-2',
-      abilities: [ability2] as unknown as PlayableCard['abilities'],
+      abilities: [ability2],
     })
     const event = createCardPlayEvent('card-3')
     const run = createTestRun({
@@ -683,11 +683,11 @@ describe('findMatchingAbilities', () => {
     }
     const handCard = createTestCard({
       instanceId: 'hand-card',
-      abilities: [handAbility] as unknown as PlayableCard['abilities'],
+      abilities: [handAbility],
     })
     const boardCard = createTestCard({
       instanceId: 'board-card',
-      abilities: [boardAbility] as unknown as PlayableCard['abilities'],
+      abilities: [boardAbility],
     })
     const event = createTurnStartEvent()
     const run = createTestRun({
@@ -708,7 +708,7 @@ describe('findMatchingAbilities', () => {
     }
     const handCard = createTestCard({
       instanceId: 'hand-card',
-      abilities: [handAbility] as unknown as PlayableCard['abilities'],
+      abilities: [handAbility],
     })
     const event = createTurnStartEvent()
     const run = createTestRun({
@@ -728,11 +728,11 @@ describe('findMatchingAbilities', () => {
     }
     const handCard = createTestCard({
       instanceId: 'hand-card',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const boardCard = createTestCard({
       instanceId: 'board-card',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const event = createCardPlayEvent('some-other-card')
     const run = createTestRun({
@@ -751,7 +751,7 @@ describe('findMatchingAbilities', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const event = createCardPlayEvent('card-1')
     const run = createTestRun({
@@ -780,7 +780,7 @@ describe('handleEvent', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const gameState = createTestGameState({
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
@@ -803,7 +803,7 @@ describe('handleEvent', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const gameState = createTestGameState({
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
@@ -827,11 +827,11 @@ describe('handleEvent', () => {
     }
     const card1 = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability1] as unknown as PlayableCard['abilities'],
+      abilities: [ability1],
     })
     const card2 = createTestCard({
       instanceId: 'card-2',
-      abilities: [ability2] as unknown as PlayableCard['abilities'],
+      abilities: [ability2],
     })
     const gameState = createTestGameState({
       cards: { drawPile: [], hand: [card1, card2], board: [], stack: [], discardPile: [] },
@@ -862,7 +862,7 @@ describe('handleEvent', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const gameState = createTestGameState({
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
@@ -882,7 +882,7 @@ describe('handleEvent', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
     const gameState = createTestGameState({
       cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
@@ -904,7 +904,7 @@ describe('isAsset', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
 
     expect(isAsset(card)).toBe(true)
@@ -921,7 +921,7 @@ describe('isAsset', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability1, ability2] as unknown as PlayableCard['abilities'],
+      abilities: [ability1, ability2],
     })
 
     expect(isAsset(card)).toBe(true)
@@ -934,7 +934,7 @@ describe('isAsset', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
 
     expect(isAsset(card)).toBe(false)
@@ -943,7 +943,7 @@ describe('isAsset', () => {
   it('returns false when card has no abilities', () => {
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [] as unknown as PlayableCard['abilities'],
+      abilities: [],
     })
 
     expect(isAsset(card)).toBe(false)
@@ -956,7 +956,7 @@ describe('isAsset', () => {
     }
     const card = createTestCard({
       instanceId: 'card-1',
-      abilities: [ability] as unknown as PlayableCard['abilities'],
+      abilities: [ability],
     })
 
     expect(isAsset(card)).toBe(true)
