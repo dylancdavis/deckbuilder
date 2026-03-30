@@ -1,30 +1,37 @@
 import { describe, it, expect } from 'vitest'
 import { hasRulesCard, deckInSizeRange } from '../../utils/deck.js'
+import { starterRules } from '../../utils/cards.js'
+
+const rulesWithSize = (size: [number, number]) => ({
+  ...starterRules,
+  deckLimits: { size },
+})
 
 describe('hasRulesCard', () => {
   it('returns false when no rules card', () => {
-    expect(hasRulesCard({ cards: {}, rulesCard: null })).toBe(false)
+    expect(hasRulesCard({ name: 'Test', cards: {}, rulesCard: null })).toBe(false)
   })
 
   it('returns true when rules card exists', () => {
-    expect(hasRulesCard({ cards: {}, rulesCard: {} })).toBe(true)
+    expect(hasRulesCard({ name: 'Test', cards: {}, rulesCard: starterRules })).toBe(true)
   })
 })
 
 describe('deckInSizeRange', () => {
   it('empty deck should be vacuously true when no rules card', () => {
-    expect(deckInSizeRange({ cards: {}, rulesCard: null })).toBe(true)
+    expect(deckInSizeRange({ name: 'Test', cards: {}, rulesCard: null })).toBe(true)
   })
 
   it('populated deck should be vacuously true when no rules card', () => {
-    expect(deckInSizeRange({ cards: { a: 3 }, rulesCard: null })).toBe(true)
+    expect(deckInSizeRange({ name: 'Test', cards: { score: 3 }, rulesCard: null })).toBe(true)
   })
 
   it('empty deck should be valid for [0,0]', () => {
     expect(
       deckInSizeRange({
+        name: 'Test',
         cards: {},
-        rulesCard: { deckLimits: { size: [0, 0] } },
+        rulesCard: rulesWithSize([0, 0]),
       }),
     ).toBe(true)
   })
@@ -32,8 +39,9 @@ describe('deckInSizeRange', () => {
   it('deck below minimum size should be invalid', () => {
     expect(
       deckInSizeRange({
-        cards: { a: 3 },
-        rulesCard: { deckLimits: { size: [4, 8] } },
+        name: 'Test',
+        cards: { score: 3 },
+        rulesCard: rulesWithSize([4, 8]),
       }),
     ).toBe(false)
   })
@@ -41,8 +49,9 @@ describe('deckInSizeRange', () => {
   it('deck above maximum size should be invalid', () => {
     expect(
       deckInSizeRange({
-        cards: { a: 9 },
-        rulesCard: { deckLimits: { size: [4, 8] } },
+        name: 'Test',
+        cards: { score: 9 },
+        rulesCard: rulesWithSize([4, 8]),
       }),
     ).toBe(false)
   })
@@ -50,8 +59,9 @@ describe('deckInSizeRange', () => {
   it('deck with minimum size should be valid', () => {
     expect(
       deckInSizeRange({
-        cards: { a: 4 },
-        rulesCard: { deckLimits: { size: [4, 8] } },
+        name: 'Test',
+        cards: { score: 4 },
+        rulesCard: rulesWithSize([4, 8]),
       }),
     ).toBe(true)
   })
@@ -59,8 +69,9 @@ describe('deckInSizeRange', () => {
   it('deck between range should be valid', () => {
     expect(
       deckInSizeRange({
-        cards: { a: 6 },
-        rulesCard: { deckLimits: { size: [4, 8] } },
+        name: 'Test',
+        cards: { score: 6 },
+        rulesCard: rulesWithSize([4, 8]),
       }),
     ).toBe(true)
   })
@@ -68,8 +79,9 @@ describe('deckInSizeRange', () => {
   it('deck with maximum size should be valid', () => {
     expect(
       deckInSizeRange({
-        cards: { a: 8 },
-        rulesCard: { deckLimits: { size: [4, 8] } },
+        name: 'Test',
+        cards: { score: 8 },
+        rulesCard: rulesWithSize([4, 8]),
       }),
     ).toBe(true)
   })
