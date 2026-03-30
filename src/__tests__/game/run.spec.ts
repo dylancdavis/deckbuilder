@@ -4,11 +4,12 @@ import {
   moveCards,
   populateDrawPile,
   processStartOfGame,
+  Run,
 } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
-import type { AddCardsEffect, RulesCard } from '../../utils/cards.ts'
-import type { Run } from '../../stores/game.ts'
+import type { RulesCard } from '../../utils/cards.ts'
 import type { GameState } from '../../utils/game.ts'
+import { AddCardsEffect } from '../../utils/effects.ts'
 
 // Helper to wrap a Run in a minimal GameState for testing
 const wrapInGameState = (run: Run): GameState => ({
@@ -34,6 +35,7 @@ const baseRules: RulesCard = {
   effects: {
     gameStart: [],
   },
+  abilities: [],
 }
 
 const addThreeScore: AddCardsEffect = {
@@ -57,6 +59,7 @@ const rulesWithAddedCards: RulesCard = {
   turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
   endConditions: { rounds: 1 },
   effects: { gameStart: [addThreeScore] },
+  abilities: [],
 }
 
 const preMoveRun: Partial<Run> = {
@@ -169,5 +172,4 @@ describe('processStartOfGame', () => {
     const idCounter = pileToIdCounter(result.game.run!.cards.drawPile)
     expect(idCounter).toEqual({ a: 3, b: 2, c: 1, score: 3 })
   })
-
 })
