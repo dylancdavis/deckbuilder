@@ -4,12 +4,12 @@ import {
   moveCards,
   populateDrawPile,
   processStartOfGame,
-  Run,
+  type Run,
 } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
 import type { RulesCard } from '../../utils/cards.ts'
 import type { GameState } from '../../utils/game.ts'
-import { AddCardsEffect } from '../../utils/effects.ts'
+import type { AddCardsEffect } from '@/utils/effects.ts'
 
 // Helper to wrap a Run in a minimal GameState for testing
 const wrapInGameState = (run: Run): GameState => ({
@@ -127,7 +127,7 @@ const exampleCounter = { score: 4 }
 
 const emptyHandRun: Run = {
   resources: { points: 0 },
-  cards: { drawPile: [], hand: [], discardPile: [], board: [] },
+  cards: { drawPile: [], hand: [], discardPile: [], board: [], stack: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: rulesWithAddedCards },
   stats: { turns: 1, rounds: 1 },
 }
@@ -148,14 +148,14 @@ const examplePile = [a, a, a, b, b, c]
 const populatedHandRun: Run = {
   resources: { points: 0 },
   cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
-  deck: { name: '',  cards: exampleCounter, rulesCard: rulesWithAddedCards },
+  deck: { name: '', cards: exampleCounter, rulesCard: rulesWithAddedCards },
   stats: { turns: 1, rounds: 1 },
 }
 
 const populatedHandRunNoAdded: Run = {
   resources: { points: 0 },
   cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
-  deck: { name: '',  cards: exampleCounter, rulesCard: baseRules },
+  deck: { name: '', cards: exampleCounter, rulesCard: baseRules },
   stats: { turns: 1, rounds: 1 },
 }
 
