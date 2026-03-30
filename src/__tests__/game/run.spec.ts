@@ -7,7 +7,12 @@ import {
   type Run,
 } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
-import type { RulesCard } from '../../utils/cards.ts'
+import {
+  playableCards,
+  type CardInstance,
+  type RulesCard,
+  type PlayableCardID,
+} from '../../utils/cards.ts'
 import type { GameState } from '../../utils/game.ts'
 import type { AddCardsEffect } from '@/utils/effects.ts'
 
@@ -62,13 +67,33 @@ const rulesWithAddedCards: RulesCard = {
   abilities: [],
 }
 
-const preMoveRun: Partial<Run> = {
+const card = (id: PlayableCardID, instanceId: string): CardInstance => ({
+  ...playableCards[id],
+  instanceId,
+})
+
+const cA = card('score', 'a')
+const cB = card('score', 'b')
+const cC = card('score', 'c')
+const cD = card('score', 'd')
+const cE = card('score', 'e')
+const cF = card('score', 'f')
+const cG = card('score', 'g')
+const cH = card('score', 'h')
+const cI = card('score', 'i')
+
+const preMoveRun: Run = {
   cards: {
-    drawPile: ['a', 'b', 'c', 'd', 'e'],
-    hand: ['f', 'g', 'h', 'i'],
+    drawPile: [cA, cB, cC, cD, cE],
+    hand: [cF, cG, cH, cI],
     discardPile: [],
     board: [],
+    stack: [],
   },
+  deck: { name: '', cards: {}, rulesCard: baseRules },
+  resources: { points: 0 },
+  stats: { turns: 1, rounds: 1 },
+  events: [],
 }
 
 describe('moveCardByIndex', () => {
@@ -76,10 +101,11 @@ describe('moveCardByIndex', () => {
     const result = moveCardByIndex(preMoveRun, 'hand', 'discardPile', 1)
     expect(result).toEqual({
       cards: {
-        drawPile: ['a', 'b', 'c', 'd', 'e'],
-        hand: ['f', 'h', 'i'],
-        discardPile: ['g'],
+        drawPile: [cA, cB, cC, cD, cE],
+        hand: [cF, cH, cI],
+        discardPile: [cG],
         board: [],
+        stack: [],
       },
     })
   })
@@ -88,10 +114,11 @@ describe('moveCardByIndex', () => {
     const result = moveCardByIndex(preMoveRun, 'hand', 'board', 2, 0)
     expect(result).toEqual({
       cards: {
-        drawPile: ['a', 'b', 'c', 'd', 'e'],
-        hand: ['f', 'g', 'i'],
+        drawPile: [cA, cB, cC, cD, cE],
+        hand: [cF, cG, cI],
         discardPile: [],
-        board: ['h'],
+        board: [cH],
+        stack: [],
       },
     })
   })
@@ -102,10 +129,11 @@ describe('moveCards', () => {
     const result = moveCards(preMoveRun, 'drawPile', 'hand', 3)
     expect(result).toEqual({
       cards: {
-        drawPile: ['d', 'e'],
-        hand: ['f', 'g', 'h', 'i', 'a', 'b', 'c'],
+        drawPile: [cD, cE],
+        hand: [cF, cG, cH, cI, cA, cB, cC],
         discardPile: [],
         board: [],
+        stack: [],
       },
     })
   })
@@ -114,10 +142,11 @@ describe('moveCards', () => {
     const result = moveCards(preMoveRun, 'drawPile', 'discardPile', 3)
     expect(result).toEqual({
       cards: {
-        drawPile: ['d', 'e'],
-        hand: ['f', 'g', 'h', 'i'],
-        discardPile: ['a', 'b', 'c'],
+        drawPile: [cD, cE],
+        hand: [cF, cG, cH, cI],
+        discardPile: [cA, cB, cC],
         board: [],
+        stack: [],
       },
     })
   })
@@ -130,6 +159,7 @@ const emptyHandRun: Run = {
   cards: { drawPile: [], hand: [], discardPile: [], board: [], stack: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: rulesWithAddedCards },
   stats: { turns: 1, rounds: 1 },
+  events: [],
 }
 
 describe('populateDrawPile', () => {
@@ -140,23 +170,25 @@ describe('populateDrawPile', () => {
   })
 })
 
-const a = { id: 'a' }
-const b = { id: 'b' }
-const c = { id: 'c' }
-const examplePile = [a, a, a, b, b, c]
+const pileA = card('score', 'p1')
+const pileB = card('collect-basic', 'p2')
+const pileC = card('dual-score', 'p3')
+const examplePile = [pileA, pileA, pileA, pileB, pileB, pileC]
 
 const populatedHandRun: Run = {
   resources: { points: 0 },
-  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
+  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [], stack: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: rulesWithAddedCards },
   stats: { turns: 1, rounds: 1 },
+  events: [],
 }
 
 const populatedHandRunNoAdded: Run = {
   resources: { points: 0 },
-  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
+  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [], stack: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: baseRules },
   stats: { turns: 1, rounds: 1 },
+  events: [],
 }
 
 describe('processStartOfGame', () => {
@@ -170,6 +202,6 @@ describe('processStartOfGame', () => {
     const gameState = wrapInGameState(populatedHandRun)
     const result = processStartOfGame(gameState)
     const idCounter = pileToIdCounter(result.game.run!.cards.drawPile)
-    expect(idCounter).toEqual({ a: 3, b: 2, c: 1, score: 3 })
+    expect(idCounter).toEqual({ score: 6, 'collect-basic': 2, 'dual-score': 1 })
   })
 })
