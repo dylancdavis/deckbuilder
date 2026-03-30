@@ -15,6 +15,7 @@ npm run dev
 ### Run Storybook
 
 > Note: Currently incompatible with Vue Devtools; disable in `vite.config.ts` to prevent errors.
+
 ```sh
 npm run storybook
 ```
@@ -28,7 +29,7 @@ npm run build
 ### Run Unit Tests with [Vitest](https://vitest.dev/)
 
 ```sh
-npm run test:unit
+npm run test
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
@@ -36,4 +37,3 @@ npm run test:unit
 ```sh
 npm run lint
 ```
-
