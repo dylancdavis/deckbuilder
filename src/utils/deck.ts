@@ -17,7 +17,6 @@ export type Deck = {
   name: string
   rulesCard: RulesCard | null
   cards: Counter<PlayableCardID>
-  editable: boolean
 }
 
 /**

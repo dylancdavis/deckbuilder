@@ -5,5 +5,5 @@ export const startingDeck: Deck = {
   name: 'Starter Deck',
   cards: {},
   rulesCard: cards['starter-rules'],
-  editable: false,
+
 }

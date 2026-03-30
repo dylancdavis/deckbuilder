@@ -175,7 +175,7 @@ it('score-synergy gains points for each score in deck', () => {
     resources: { points: 0 },
     deck: {
       name: 'Test Deck',
-      editable: false,
+
       cards: { score: 5 },
       rulesCard: starterRules,
     },

@@ -8,7 +8,7 @@ import { starterRules } from '../../../utils/cards'
 export const createTestRun = (overrides: Partial<Run> = {}): Run => ({
   deck: {
     name: 'Test Deck',
-    editable: false,
+
     cards: { score: 1 },
     rulesCard: starterRules,
   },

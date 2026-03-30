@@ -11,7 +11,7 @@ function createTestRun(cards: Partial<Run['cards']> = {}): Run {
       name: 'Test Deck',
       rulesCard: starterRules,
       cards: {},
-      editable: false,
+
     },
     cards: {
       drawPile: [],

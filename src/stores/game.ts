@@ -129,7 +129,7 @@ export const useGameStore = defineStore('game', () => {
       name: name,
       rulesCard: null,
       cards: {},
-      editable: true,
+
     }
     return newDeckKey
   }
