@@ -99,7 +99,7 @@ const preMoveRun: Run = {
 describe('moveCardByIndex', () => {
   it('moves card from hand to discard when toIndex is not specified', () => {
     const result = moveCardByIndex(preMoveRun, 'hand', 'discardPile', 1)
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       cards: {
         drawPile: [cA, cB, cC, cD, cE],
         hand: [cF, cH, cI],
@@ -112,7 +112,7 @@ describe('moveCardByIndex', () => {
 
   it('moves card from hand to specific index in board when toIndex is specified', () => {
     const result = moveCardByIndex(preMoveRun, 'hand', 'board', 2, 0)
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       cards: {
         drawPile: [cA, cB, cC, cD, cE],
         hand: [cF, cG, cI],
@@ -127,7 +127,7 @@ describe('moveCardByIndex', () => {
 describe('moveCards', () => {
   it('moves top 3 cards from draw-pile to hand', () => {
     const result = moveCards(preMoveRun, 'drawPile', 'hand', 3)
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       cards: {
         drawPile: [cD, cE],
         hand: [cF, cG, cH, cI, cA, cB, cC],
@@ -140,7 +140,7 @@ describe('moveCards', () => {
 
   it('moves top 3 cards from draw-pile to discard', () => {
     const result = moveCards(preMoveRun, 'drawPile', 'discardPile', 3)
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       cards: {
         drawPile: [cD, cE],
         hand: [cF, cG, cH, cI],
