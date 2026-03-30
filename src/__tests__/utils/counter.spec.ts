@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { add, makeCounter, sub, total, missingCounts, mergeCounters } from '../../utils/counter.js'
+import {
+  add,
+  makeCounter,
+  sub,
+  total,
+  missingCounts,
+  mergeCounters,
+  type Counter,
+} from '../../utils/counter.js'
 
 describe('Counter', () => {
   describe('add', () => {
@@ -12,7 +20,7 @@ describe('Counter', () => {
     })
 
     it('adds new key to existing counter', () => {
-      expect(add({ a: 1 }, 'b')).toEqual({ a: 1, b: 1 })
+      expect(add({ a: 1 } as Counter, 'b')).toEqual({ a: 1, b: 1 })
     })
   })
 
@@ -40,7 +48,7 @@ describe('Counter', () => {
     })
 
     it('subtracts non-existing key does nothing', () => {
-      expect(sub({ a: 2 }, 'b')).toEqual({ a: 2 })
+      expect(sub({ a: 2 } as Counter, 'b')).toEqual({ a: 2 })
     })
 
     it('subtracts more than available removes key', () => {
