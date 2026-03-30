@@ -156,9 +156,9 @@ it('score-surge gains points for each score played this round', () => {
     cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
     resources: { points: 0 },
     events: [
-      { type: 'card-play', round: 1, turn: 1, cardId: 'score' },
-      { type: 'card-play', round: 1, turn: 1, cardId: 'score' },
-      { type: 'card-play', round: 1, turn: 1, cardId: 'score' },
+      { type: 'card-play', round: 1, turn: 1, cardId: 'score', instanceId: 'i-1' },
+      { type: 'card-play', round: 1, turn: 1, cardId: 'score', instanceId: 'i-2' },
+      { type: 'card-play', round: 1, turn: 1, cardId: 'score', instanceId: 'i-3' },
     ],
     stats: { turns: 1, rounds: 1 },
   })
