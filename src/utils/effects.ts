@@ -152,6 +152,11 @@ export type Effect =
   | RunEndEffect
   | RefreshDeckEffect
 
+/** No-op handler — returns game state unchanged with no events. */
+function handleIdentity(gameState: GameState): { game: GameState; events: Event[] } {
+  return { game: gameState, events: [] }
+}
+
 function handleUpdateResource(
   gameState: GameState,
   effect: UpdateResourceEffect,
@@ -521,9 +526,13 @@ export function handleEffect(
         events,
       }
     }
-    default: {
-      throw new Error(`Unknown effect type: ${JSON.stringify(effect.type)}`)
-    }
+    // TODO: implement these effect handlers
+    case 'discard-cards':
+    case 'move-card':
+    case 'retrigger-card':
+    case 'card-choice':
+      console.warn('unimplemented effect handle; falling back to no-op')
+      return handleIdentity(gameState)
   }
 }
 
