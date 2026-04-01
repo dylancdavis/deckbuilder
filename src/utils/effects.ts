@@ -152,6 +152,53 @@ export type Effect =
   | RunEndEffect
   | RefreshDeckEffect
 
+function handleUpdateResource(
+  gameState: GameState,
+  effect: UpdateResourceEffect,
+): { game: GameState; events: Event[] } {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const resource = effect.params.resource
+  const oldValue = run.resources[resource]
+  let newValue: number
+
+  if ('delta' in effect.params) {
+    newValue = oldValue + effect.params.delta
+  } else if ('set' in effect.params) {
+    newValue = effect.params.set
+  } else {
+    newValue = effect.params.update(oldValue, run)
+  }
+
+  const event: ResourceChangeEvent = {
+    type: 'resource-change',
+    resource,
+    oldValue,
+    newValue,
+    delta: newValue - oldValue,
+    round,
+    turn,
+  }
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          resources: {
+            ...run.resources,
+            [effect.params.resource]: newValue,
+          },
+        },
+      },
+    },
+    events: [event],
+  }
+}
+
 /**
  * Handles a given effect and updates the event log if the effect successfully generated events.
  * Returns the new GameState and any generated events.
@@ -166,46 +213,8 @@ export function handleEffect(
   const turn = run.stats.turns
 
   switch (effect.type) {
-    case 'update-resource': {
-      const resource = effect.params.resource
-      const oldValue = run.resources[resource]
-      let newValue: number
-
-      if ('delta' in effect.params) {
-        newValue = oldValue + effect.params.delta
-      } else if ('set' in effect.params) {
-        newValue = effect.params.set
-      } else {
-        newValue = effect.params.update(oldValue, run)
-      }
-
-      const event: ResourceChangeEvent = {
-        type: 'resource-change',
-        resource,
-        oldValue,
-        newValue,
-        delta: newValue - oldValue,
-        round,
-        turn,
-      }
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              resources: {
-                ...run.resources,
-                [effect.params.resource]: newValue,
-              },
-            },
-          },
-        },
-        events: [event],
-      }
-    }
+    case 'update-resource':
+      return handleUpdateResource(gameState, effect)
     case 'add-cards': {
       const { location, cards, mode } = effect.params
       const shuffledIDs = shuffle(toArray(cards))
