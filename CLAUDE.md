@@ -24,7 +24,7 @@ Always verify changes by running tests before committing.
 
 ### Testing
 
-- `npm run test:unit` - Run unit tests with Vitest
+- `npm test` - Run unit tests with Vitest
 - Test files are located in `src/__tests__/` with `.spec.ts` extension
 
 ## Architecture
