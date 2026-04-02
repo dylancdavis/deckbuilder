@@ -152,15 +152,14 @@ export type Effect =
   | RunEndEffect
   | RefreshDeckEffect
 
+type EffectResult = { game: GameState; events: Event[] }
+
 /** No-op handler — returns game state unchanged with no events. */
-function handleIdentity(gameState: GameState): { game: GameState; events: Event[] } {
+function handleIdentity(gameState: GameState): EffectResult {
   return { game: gameState, events: [] }
 }
 
-function handleUpdateResource(
-  gameState: GameState,
-  effect: UpdateResourceEffect,
-): { game: GameState; events: Event[] } {
+function handleUpdateResource(gameState: GameState, effect: UpdateResourceEffect): EffectResult {
   const run = gameState.game.run!
   const round = run.stats.rounds
   const turn = run.stats.turns
@@ -204,328 +203,370 @@ function handleUpdateResource(
   }
 }
 
+function handleAddCards(gameState: GameState, effect: AddCardsEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { location, cards, mode } = effect.params
+  const shuffledIDs = shuffle(toArray(cards))
+  const cardsToAdd = shuffledIDs.map((id) => ({
+    ...playableCards[id],
+    instanceId: crypto.randomUUID(),
+  }))
+  const existingCards = run.cards[location]
+  let newCardArr: CardInstance[]
+  if (mode === 'top') {
+    newCardArr = [...cardsToAdd, ...existingCards]
+  } else if (mode === 'bottom') {
+    newCardArr = [...existingCards, ...cardsToAdd]
+  } else {
+    newCardArr = shuffle([...existingCards, ...cardsToAdd])
+  }
+
+  const events: CardAddEvent[] = cardsToAdd.map((card) => ({
+    type: 'card-add',
+    cardId: card.id,
+    instanceId: card.instanceId,
+    toLocation: location,
+    round,
+    turn,
+  }))
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: {
+            ...run.cards,
+            [location]: newCardArr,
+          },
+        },
+      },
+    },
+    events,
+  }
+}
+
+function handleCollectCard(gameState: GameState, effect: CollectCardEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { cards } = effect.params
+
+  const events: CardCollectEvent[] = toArray(cards).map((cardId) => ({
+    type: 'card-collect',
+    cardId,
+    round,
+    turn,
+  }))
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        collection: {
+          ...gameState.game.collection,
+          cards: mergeCounters(gameState.game.collection.cards, cards),
+        },
+      },
+    },
+    events,
+  }
+}
+
+function handleDestroyCard(gameState: GameState, effect: DestroyCardEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { cards } = effect.params
+
+  const events: CardDestroyEvent[] = toArray(cards).map((cardId) => ({
+    type: 'card-destroy',
+    cardId,
+    round,
+    turn,
+  }))
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        collection: {
+          ...gameState.game.collection,
+          cards: subtractCounters(gameState.game.collection.cards, cards),
+        },
+      },
+    },
+    events,
+  }
+}
+
+function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): EffectResult {
+  if ('matching' in effect.params) throw new Error('Card matcher removal not yet implemented')
+
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { instanceId } = effect.params
+
+  const updatedCards = { ...run.cards }
+  let removedCard: CardRemoveEvent | null = null
+
+  for (const location of locations) {
+    const cardIndex = updatedCards[location].findIndex((card) => card.instanceId === instanceId)
+    if (cardIndex !== -1) {
+      const card = updatedCards[location][cardIndex]
+
+      removedCard = {
+        type: 'card-remove',
+        cardId: card.id,
+        instanceId: card.instanceId,
+        fromLocation: location,
+        round,
+        turn,
+      }
+
+      updatedCards[location] = [
+        ...updatedCards[location].slice(0, cardIndex),
+        ...updatedCards[location].slice(cardIndex + 1),
+      ]
+      break
+    }
+  }
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: updatedCards,
+        },
+      },
+    },
+    events: removedCard ? [removedCard] : [],
+  }
+}
+
+function handleTurnStart(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const newTurn = run.stats.turns + 1
+  const event: TurnStartEvent = {
+    type: 'turn-start',
+    round: run.stats.rounds,
+    turn: newTurn,
+  }
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          stats: {
+            ...run.stats,
+            turns: newTurn,
+          },
+        },
+      },
+    },
+    events: [event],
+  }
+}
+
+function handleTurnEnd(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const event: TurnEndEvent = {
+    type: 'turn-end',
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  return {
+    game: gameState,
+    events: [event],
+  }
+}
+
+function handleRoundStart(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const newRound = run.stats.rounds + 1
+  const event: Event = {
+    type: 'round-start',
+    round: newRound,
+    turn: 0,
+  }
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          stats: {
+            ...run.stats,
+            rounds: newRound,
+            turns: 0,
+          },
+        },
+      },
+    },
+    events: [event],
+  }
+}
+
+function handleRoundEnd(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const event: Event = {
+    type: 'round-end',
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  return {
+    game: gameState,
+    events: [event],
+  }
+}
+
+function handleRunStart(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const event: Event = {
+    type: 'run-start',
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  return {
+    game: gameState,
+    events: [event],
+  }
+}
+
+function handleRunEnd(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const event: Event = {
+    type: 'run-end',
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  return {
+    game: gameState,
+    events: [event],
+  }
+}
+
+function handleRefreshDeck(gameState: GameState): EffectResult {
+  const run = gameState.game.run!
+  const allCards = [...run.cards.hand, ...run.cards.board, ...run.cards.discardPile]
+  allCards.sort(() => Math.random() - 0.5)
+
+  const event: DeckRefreshEvent = {
+    type: 'deck-refresh',
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: {
+            ...run.cards,
+            drawPile: allCards,
+            hand: [],
+            board: [],
+            discardPile: [],
+          },
+        },
+      },
+    },
+    events: [event],
+  }
+}
+
+function handleDrawCards(gameState: GameState, effect: DrawCardsEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { amount } = effect.params
+  const drawPile = run.cards.drawPile
+  const cardsToDraw = drawPile.slice(0, amount)
+  const remainingDrawPile = drawPile.slice(amount)
+
+  const events: CardDrawEvent[] = cardsToDraw.map((card) => ({
+    type: 'card-draw',
+    cardId: card.id,
+    instanceId: card.instanceId,
+    round,
+    turn,
+  }))
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: {
+            ...run.cards,
+            drawPile: remainingDrawPile,
+            hand: [...run.cards.hand, ...cardsToDraw],
+          },
+        },
+      },
+    },
+    events,
+  }
+}
+
 /**
  * Handles a given effect and updates the event log if the effect successfully generated events.
  * Returns the new GameState and any generated events.
  */
-export function handleEffect(
-  gameState: GameState,
-  effect: Effect,
-): { game: GameState; events: Event[] } {
+export function handleEffect(gameState: GameState, effect: Effect): EffectResult {
   if (!gameState.game.run) throw new Error('No active run in game state')
-  const run = gameState.game.run
-  const round = run.stats.rounds
-  const turn = run.stats.turns
 
   switch (effect.type) {
     case 'update-resource':
       return handleUpdateResource(gameState, effect)
-    case 'add-cards': {
-      const { location, cards, mode } = effect.params
-      const shuffledIDs = shuffle(toArray(cards))
-      const cardsToAdd = shuffledIDs.map((id) => ({
-        ...playableCards[id],
-        instanceId: crypto.randomUUID(),
-      }))
-      const existingCards = run.cards[location]
-      let newCardArr: CardInstance[]
-      if (mode === 'top') {
-        newCardArr = [...cardsToAdd, ...existingCards]
-      } else if (mode === 'bottom') {
-        newCardArr = [...existingCards, ...cardsToAdd]
-      } else {
-        newCardArr = shuffle([...existingCards, ...cardsToAdd])
-      }
-
-      const events: CardAddEvent[] = cardsToAdd.map((card) => ({
-        type: 'card-add',
-        cardId: card.id,
-        instanceId: card.instanceId,
-        toLocation: location,
-        round,
-        turn,
-      }))
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              cards: {
-                ...run.cards,
-                [location]: newCardArr,
-              },
-            },
-          },
-        },
-        events,
-      }
-    }
-    case 'collect-card': {
-      const { cards } = effect.params
-
-      const collectedCardIds = toArray(cards)
-
-      const events: CardCollectEvent[] = collectedCardIds.map((cardId) => ({
-        type: 'card-collect',
-        cardId,
-        round,
-        turn,
-      }))
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            collection: {
-              ...gameState.game.collection,
-              cards: mergeCounters(gameState.game.collection.cards, cards),
-            },
-          },
-        },
-        events,
-      }
-    }
-    case 'destroy-card': {
-      const { cards } = effect.params
-
-      const destroyedCardIds = toArray(cards)
-
-      const events: CardDestroyEvent[] = destroyedCardIds.map((cardId) => ({
-        type: 'card-destroy',
-        cardId,
-        round,
-        turn,
-      }))
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            collection: {
-              ...gameState.game.collection,
-              cards: subtractCounters(gameState.game.collection.cards, cards),
-            },
-          },
-        },
-        events,
-      }
-    }
-    case 'remove-card': {
-      if ('matching' in effect.params) throw new Error('Card matcher removal not yet implemented')
-
-      const { instanceId } = effect.params
-
-      // Find the location containing the card with the matching instanceId
-      const updatedCards = { ...run.cards }
-      let removedCard: CardRemoveEvent | null = null
-
-      for (const location of locations) {
-        const cardIndex = updatedCards[location].findIndex((card) => card.instanceId === instanceId)
-        if (cardIndex !== -1) {
-          const card = updatedCards[location][cardIndex]
-
-          // Create event for the removed card
-          removedCard = {
-            type: 'card-remove',
-            cardId: card.id,
-            instanceId: card.instanceId,
-            fromLocation: location,
-            round,
-            turn,
-          }
-
-          // Remove the card from this location
-          updatedCards[location] = [
-            ...updatedCards[location].slice(0, cardIndex),
-            ...updatedCards[location].slice(cardIndex + 1),
-          ]
-          break
-        }
-      }
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              cards: updatedCards,
-            },
-          },
-        },
-        events: removedCard ? [removedCard] : [],
-      }
-    }
-    case 'turn-start': {
-      const newTurn = turn + 1
-      const event: TurnStartEvent = {
-        type: 'turn-start',
-        round: round,
-        turn: newTurn,
-      }
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              stats: {
-                ...run.stats,
-                turns: newTurn,
-              },
-            },
-          },
-        },
-        events: [event],
-      }
-    }
-    case 'turn-end': {
-      const event: TurnEndEvent = {
-        type: 'turn-end',
-        round,
-        turn,
-      }
-
-      return {
-        game: gameState,
-        events: [event],
-      }
-    }
-    case 'round-start': {
-      const newRound = round + 1
-      const event: Event = {
-        type: 'round-start',
-        round: newRound,
-        turn: 0,
-      }
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              stats: {
-                ...run.stats,
-                rounds: newRound,
-                turns: 0,
-              },
-            },
-          },
-        },
-        events: [event],
-      }
-    }
-    case 'round-end': {
-      const event: Event = {
-        type: 'round-end',
-        round,
-        turn,
-      }
-
-      return {
-        game: gameState,
-        events: [event],
-      }
-    }
-    case 'run-start': {
-      const event: Event = {
-        type: 'run-start',
-        round,
-        turn,
-      }
-
-      return {
-        game: gameState,
-        events: [event],
-      }
-    }
-    case 'run-end': {
-      const event: Event = {
-        type: 'run-end',
-        round,
-        turn,
-      }
-
-      return {
-        game: gameState,
-        events: [event],
-      }
-    }
-    case 'refresh-deck': {
-      // Collect all cards from hand, board, and discard pile
-      const allCards = [...run.cards.hand, ...run.cards.board, ...run.cards.discardPile]
-
-      // Shuffle the collected cards
-      allCards.sort(() => Math.random() - 0.5)
-
-      const event: DeckRefreshEvent = {
-        type: 'deck-refresh',
-        round: run.stats.rounds,
-        turn: run.stats.turns,
-      }
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              cards: {
-                ...run.cards,
-                drawPile: allCards,
-                hand: [],
-                board: [],
-                discardPile: [],
-              },
-            },
-          },
-        },
-        events: [event],
-      }
-    }
-    case 'draw-cards': {
-      const { amount } = effect.params
-      const drawPile = run.cards.drawPile
-      const cardsToDraw = drawPile.slice(0, amount)
-      const remainingDrawPile = drawPile.slice(amount)
-
-      const events: CardDrawEvent[] = cardsToDraw.map((card) => ({
-        type: 'card-draw',
-        cardId: card.id,
-        instanceId: card.instanceId,
-        round,
-        turn,
-      }))
-
-      return {
-        game: {
-          ...gameState,
-          game: {
-            ...gameState.game,
-            run: {
-              ...run,
-              cards: {
-                ...run.cards,
-                drawPile: remainingDrawPile,
-                hand: [...run.cards.hand, ...cardsToDraw],
-              },
-            },
-          },
-        },
-        events,
-      }
-    }
+    case 'add-cards':
+      return handleAddCards(gameState, effect)
+    case 'collect-card':
+      return handleCollectCard(gameState, effect)
+    case 'destroy-card':
+      return handleDestroyCard(gameState, effect)
+    case 'remove-card':
+      return handleRemoveCard(gameState, effect)
+    case 'draw-cards':
+      return handleDrawCards(gameState, effect)
+    case 'turn-start':
+      return handleTurnStart(gameState)
+    case 'turn-end':
+      return handleTurnEnd(gameState)
+    case 'round-start':
+      return handleRoundStart(gameState)
+    case 'round-end':
+      return handleRoundEnd(gameState)
+    case 'run-start':
+      return handleRunStart(gameState)
+    case 'run-end':
+      return handleRunEnd(gameState)
+    case 'refresh-deck':
+      return handleRefreshDeck(gameState)
     // TODO: implement these effect handlers
     case 'discard-cards':
     case 'move-card':
