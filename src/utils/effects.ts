@@ -467,7 +467,13 @@ function handleRunEnd(gameState: GameState): EffectResult {
 
 function handleRefreshDeck(gameState: GameState): EffectResult {
   const run = gameState.game.run!
-  const allCards = [...run.cards.hand, ...run.cards.board, ...run.cards.discardPile]
+  const allCards = [
+    ...run.cards.drawPile,
+    ...run.cards.hand,
+    ...run.cards.stack,
+    ...run.cards.board,
+    ...run.cards.discardPile,
+  ]
   allCards.sort(() => Math.random() - 0.5)
 
   const event: DeckRefreshEvent = {
