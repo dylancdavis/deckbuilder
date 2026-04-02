@@ -300,6 +300,33 @@ describe('starter deck run', () => {
     })
   })
 
+  describe('discard effects', () => {
+    async function startDiscardTestRun() {
+      renderApp()
+      await fireEvent.click(screen.getByText('Discard Test Deck'))
+      await fireEvent.click(screen.getByText('Run This Deck'))
+    }
+
+    const getBoardSize = () => screen.queryAllByTestId('board-card').length
+
+    it('playing a discard card removes cards from hand and board', async () => {
+      await startDiscardTestRun()
+
+      // Initial state: hand = [hand-board-discard, score], board = [score]
+      expect(getHandSize()).toBe(2)
+      expect(getBoardSize()).toBe(1)
+
+      // Play hand-board-discard (first card)
+      await playFirstHandCard()
+
+      // hand-board-discard discards 1 from hand (score) and 1 from board (score)
+      // The played card itself also goes to discard
+      expect(getHandSize()).toBe(0)
+      expect(getBoardSize()).toBe(0)
+      expect(getDiscardPileCount()).toBe('3')
+    })
+  })
+
   // Choice tests
   describe('card choice modal', () => {
     it('playing collect-basic opens the choice modal', async () => {

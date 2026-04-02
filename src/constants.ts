@@ -5,5 +5,10 @@ export const startingDeck: Deck = {
   name: 'Starter Deck',
   cards: {},
   rulesCard: cards['starter-rules'],
+}
 
+export const discardTestDeck: Deck = {
+  name: 'Discard Test Deck',
+  cards: {},
+  rulesCard: cards['discard-test-rules'],
 }

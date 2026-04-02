@@ -180,7 +180,7 @@ export const starterRules: RulesCard = {
     },
     {
       trigger: { on: 'turn-end' },
-      effects: [{ type: 'discard-cards', params: { amount: 'all' } }],
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     // Run end condition - end after first (and only) round
     {
@@ -523,7 +523,7 @@ export const testRules: RulesCard = {
     },
     {
       trigger: { on: 'turn-end' },
-      effects: [{ type: 'discard-cards', params: { amount: 'all' } }],
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     // Run end condition
     {
@@ -536,9 +536,58 @@ export const testRules: RulesCard = {
   ],
 }
 
+export const discardTestRules: RulesCard = {
+  type: 'rules',
+  id: 'discard-test-rules',
+  name: 'Discard Test Rules',
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
+  deckLimits: { size: [0, 4] },
+  turnStructure: {
+    drawAmount: 2,
+    playAmount: 1,
+    discardAmount: 'all',
+  },
+  endConditions: { rounds: 1 },
+  effects: {
+    gameStart: [
+      {
+        type: 'add-cards',
+        params: {
+          location: 'drawPile',
+          cards: { 'hand-board-discard': 1, score: 1 },
+          mode: 'top',
+        },
+      },
+      {
+        type: 'add-cards',
+        params: { location: 'board', cards: { score: 1 }, mode: 'top' },
+      },
+    ],
+  },
+  abilities: [
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+    },
+    {
+      trigger: { on: 'round-end' },
+      effects: [{ type: 'run-end', params: {} }],
+    },
+  ],
+}
+
 export const rulesCards = {
   'starter-rules': starterRules,
   'test-rules': testRules,
+  'discard-test-rules': discardTestRules,
 } as const
 
 // === TEST CARDS FOR PROBLEMATIC SCENARIOS ===
@@ -734,6 +783,28 @@ export const drawBonusPlus: PlayableCard = {
   },
 }
 
+export const handBoardDiscard: PlayableCard = {
+  type: 'playable',
+  id: 'hand-board-discard',
+  name: 'Hand & Board Discard',
+  description: 'Discard 1 from hand and 1 from board.',
+  abilities: [
+    {
+      trigger: { on: 'card-play', target: 'self' },
+      effects: [
+        { type: 'discard-cards', params: { from: 'hand', amount: 1 } },
+        { type: 'discard-cards', params: { from: 'board', amount: 1 } },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
+}
+
 export const playableCards = {
   score: score,
   'collect-basic': collectBasic,
@@ -755,6 +826,7 @@ export const playableCards = {
   'lucky-draw': luckyDraw,
   'point-draw': pointDraw,
   'draw-bonus-plus': drawBonusPlus,
+  'hand-board-discard': handBoardDiscard,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }

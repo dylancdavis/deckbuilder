@@ -1,6 +1,6 @@
 import { ref, computed, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import { startingDeck } from '../constants.ts'
+import { startingDeck, discardTestDeck } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
 import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
 import { cards } from '@/utils/cards.ts'
@@ -23,6 +23,8 @@ const initialCollectionCards: Counter<CardID> = {
   'starter-rules': 1,
   // Test cards
   'test-rules': 1,
+  'discard-test-rules': 1,
+  'hand-board-discard': 4,
   'double-choice': 4,
   'choice-draw': 4,
   'draw-watcher': 4,
@@ -34,7 +36,7 @@ export const useGameStore = defineStore('game', () => {
     game: {
       collection: {
         cards: initialCollectionCards,
-        decks: { startingDeck: startingDeck },
+        decks: { startingDeck: startingDeck, discardTestDeck: discardTestDeck },
       },
       run: null,
     },
