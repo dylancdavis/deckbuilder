@@ -482,7 +482,6 @@ function handleRefreshDeck(gameState: GameState): EffectResult {
     ...run.cards.board,
     ...run.cards.discardPile,
   ]
-  allCards.sort(() => Math.random() - 0.5)
 
   const event: DeckRefreshEvent = {
     type: 'deck-refresh',
@@ -499,7 +498,7 @@ function handleRefreshDeck(gameState: GameState): EffectResult {
           ...run,
           cards: {
             ...run.cards,
-            drawPile: allCards,
+            drawPile: shuffle(allCards),
             hand: [],
             board: [],
             discardPile: [],
