@@ -151,6 +151,18 @@ function transformSelfReferences(effect: Effect, instanceId: string): Effect {
       },
     } as Effect
   }
+  if ('instanceIds' in effect.params) {
+    const ids = effect.params.instanceIds as (string | 'self')[]
+    if (ids.includes('self')) {
+      return {
+        ...effect,
+        params: {
+          ...effect.params,
+          instanceIds: ids.map((id) => (id === 'self' ? instanceId : id)),
+        },
+      } as Effect
+    }
+  }
   return effect
 }
 

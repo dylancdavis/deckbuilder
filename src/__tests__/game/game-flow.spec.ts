@@ -327,6 +327,32 @@ describe('starter deck run', () => {
     })
   })
 
+  describe('move effects', () => {
+    async function startMoveTestRun() {
+      renderApp()
+      await fireEvent.click(screen.getByText('Move Test Deck'))
+      await fireEvent.click(screen.getByText('Run This Deck'))
+    }
+
+    const getBoardSize = () => screen.queryAllByTestId('board-card').length
+
+    it('playing a move card moves a card from hand to board', async () => {
+      await startMoveTestRun()
+
+      // Initial state: hand = [hand-to-board, score], board empty
+      expect(getHandSize()).toBe(2)
+      expect(getBoardSize()).toBe(0)
+
+      // Play hand-to-board (first card) — moves 1 from hand to board
+      await playFirstHandCard()
+
+      // score moved to board, hand-to-board went to discard
+      expect(getHandSize()).toBe(0)
+      expect(getBoardSize()).toBe(1)
+      expect(getDiscardPileCount()).toBe('1')
+    })
+  })
+
   // Choice tests
   describe('card choice modal', () => {
     it('playing collect-basic opens the choice modal', async () => {

@@ -12,3 +12,9 @@ export const discardTestDeck: Deck = {
   cards: {},
   rulesCard: cards['discard-test-rules'],
 }
+
+export const moveTestDeck: Deck = {
+  name: 'Move Test Deck',
+  cards: {},
+  rulesCard: cards['move-test-rules'],
+}

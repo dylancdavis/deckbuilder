@@ -13,6 +13,7 @@ import type {
   CardDestroyEvent,
   CardDiscardEvent,
   CardDrawEvent,
+  CardMoveEvent,
   CardRemoveEvent,
   DeckRefreshEvent,
   Event,
@@ -87,9 +88,11 @@ export type DiscardCardsEffect = {
 
 export type MoveCardEffect = {
   type: 'move-card'
-  params: {
-    instanceId: string | 'self'
-    from: Location
+  params: (
+    | { instanceIds: (string | 'self')[] }
+    | { from: Location; amount: number | 'all' }
+    | { from: Location; matching: CardMatcher }
+  ) & {
     to: Location
     position?: 'top' | 'bottom' | 'shuffle'
   }
@@ -619,6 +622,96 @@ function handleDiscardCards(gameState: GameState, effect: DiscardCardsEffect): E
   }
 }
 
+function placeCards(
+  existing: CardInstance[],
+  incoming: CardInstance[],
+  position?: 'top' | 'bottom' | 'shuffle',
+): CardInstance[] {
+  if (position === 'top') return [...incoming, ...existing]
+  if (position === 'shuffle') return shuffle([...existing, ...incoming])
+  return [...existing, ...incoming]
+}
+
+function handleMoveCard(gameState: GameState, effect: MoveCardEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { to, position } = effect.params
+  const events: CardMoveEvent[] = []
+  const updatedCards = { ...run.cards }
+  let cardsToMove: CardInstance[] = []
+
+  if ('instanceIds' in effect.params) {
+    for (const instanceId of effect.params.instanceIds) {
+      for (const location of locations) {
+        const idx = updatedCards[location].findIndex((c) => c.instanceId === instanceId)
+        if (idx !== -1) {
+          const card = updatedCards[location][idx]
+          updatedCards[location] = [
+            ...updatedCards[location].slice(0, idx),
+            ...updatedCards[location].slice(idx + 1),
+          ]
+          cardsToMove.push(card)
+          events.push({
+            type: 'card-move',
+            cardId: card.id,
+            instanceId: card.instanceId,
+            fromLocation: location,
+            toLocation: to,
+            round,
+            turn,
+          })
+          break
+        }
+      }
+    }
+  } else {
+    const { from } = effect.params
+    let remaining: CardInstance[]
+
+    if ('matching' in effect.params) {
+      const { matching } = effect.params
+      cardsToMove = updatedCards[from].filter((c) => matchesCard(c, matching))
+      remaining = updatedCards[from].filter((c) => !matchesCard(c, matching))
+    } else {
+      const count =
+        effect.params.amount === 'all' ? updatedCards[from].length : effect.params.amount
+      cardsToMove = updatedCards[from].slice(0, count)
+      remaining = updatedCards[from].slice(count)
+    }
+
+    updatedCards[from] = remaining
+
+    for (const card of cardsToMove) {
+      events.push({
+        type: 'card-move',
+        cardId: card.id,
+        instanceId: card.instanceId,
+        fromLocation: from,
+        toLocation: to,
+        round,
+        turn,
+      })
+    }
+  }
+
+  updatedCards[to] = placeCards(updatedCards[to], cardsToMove, position)
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: updatedCards,
+        },
+      },
+    },
+    events,
+  }
+}
+
 /**
  * Handles a given effect and updates the event log if the effect successfully generated events.
  * Returns the new GameState and any generated events.
@@ -655,8 +748,9 @@ export function handleEffect(gameState: GameState, effect: Effect): EffectResult
       return handleRefreshDeck(gameState)
     case 'discard-cards':
       return handleDiscardCards(gameState, effect)
-    // TODO: implement these effect handlers
     case 'move-card':
+      return handleMoveCard(gameState, effect)
+    // TODO: implement these effect handlers
     case 'retrigger-card':
     case 'card-choice':
       console.warn('unimplemented effect handle; falling back to no-op')

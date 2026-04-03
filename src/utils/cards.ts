@@ -584,10 +584,55 @@ export const discardTestRules: RulesCard = {
   ],
 }
 
+export const moveTestRules: RulesCard = {
+  type: 'rules',
+  id: 'move-test-rules',
+  name: 'Move Test Rules',
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
+  deckLimits: { size: [0, 4] },
+  turnStructure: {
+    drawAmount: 2,
+    playAmount: 1,
+    discardAmount: 'all',
+  },
+  endConditions: { rounds: 1 },
+  effects: {
+    gameStart: [
+      {
+        type: 'add-cards',
+        params: {
+          location: 'drawPile',
+          cards: { 'hand-to-board': 1, score: 1 },
+          mode: 'top',
+        },
+      },
+    ],
+  },
+  abilities: [
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+    },
+    {
+      trigger: { on: 'round-end' },
+      effects: [{ type: 'run-end', params: {} }],
+    },
+  ],
+}
+
 export const rulesCards = {
   'starter-rules': starterRules,
   'test-rules': testRules,
   'discard-test-rules': discardTestRules,
+  'move-test-rules': moveTestRules,
 } as const
 
 // === TEST CARDS FOR PROBLEMATIC SCENARIOS ===
@@ -805,6 +850,27 @@ export const handBoardDiscard: PlayableCard = {
   },
 }
 
+export const handToBoard: PlayableCard = {
+  type: 'playable',
+  id: 'hand-to-board',
+  name: 'Hand to Board',
+  description: 'Move 1 card from hand to board.',
+  abilities: [
+    {
+      trigger: { on: 'card-play', target: 'self' },
+      effects: [
+        { type: 'move-card', params: { from: 'hand', amount: 1, to: 'board' } },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'scarab',
+  },
+}
+
 export const playableCards = {
   score: score,
   'collect-basic': collectBasic,
@@ -827,6 +893,7 @@ export const playableCards = {
   'point-draw': pointDraw,
   'draw-bonus-plus': drawBonusPlus,
   'hand-board-discard': handBoardDiscard,
+  'hand-to-board': handToBoard,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }
