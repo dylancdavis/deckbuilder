@@ -586,7 +586,8 @@ function handleDiscardCards(gameState: GameState, effect: DiscardCardsEffect): E
       cardsToDiscard = updatedCards[from].filter((c) => matchesCard(c, matching))
       remaining = updatedCards[from].filter((c) => !matchesCard(c, matching))
     } else {
-      const count = effect.params.amount === 'all' ? updatedCards[from].length : effect.params.amount
+      const count =
+        effect.params.amount === 'all' ? updatedCards[from].length : effect.params.amount
       cardsToDiscard = updatedCards[from].slice(0, count)
       remaining = updatedCards[from].slice(count)
     }
