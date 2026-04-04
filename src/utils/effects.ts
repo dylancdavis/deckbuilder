@@ -3,7 +3,7 @@ import { toArray, mergeCounters, subtractCounters } from './counter'
 import { playableCards, type CardID, type CardInstance, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
-import { shuffle } from './utils'
+import { shuffle, placeItems } from './utils'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
 import { matchesCard } from './card-matchers'
@@ -622,16 +622,6 @@ function handleDiscardCards(gameState: GameState, effect: DiscardCardsEffect): E
   }
 }
 
-function placeCards(
-  existing: CardInstance[],
-  incoming: CardInstance[],
-  position?: 'top' | 'bottom' | 'shuffle',
-): CardInstance[] {
-  if (position === 'top') return [...incoming, ...existing]
-  if (position === 'shuffle') return shuffle([...existing, ...incoming])
-  return [...existing, ...incoming]
-}
-
 function handleMoveCard(gameState: GameState, effect: MoveCardEffect): EffectResult {
   const run = gameState.game.run!
   const round = run.stats.rounds
@@ -695,7 +685,7 @@ function handleMoveCard(gameState: GameState, effect: MoveCardEffect): EffectRes
     }
   }
 
-  updatedCards[to] = placeCards(updatedCards[to], cardsToMove, position)
+  updatedCards[to] = placeItems(updatedCards[to], cardsToMove, position)
 
   return {
     game: {

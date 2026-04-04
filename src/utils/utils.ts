@@ -110,3 +110,17 @@ export function shuffle<T>(arr: T[]): T[] {
 export function selectRandom<T>(arr: T[], n?: number) {
   return shuffle(arr).slice(0, n)
 }
+
+/**
+ * Places `incoming` items into `existing` array at the given position.
+ * 'top' prepends, 'bottom' / undefined appends, 'shuffle' merges and shuffles.
+ */
+export function placeItems<T>(
+  existing: T[],
+  incoming: T[],
+  position?: 'top' | 'bottom' | 'shuffle',
+): T[] {
+  if (position === 'top') return [...incoming, ...existing]
+  if (position === 'shuffle') return shuffle([...existing, ...incoming])
+  return [...existing, ...incoming]
+}
