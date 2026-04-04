@@ -1,5 +1,8 @@
 import { it, expect } from 'vitest'
-import { playCard, drawCards } from '../../utils/game'
+import { drawCards } from '../../utils/game'
+import type { GameState } from '../../utils/game'
+import { handleEffect } from '../../utils/effects'
+import { handleEvent } from '../../utils/ability-processor'
 import {
   score,
   dualScore,
@@ -16,10 +19,15 @@ import {
 } from '../../utils/cards'
 import { createTestGameState } from '../utils/effects/shared'
 
+function playCard(gameState: GameState, instanceId: string): GameState {
+  const { game, events } = handleEffect(gameState, { type: 'play-card', params: { instanceId } })
+  return events.reduce((state, event) => handleEvent(state, event), game)
+}
+
 it('score gains 1 point', () => {
   const card = { ...score, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 5 },
   })
 
@@ -31,7 +39,7 @@ it('score gains 1 point', () => {
 it('dual-score gains 2 points', () => {
   const card = { ...dualScore, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 5 },
   })
 
@@ -43,7 +51,7 @@ it('dual-score gains 2 points', () => {
 it('point-reset sets points to 4', () => {
   const card = { ...pointReset, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 10 },
   })
 
@@ -55,7 +63,7 @@ it('point-reset sets points to 4', () => {
 it('zero-reward gains 6 points when at 0 points', () => {
   const card = { ...zeroReward, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 0 },
   })
 
@@ -67,7 +75,7 @@ it('zero-reward gains 6 points when at 0 points', () => {
 it('zero-reward does not change points when not at 0', () => {
   const card = { ...zeroReward, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 5 },
   })
 
@@ -79,7 +87,7 @@ it('zero-reward does not change points when not at 0', () => {
 it('point-multiply doubles points when at 0', () => {
   const card = { ...pointMultiply, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 0 },
   })
 
@@ -91,7 +99,7 @@ it('point-multiply doubles points when at 0', () => {
 it('point-multiply doubles points when at 2', () => {
   const card = { ...pointMultiply, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 2 },
   })
 
@@ -103,7 +111,7 @@ it('point-multiply doubles points when at 2', () => {
 it('point-multiply doubles points when at 4', () => {
   const card = { ...pointMultiply, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 4 },
   })
 
@@ -115,7 +123,7 @@ it('point-multiply doubles points when at 4', () => {
 it('point-multiply does not change points when above 4', () => {
   const card = { ...pointMultiply, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 10 },
   })
 
@@ -127,7 +135,7 @@ it('point-multiply does not change points when above 4', () => {
 it('point-loan gains 6 points and adds debt to draw pile', () => {
   const card = { ...pointLoan, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 0 },
   })
 
@@ -141,7 +149,7 @@ it('point-loan gains 6 points and adds debt to draw pile', () => {
 it('collect-basic presents card choice', () => {
   const card = { ...collectBasic, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
   })
 
   const result = playCard(gameState, 'card-1')
@@ -153,14 +161,14 @@ it('collect-basic presents card choice', () => {
 it('score-surge gains points for each score played this round', () => {
   const card = { ...scoreSurge, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 0 },
     events: [
       { type: 'card-play', round: 1, turn: 1, cardId: 'score', instanceId: 'i-1' },
-      { type: 'card-play', round: 1, turn: 1, cardId: 'score', instanceId: 'i-2' },
-      { type: 'card-play', round: 1, turn: 1, cardId: 'score', instanceId: 'i-3' },
+      { type: 'card-play', round: 1, turn: 2, cardId: 'score', instanceId: 'i-2' },
+      { type: 'card-play', round: 1, turn: 3, cardId: 'score', instanceId: 'i-3' },
     ],
-    stats: { turns: 1, rounds: 1 },
+    stats: { turns: 4, rounds: 1 },
   })
 
   const result = playCard(gameState, 'card-1')
@@ -171,7 +179,7 @@ it('score-surge gains points for each score played this round', () => {
 it('score-synergy gains points for each score in deck', () => {
   const card = { ...scoreSynergy, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 0 },
     deck: {
       name: 'Test Deck',
@@ -189,7 +197,7 @@ it('score-synergy gains points for each score in deck', () => {
 it('last-resort gains 8 points and destroys itself', () => {
   const card = { ...lastResort, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [], hand: [card], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [card], board: [], discardPile: [] },
     resources: { points: 0 },
   })
 
@@ -202,7 +210,7 @@ it('last-resort gains 8 points and destroys itself', () => {
 it('debt loses 6 points when drawn', () => {
   const card = { ...debt, instanceId: 'card-1' }
   const gameState = createTestGameState({
-    cards: { drawPile: [card], hand: [], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [card], hand: [], board: [], discardPile: [] },
     resources: { points: 10 },
   })
 

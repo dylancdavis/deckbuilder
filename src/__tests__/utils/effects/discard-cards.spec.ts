@@ -11,7 +11,6 @@ describe('DiscardCardsEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [{ ...dualScore, instanceId: 'b' }],
           discardPile: [],
         },
@@ -33,7 +32,6 @@ describe('DiscardCardsEffect', () => {
         cards: {
           drawPile: [{ ...score, instanceId: 'a' }],
           hand: [{ ...dualScore, instanceId: 'b' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -67,7 +65,6 @@ describe('DiscardCardsEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -94,7 +91,6 @@ describe('DiscardCardsEffect', () => {
             { ...collectBasic, instanceId: 'c' },
           ],
           hand: [],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -119,7 +115,6 @@ describe('DiscardCardsEffect', () => {
             { ...score, instanceId: 'a' },
             { ...dualScore, instanceId: 'b' },
           ],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -140,7 +135,6 @@ describe('DiscardCardsEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -168,7 +162,6 @@ describe('DiscardCardsEffect', () => {
             { ...dualScore, instanceId: 'b' },
             { ...score, instanceId: 'c' },
           ],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -191,7 +184,6 @@ describe('DiscardCardsEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -221,7 +213,6 @@ describe('DiscardCardsEffect', () => {
             { ...score, instanceId: 'h1' },
             { ...dualScore, instanceId: 'h2' },
           ],
-          stack: [],
           board: [
             { ...score, instanceId: 'b1' },
             { ...dualScore, instanceId: 'b2' },
@@ -264,7 +255,6 @@ describe('DiscardCardsEffect', () => {
       cards: {
         drawPile: [],
         hand: [{ ...score, instanceId: 'a' }],
-        stack: [],
         board: [],
         discardPile: [],
       },

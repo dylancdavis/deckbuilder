@@ -88,7 +88,6 @@ const preMoveRun: Run = {
     hand: [cF, cG, cH, cI],
     discardPile: [],
     board: [],
-    stack: [],
   },
   deck: { name: '', cards: {}, rulesCard: baseRules },
   resources: { points: 0 },
@@ -105,7 +104,6 @@ describe('moveCardByIndex', () => {
         hand: [cF, cH, cI],
         discardPile: [cG],
         board: [],
-        stack: [],
       },
     })
   })
@@ -118,7 +116,6 @@ describe('moveCardByIndex', () => {
         hand: [cF, cG, cI],
         discardPile: [],
         board: [cH],
-        stack: [],
       },
     })
   })
@@ -133,7 +130,6 @@ describe('moveCards', () => {
         hand: [cF, cG, cH, cI, cA, cB, cC],
         discardPile: [],
         board: [],
-        stack: [],
       },
     })
   })
@@ -146,7 +142,6 @@ describe('moveCards', () => {
         hand: [cF, cG, cH, cI],
         discardPile: [cA, cB, cC],
         board: [],
-        stack: [],
       },
     })
   })
@@ -156,7 +151,7 @@ const exampleCounter = { score: 4 }
 
 const emptyHandRun: Run = {
   resources: { points: 0 },
-  cards: { drawPile: [], hand: [], discardPile: [], board: [], stack: [] },
+  cards: { drawPile: [], hand: [], discardPile: [], board: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: rulesWithAddedCards },
   stats: { turns: 1, rounds: 1 },
   events: [],
@@ -177,7 +172,7 @@ const examplePile = [pileA, pileA, pileA, pileB, pileB, pileC]
 
 const populatedHandRun: Run = {
   resources: { points: 0 },
-  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [], stack: [] },
+  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: rulesWithAddedCards },
   stats: { turns: 1, rounds: 1 },
   events: [],
@@ -185,7 +180,7 @@ const populatedHandRun: Run = {
 
 const populatedHandRunNoAdded: Run = {
   resources: { points: 0 },
-  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [], stack: [] },
+  cards: { drawPile: examplePile, hand: [], discardPile: [], board: [] },
   deck: { name: '', cards: exampleCounter, rulesCard: baseRules },
   stats: { turns: 1, rounds: 1 },
   events: [],

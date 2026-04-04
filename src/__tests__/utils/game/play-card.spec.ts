@@ -1,10 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { playCard } from '../../../utils/game'
+import { handleEffect } from '../../../utils/effects'
+import { handleEvent } from '../../../utils/ability-processor'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from '../effects/shared'
 import { Resource } from '../../../utils/resource'
+import type { GameState } from '../../../utils/game'
+import type { PlayCardEffect } from '../../../utils/effects'
 
-describe('playCard', () => {
+/** Helper that mirrors what the store does: handleEffect + reduce events through handleEvent */
+function playCard(gameState: GameState, instanceId: string): GameState {
+  const effect: PlayCardEffect = { type: 'play-card', params: { instanceId } }
+  const { game, events } = handleEffect(gameState, effect)
+  return events.reduce((state, event) => handleEvent(state, event), game)
+}
+
+describe('play-card effect', () => {
   it('plays a card by instance ID', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const card2 = { ...score, instanceId: 'card-2' }
@@ -13,7 +23,6 @@ describe('playCard', () => {
         drawPile: [],
         hand: [card1, card2],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
@@ -22,19 +31,17 @@ describe('playCard', () => {
 
     expect(result.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.run!.cards.hand[0].instanceId).toBe('card-2')
-    expect(result.game.run!.cards.stack).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
   })
 
-  it('throws error when instance ID not found in hand or stack', () => {
+  it('throws error when instance ID not found in hand', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const gameState = createTestGameState({
       cards: {
         drawPile: [],
         hand: [card1],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
@@ -44,14 +51,13 @@ describe('playCard', () => {
     )
   })
 
-  it('applies card effects before moving to discard', () => {
+  it('applies card effects after moving to discard', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const gameState = createTestGameState({
       cards: {
         drawPile: [],
         hand: [card1],
         board: [],
-        stack: [],
         discardPile: [],
       },
       resources: {
@@ -65,8 +71,6 @@ describe('playCard', () => {
     expect(result.game.run!.resources.points).toBe(1)
     // Card moved to discard
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
-    // Stack should be empty after resolution
-    expect(result.game.run!.cards.stack).toHaveLength(0)
   })
 
   it('logs card play event', () => {
@@ -76,7 +80,6 @@ describe('playCard', () => {
         drawPile: [],
         hand: [card1],
         board: [],
-        stack: [],
         discardPile: [],
       },
       stats: {
@@ -116,7 +119,6 @@ describe('playCard', () => {
         drawPile: [],
         hand: [card1, card2, card3],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
@@ -126,7 +128,6 @@ describe('playCard', () => {
     expect(result.game.run!.cards.hand).toHaveLength(2)
     expect(result.game.run!.cards.hand[0].instanceId).toBe('card-1')
     expect(result.game.run!.cards.hand[1].instanceId).toBe('card-3')
-    expect(result.game.run!.cards.stack).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.run!.cards.discardPile[0].instanceId).toBe('card-2')
   })
@@ -138,19 +139,16 @@ describe('playCard', () => {
         drawPile: [],
         hand: [card1],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
 
     const originalHandLength = gameState.game.run!.cards.hand.length
-    const originalStackLength = gameState.game.run!.cards.stack.length
     const originalDiscardLength = gameState.game.run!.cards.discardPile.length
 
     playCard(gameState, 'card-1')
 
     expect(gameState.game.run!.cards.hand).toHaveLength(originalHandLength)
-    expect(gameState.game.run!.cards.stack).toHaveLength(originalStackLength)
     expect(gameState.game.run!.cards.discardPile).toHaveLength(originalDiscardLength)
   })
 
@@ -163,7 +161,6 @@ describe('playCard', () => {
         drawPile: [],
         hand: [card1, card2],
         board: [],
-        stack: [],
         discardPile: [existingCard],
       },
     })
@@ -194,7 +191,6 @@ describe('playCard', () => {
         drawPile: [],
         hand: [cardWithSelfRemoval],
         board: [],
-        stack: [],
         discardPile: [],
       },
       resources: {
@@ -210,6 +206,6 @@ describe('playCard', () => {
     expect(result.game.run!.cards.discardPile).toHaveLength(0)
     // Card should not be in any location
     expect(result.game.run!.cards.hand).toHaveLength(0)
-    expect(result.game.run!.cards.stack).toHaveLength(0)
+    expect(result.game.run!.cards.board).toHaveLength(0)
   })
 })

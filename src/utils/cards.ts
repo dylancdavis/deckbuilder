@@ -858,9 +858,7 @@ export const handToBoard: PlayableCard = {
   abilities: [
     {
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
-        { type: 'move-card', params: { from: 'hand', amount: 1, to: 'board' } },
-      ],
+      effects: [{ type: 'move-card', params: { from: 'hand', amount: 1, to: 'board' } }],
     },
   ],
   cost: 0,

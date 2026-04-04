@@ -14,6 +14,7 @@ import type {
   CardDiscardEvent,
   CardDrawEvent,
   CardMoveEvent,
+  CardPlayEvent,
   CardRemoveEvent,
   DeckRefreshEvent,
   Event,
@@ -98,6 +99,13 @@ export type MoveCardEffect = {
   }
 }
 
+export type PlayCardEffect = {
+  type: 'play-card'
+  params: {
+    instanceId: string
+  }
+}
+
 export type RetriggerCardEffect = {
   type: 'retrigger-card'
   params: {
@@ -151,6 +159,7 @@ export type Effect =
   | DrawCardsEffect
   | DiscardCardsEffect
   | MoveCardEffect
+  | PlayCardEffect
   | RetriggerCardEffect
   | TurnStartEffect
   | TurnEndEffect
@@ -478,7 +487,6 @@ function handleRefreshDeck(gameState: GameState): EffectResult {
   const allCards = [
     ...run.cards.drawPile,
     ...run.cards.hand,
-    ...run.cards.stack,
     ...run.cards.board,
     ...run.cards.discardPile,
   ]
@@ -502,6 +510,71 @@ function handleRefreshDeck(gameState: GameState): EffectResult {
             hand: [],
             board: [],
             discardPile: [],
+          },
+        },
+      },
+    },
+    events: [event],
+  }
+}
+
+function handlePlayCard(gameState: GameState, effect: PlayCardEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { instanceId } = effect.params
+
+  // Find card in hand
+  const cardIndex = run.cards.hand.findIndex((c) => c.instanceId === instanceId)
+  if (cardIndex === -1) {
+    throw new Error(`Cannot play card: no card with instanceId ${instanceId} found in hand`)
+  }
+
+  // Check playAmount limit
+  const rulesCard = run.deck.rulesCard
+  if (rulesCard) {
+    const playAmount = rulesCard.turnStructure.playAmount
+    if (typeof playAmount === 'number') {
+      const cardsPlayedThisTurn = run.events.filter(
+        (e) => e.type === 'card-play' && e.round === round && e.turn === turn,
+      ).length
+      if (cardsPlayedThisTurn >= playAmount) {
+        throw new Error(
+          `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`,
+        )
+      }
+    }
+  }
+
+  const card = run.cards.hand[cardIndex]
+
+  // Determine destination: board if asset (has board-location abilities), otherwise discard
+  const isAsset = card.abilities.some((a) => a.trigger.locations?.includes('board'))
+  const destination = isAsset ? 'board' : 'discardPile'
+
+  // Move card from hand to destination
+  const newHand = [...run.cards.hand.slice(0, cardIndex), ...run.cards.hand.slice(cardIndex + 1)]
+  const newDestination = [...run.cards[destination], card]
+
+  const event: CardPlayEvent = {
+    type: 'card-play',
+    cardId: card.id,
+    instanceId,
+    round,
+    turn,
+  }
+
+  return {
+    game: {
+      ...gameState,
+      game: {
+        ...gameState.game,
+        run: {
+          ...run,
+          cards: {
+            ...run.cards,
+            hand: newHand,
+            [destination]: newDestination,
           },
         },
       },
@@ -740,6 +813,8 @@ export function handleEffect(gameState: GameState, effect: Effect): EffectResult
       return handleDiscardCards(gameState, effect)
     case 'move-card':
       return handleMoveCard(gameState, effect)
+    case 'play-card':
+      return handlePlayCard(gameState, effect)
     // TODO: implement these effect handlers
     case 'retrigger-card':
     case 'card-choice':

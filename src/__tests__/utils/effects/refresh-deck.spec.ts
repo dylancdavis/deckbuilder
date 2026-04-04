@@ -15,7 +15,6 @@ describe('RefreshDeckEffect', () => {
       cards: {
         drawPile: [],
         hand: [{ ...score, instanceId: 'a' }],
-        stack: [],
         board: [{ ...dualScore, instanceId: 'b' }],
         discardPile: [{ ...score, instanceId: 'c' }],
       },
@@ -34,7 +33,6 @@ describe('RefreshDeckEffect', () => {
       cards: {
         drawPile: [{ ...score, instanceId: 'existing' }],
         hand: [{ ...dualScore, instanceId: 'from-hand' }],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -53,7 +51,6 @@ describe('RefreshDeckEffect', () => {
       cards: {
         drawPile: [],
         hand: [{ ...score, instanceId: 'a' }],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -70,7 +67,6 @@ describe('RefreshDeckEffect', () => {
       cards: {
         drawPile: [],
         hand: [{ ...score, instanceId: 'a' }],
-        stack: [],
         board: [{ ...dualScore, instanceId: 'b' }],
         discardPile: [{ ...score, instanceId: 'c' }],
       },

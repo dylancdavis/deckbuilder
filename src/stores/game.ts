@@ -6,7 +6,9 @@ import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/car
 import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
-import { playCard, drawCards, type GameState } from '@/utils/game.ts'
+import { drawCards, type GameState } from '@/utils/game.ts'
+import { handleEffect } from '@/utils/effects.ts'
+import { handleEvent } from '@/utils/ability-processor.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -38,7 +40,11 @@ export const useGameStore = defineStore('game', () => {
     game: {
       collection: {
         cards: initialCollectionCards,
-        decks: { startingDeck: startingDeck, discardTestDeck: discardTestDeck, moveTestDeck: moveTestDeck },
+        decks: {
+          startingDeck: startingDeck,
+          discardTestDeck: discardTestDeck,
+          moveTestDeck: moveTestDeck,
+        },
       },
       run: null,
     },
@@ -133,38 +139,16 @@ export const useGameStore = defineStore('game', () => {
       name: name,
       rulesCard: null,
       cards: {},
-
     }
     return newDeckKey
   }
 
   function tryPlayCard(instanceId: string) {
-    // Validation checks
-    const run = gameState.value.game.run
-    if (!run || !run.deck.rulesCard) {
-      throw new Error('Cannot play card: no active run or rules card')
-    }
-
-    const card = run.cards.hand.find((card) => card.instanceId === instanceId)
-    if (!card) {
-      throw new Error(`Cannot play card: no card with instanceId ${instanceId}`)
-    }
-
-    // Check playAmount limit by counting events for current turn
-    const playAmount = run.deck.rulesCard.turnStructure.playAmount
-    if (typeof playAmount === 'number') {
-      const cardsPlayedThisTurn = run.events.filter(
-        (e) => e.type === 'card-play' && e.round === run.stats.rounds && e.turn === run.stats.turns,
-      ).length
-      if (cardsPlayedThisTurn >= playAmount) {
-        throw new Error(
-          `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`,
-        )
-      }
-    }
-
-    // Use pure function to process card play and non-choice effects
-    gameState.value = playCard(gameState.value, instanceId)
+    const { game, events } = handleEffect(gameState.value, {
+      type: 'play-card',
+      params: { instanceId },
+    })
+    gameState.value = events.reduce((state, event) => handleEvent(state, event), game)
   }
 
   function nextTurn() {

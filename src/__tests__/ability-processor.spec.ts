@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { handleEvent } from '../utils/ability-processor'
+import { handleEffect } from '../utils/effects'
 import type { GameState } from '../utils/game'
 import type { Run } from '../utils/run'
-import type { CardPlayEvent } from '../utils/event'
 import { doubleChoice, starterRules } from '../utils/cards'
 
 function createTestRun(cards: Partial<Run['cards']> = {}): Run {
@@ -16,7 +16,6 @@ function createTestRun(cards: Partial<Run['cards']> = {}): Run {
       drawPile: [],
       hand: [],
       board: [],
-      stack: [],
       discardPile: [],
       ...cards,
     },
@@ -44,6 +43,11 @@ function createTestGameState(run: Run): GameState {
   }
 }
 
+function playCard(gameState: GameState, instanceId: string): GameState {
+  const { game, events } = handleEffect(gameState, { type: 'play-card', params: { instanceId } })
+  return events.reduce((state, event) => handleEvent(state, event), game)
+}
+
 describe('ability-processor', () => {
   describe('double choice card', () => {
     it('should open first modal when card with two choices is played', () => {
@@ -53,19 +57,11 @@ describe('ability-processor', () => {
       }
 
       const run = createTestRun({
-        stack: [cardInstance],
+        hand: [cardInstance],
       })
       const gameState = createTestGameState(run)
 
-      const playEvent: CardPlayEvent = {
-        type: 'card-play',
-        cardId: 'double-choice',
-        instanceId: 'test-instance-1',
-        round: 1,
-        turn: 1,
-      }
-
-      const result = handleEvent(gameState, playEvent)
+      const result = playCard(gameState, 'test-instance-1')
 
       // First modal should be open
       expect(result.viewData.modalView).toBe('card-choice')
@@ -80,20 +76,12 @@ describe('ability-processor', () => {
       }
 
       const run = createTestRun({
-        stack: [cardInstance],
+        hand: [cardInstance],
       })
       const gameState = createTestGameState(run)
 
-      const playEvent: CardPlayEvent = {
-        type: 'card-play',
-        cardId: 'double-choice',
-        instanceId: 'test-instance-1',
-        round: 1,
-        turn: 1,
-      }
-
       // Step 1: Play the card - first modal should open
-      const afterFirstModal = handleEvent(gameState, playEvent)
+      const afterFirstModal = playCard(gameState, 'test-instance-1')
       expect(afterFirstModal.viewData.modalView).toBe('card-choice')
       expect(afterFirstModal.viewData.resolver).not.toBeNull()
 
@@ -126,20 +114,12 @@ describe('ability-processor', () => {
       }
 
       const run = createTestRun({
-        stack: [cardInstance],
+        hand: [cardInstance],
       })
       const gameState = createTestGameState(run)
 
-      const playEvent: CardPlayEvent = {
-        type: 'card-play',
-        cardId: 'double-choice',
-        instanceId: 'test-instance-1',
-        round: 1,
-        turn: 1,
-      }
-
       // Step 1: Play the card
-      const afterFirstModal = handleEvent(gameState, playEvent)
+      const afterFirstModal = playCard(gameState, 'test-instance-1')
       const resolver1 = afterFirstModal.viewData.resolver!
       const clearedState1: GameState = {
         ...afterFirstModal,

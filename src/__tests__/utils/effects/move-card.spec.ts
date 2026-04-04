@@ -11,7 +11,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [{ ...dualScore, instanceId: 'b' }],
           discardPile: [],
         },
@@ -33,7 +32,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [{ ...score, instanceId: 'a' }],
           hand: [{ ...dualScore, instanceId: 'b' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -69,7 +67,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -96,7 +93,6 @@ describe('MoveCardEffect', () => {
             { ...collectBasic, instanceId: 'c' },
           ],
           hand: [],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -121,7 +117,6 @@ describe('MoveCardEffect', () => {
             { ...score, instanceId: 'a' },
             { ...dualScore, instanceId: 'b' },
           ],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -142,7 +137,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -170,7 +164,6 @@ describe('MoveCardEffect', () => {
             { ...dualScore, instanceId: 'b' },
             { ...score, instanceId: 'c' },
           ],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -193,7 +186,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'a' }],
-          stack: [],
           board: [],
           discardPile: [],
         },
@@ -217,7 +209,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'new' }],
-          stack: [],
           board: [{ ...dualScore, instanceId: 'existing' }],
           discardPile: [],
         },
@@ -239,7 +230,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'new' }],
-          stack: [],
           board: [{ ...dualScore, instanceId: 'existing' }],
           discardPile: [],
         },
@@ -261,7 +251,6 @@ describe('MoveCardEffect', () => {
         cards: {
           drawPile: [],
           hand: [{ ...score, instanceId: 'new' }],
-          stack: [],
           board: [{ ...dualScore, instanceId: 'existing' }],
           discardPile: [],
         },
@@ -292,7 +281,6 @@ describe('MoveCardEffect', () => {
             { ...score, instanceId: 'h1' },
             { ...dualScore, instanceId: 'h2' },
           ],
-          stack: [],
           board: [
             { ...score, instanceId: 'b1' },
             { ...dualScore, instanceId: 'b2' },
@@ -335,7 +323,6 @@ describe('MoveCardEffect', () => {
       cards: {
         drawPile: [],
         hand: [{ ...score, instanceId: 'a' }],
-        stack: [],
         board: [],
         discardPile: [],
       },

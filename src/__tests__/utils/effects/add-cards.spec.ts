@@ -38,7 +38,9 @@ describe('AddCardsEffect', () => {
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(4)
     const scoreCards = result.game.game.run!.cards.drawPile.filter((c) => c.id === 'score')
-    const collectCards = result.game.game.run!.cards.drawPile.filter((c) => c.id === 'collect-basic')
+    const collectCards = result.game.game.run!.cards.drawPile.filter(
+      (c) => c.id === 'collect-basic',
+    )
     expect(scoreCards).toHaveLength(3)
     expect(collectCards).toHaveLength(1)
   })
@@ -97,7 +99,6 @@ describe('AddCardsEffect', () => {
       cards: {
         drawPile: [{ ...dualScore, instanceId: 'foobar' }],
         hand: [],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -123,7 +124,6 @@ describe('AddCardsEffect', () => {
       cards: {
         drawPile: [{ ...dualScore, instanceId: 'foobar' }],
         hand: [],
-        stack: [],
         board: [],
         discardPile: [],
       },

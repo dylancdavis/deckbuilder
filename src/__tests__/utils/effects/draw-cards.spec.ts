@@ -14,7 +14,6 @@ describe('DrawCardsEffect', () => {
           { ...score, instanceId: 'c' },
         ],
         hand: [],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -38,7 +37,6 @@ describe('DrawCardsEffect', () => {
       cards: {
         drawPile: [{ ...score, instanceId: 'b' }],
         hand: [{ ...dualScore, instanceId: 'a' }],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -74,7 +72,6 @@ describe('DrawCardsEffect', () => {
       cards: {
         drawPile: [{ ...score, instanceId: 'a' }],
         hand: [],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -99,7 +96,6 @@ describe('DrawCardsEffect', () => {
           { ...dualScore, instanceId: 'b' },
         ],
         hand: [],
-        stack: [],
         board: [],
         discardPile: [],
       },
@@ -129,7 +125,6 @@ describe('DrawCardsEffect', () => {
       cards: {
         drawPile: [{ ...score, instanceId: 'a' }],
         hand: [],
-        stack: [],
         board: [],
         discardPile: [],
       },

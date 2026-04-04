@@ -22,7 +22,7 @@ const ADD_POINT_EFFECT = {
   params: { resource: Resource.POINTS, delta: 1 },
 }
 
-const EMPTY_PILES = { drawPile: [], hand: [], board: [], stack: [], discardPile: [] }
+const EMPTY_PILES = { drawPile: [], hand: [], board: [], discardPile: [] }
 
 const CARD: CardInstance = {
   type: 'playable',

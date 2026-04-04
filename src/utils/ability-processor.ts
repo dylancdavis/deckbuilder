@@ -90,9 +90,6 @@ function processEffectQueue(gameState: GameState, queue: EffectQueueItem[]): Gam
       return processEffectQueue(gs, [...choiceItems, ...remainingQueue])
     }
 
-    // Note: The card being played remains in 'stack' while the modal is open.
-    // It stays in this limbo state until all abilities (including continuations
-    // after card-choice) complete, then moves to board or discard.
     return openCardChoiceModal(currentState, options, tags, resolver)
   }
 

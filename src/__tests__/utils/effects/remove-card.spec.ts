@@ -15,7 +15,6 @@ describe('RemoveCardEffect', () => {
         ],
         hand: [],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
@@ -42,7 +41,6 @@ describe('RemoveCardEffect', () => {
           { ...score, instanceId: 'card-2' },
         ],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
@@ -65,7 +63,6 @@ describe('RemoveCardEffect', () => {
         drawPile: [],
         hand: [],
         board: [{ ...score, instanceId: 'card-1' }],
-        stack: [],
         discardPile: [],
       },
     })
@@ -81,35 +78,12 @@ describe('RemoveCardEffect', () => {
     expect(result.game.game.run!.cards.board).toHaveLength(0)
   })
 
-  it('removes card from stack by instanceId', () => {
-    const gameState = createTestGameState({
-      cards: {
-        drawPile: [],
-        hand: [],
-        board: [],
-        stack: [{ ...score, instanceId: 'card-1' }],
-        discardPile: [],
-      },
-    })
-    const effect: RemoveCardEffect = {
-      type: 'remove-card',
-      params: {
-        instanceId: 'card-1',
-      },
-    }
-
-    const result = handleEffect(gameState, effect)
-
-    expect(result.game.game.run!.cards.stack).toHaveLength(0)
-  })
-
   it('removes card from discardPile by instanceId', () => {
     const gameState = createTestGameState({
       cards: {
         drawPile: [],
         hand: [],
         board: [],
-        stack: [],
         discardPile: [
           { ...score, instanceId: 'card-1' },
           { ...score, instanceId: 'card-2' },
@@ -135,7 +109,6 @@ describe('RemoveCardEffect', () => {
         drawPile: [{ ...score, instanceId: 'card-1' }],
         hand: [{ ...score, instanceId: 'card-2' }],
         board: [{ ...score, instanceId: 'card-3' }],
-        stack: [],
         discardPile: [],
       },
     })
@@ -159,7 +132,6 @@ describe('RemoveCardEffect', () => {
         drawPile: [{ ...score, instanceId: 'card-1' }],
         hand: [{ ...score, instanceId: 'card-2' }],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })
@@ -182,7 +154,6 @@ describe('RemoveCardEffect', () => {
         drawPile: [{ ...score, instanceId: 'card-1' }],
         hand: [],
         board: [],
-        stack: [],
         discardPile: [],
       },
     })

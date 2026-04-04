@@ -11,7 +11,7 @@ import type { Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
 import type { Event } from './event.ts'
 
-export type Location = 'drawPile' | 'hand' | 'board' | 'stack' | 'discardPile'
+export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
 export type RunCards = Record<Location, CardInstance[]>
 
@@ -23,7 +23,7 @@ export type Run = {
   events: Event[]
 }
 
-export const locations: Location[] = ['board', 'hand', 'stack', 'discardPile', 'drawPile']
+export const locations: Location[] = ['board', 'hand', 'discardPile', 'drawPile']
 
 /**
  * Move a card by its index in a location to another location.
@@ -124,7 +124,7 @@ export function drawFirstHand(run: Run) {
 export function makeRun(deck: Deck): Run {
   const baseRun: Run = {
     deck: deck,
-    cards: { drawPile: [], hand: [], board: [], stack: [], discardPile: [] },
+    cards: { drawPile: [], hand: [], board: [], discardPile: [] },
     resources: { points: 0 },
     stats: { turns: 1, rounds: 1 },
     events: [],

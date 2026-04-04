@@ -16,7 +16,6 @@ export const createTestRun = (overrides: Partial<Run> = {}): Run => ({
     drawPile: [],
     hand: [],
     board: [],
-    stack: [],
     discardPile: [],
   },
   resources: {
