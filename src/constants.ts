@@ -18,3 +18,9 @@ export const moveTestDeck: Deck = {
   cards: {},
   rulesCard: cards['move-test-rules'],
 }
+
+export const choiceTestDeck: Deck = {
+  name: 'Choice Test Deck',
+  cards: {},
+  rulesCard: cards['choice-test-rules'],
+}

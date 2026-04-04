@@ -628,11 +628,56 @@ export const moveTestRules: RulesCard = {
   ],
 }
 
+export const choiceTestRules: RulesCard = {
+  type: 'rules',
+  id: 'choice-test-rules',
+  name: 'Choice Test Rules',
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'lightning',
+  },
+  deckLimits: { size: [0, 4] },
+  turnStructure: {
+    drawAmount: 1,
+    playAmount: 1,
+    discardAmount: 'all',
+  },
+  endConditions: { rounds: 1 },
+  effects: {
+    gameStart: [
+      {
+        type: 'add-cards',
+        params: {
+          location: 'drawPile',
+          cards: { 'choice-add-choice': 1 },
+          mode: 'top',
+        },
+      },
+    ],
+  },
+  abilities: [
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+    },
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+    },
+    {
+      trigger: { on: 'round-end' },
+      effects: [{ type: 'run-end', params: {} }],
+    },
+  ],
+}
+
 export const rulesCards = {
   'starter-rules': starterRules,
   'test-rules': testRules,
   'discard-test-rules': discardTestRules,
   'move-test-rules': moveTestRules,
+  'choice-test-rules': choiceTestRules,
 } as const
 
 // === TEST CARDS FOR PROBLEMATIC SCENARIOS ===
@@ -869,6 +914,66 @@ export const handToBoard: PlayableCard = {
   },
 }
 
+// Test: Choice → add-cards → choice sequence
+export const choiceAddChoice: PlayableCard = {
+  type: 'playable',
+  id: 'choice-add-choice',
+  name: 'Choice Add Choice',
+  description:
+    'Choose a basic card to add to hand, add a score to hand, then choose a test card to add to hand.',
+  abilities: [
+    {
+      trigger: { on: 'card-play', target: 'self' },
+      effects: [
+        {
+          type: 'card-choice',
+          params: {
+            options: 3,
+            tags: ['basic'],
+            choiceHandler: (chosenCard) => [
+              {
+                type: 'add-cards',
+                params: {
+                  location: 'hand',
+                  cards: { [chosenCard]: 1 } as Record<string, number>,
+                  mode: 'top',
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: 'add-cards',
+          params: { location: 'hand', cards: { 'dual-score': 1 }, mode: 'top' },
+        },
+        {
+          type: 'card-choice',
+          params: {
+            options: 3,
+            tags: ['test'],
+            choiceHandler: (chosenCard) => [
+              {
+                type: 'add-cards',
+                params: {
+                  location: 'hand',
+                  cards: { [chosenCard]: 1 } as Record<string, number>,
+                  mode: 'top',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+  cost: 0,
+  tags: ['test'],
+  art: {
+    gradient: ['#4b4b4b', '#9e9e9e'],
+    image: 'lightning',
+  },
+}
+
 export const playableCards = {
   score: score,
   'collect-basic': collectBasic,
@@ -892,6 +997,7 @@ export const playableCards = {
   'draw-bonus-plus': drawBonusPlus,
   'hand-board-discard': handBoardDiscard,
   'hand-to-board': handToBoard,
+  'choice-add-choice': choiceAddChoice,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }

@@ -353,6 +353,73 @@ describe('starter deck run', () => {
     })
   })
 
+  // Choice flow tests
+  describe('choice-add-choice card', () => {
+    async function startChoiceTestRun() {
+      renderApp()
+      await fireEvent.click(screen.getByText('Choice Test Deck'))
+      await fireEvent.click(screen.getByText('Run This Deck'))
+    }
+
+    it('playing the card opens the first choice modal', async () => {
+      await startChoiceTestRun()
+
+      // Hand has 1 card: choice-add-choice
+      expect(getHandSize()).toBe(1)
+      await playFirstHandCard()
+
+      // First choice modal should open
+      expect(screen.getByTestId('card-choice-modal')).toBeTruthy()
+      const options = screen.getAllByTestId('card-option')
+      expect(options).toHaveLength(3)
+    })
+
+    it('resolving first choice adds chosen card to hand, then the non-choice add-cards runs, then second modal opens', async () => {
+      await startChoiceTestRun()
+      await playFirstHandCard()
+
+      // Resolve first choice (basic tags → first option is 'score')
+      const firstOptions = screen.getAllByTestId('card-option')
+      await fireEvent.click(firstOptions[0])
+
+      // First choice added Score, then non-choice added Dual Score. Second modal opens.
+      expect(screen.getByTestId('card-choice-modal')).toBeTruthy()
+      const handCards = screen.getAllByTestId('hand-card')
+      expect(handCards).toHaveLength(2)
+      const handCardNames = handCards.map((el) =>
+        el.querySelector('.card-name')?.textContent?.trim(),
+      )
+      expect(handCardNames).toEqual(['Dual Score', 'Score'])
+    })
+
+    it('resolving second choice adds card to hand and closes modal', async () => {
+      await startChoiceTestRun()
+      await playFirstHandCard()
+
+      // Resolve first choice (basic tags → deterministic first option is 'score')
+      const firstOptions = screen.getAllByTestId('card-option')
+      await fireEvent.click(firstOptions[0])
+
+      // Resolve second choice (test tags → deterministic first option is 'double-choice')
+      const secondOptions = screen.getAllByTestId('card-option')
+      await fireEvent.click(secondOptions[0])
+
+      // Modal should be closed
+      expect(screen.queryByTestId('card-choice-modal')).toBeNull()
+
+      // Hand should have 3 distinct cards in order (add-cards mode: 'top' prepends):
+      // 1. Double Choice (from second choice, added to top last)
+      // 2. Dual Score (from non-choice add-cards, added to top second)
+      // 3. Score (from first choice, added to top first)
+      const handCards = screen.getAllByTestId('hand-card')
+      expect(handCards).toHaveLength(3)
+      const handCardNames = handCards.map((el) =>
+        el.querySelector('.card-name')?.textContent?.trim(),
+      )
+      expect(handCardNames).toEqual(['Double Choice', 'Dual Score', 'Score'])
+    })
+  })
+
   // Choice tests
   describe('card choice modal', () => {
     it('playing collect-basic opens the choice modal', async () => {
