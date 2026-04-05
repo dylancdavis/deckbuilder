@@ -329,24 +329,24 @@ function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): Effec
   const run = gameState.game.run!
   const round = run.stats.rounds
   const turn = run.stats.turns
+  const events: CardRemoveEvent[] = []
   const { instanceId } = effect.params
 
   const updatedCards = { ...run.cards }
-  let removedCard: CardRemoveEvent | null = null
 
   for (const location of locations) {
     const cardIndex = updatedCards[location].findIndex((card) => card.instanceId === instanceId)
     if (cardIndex !== -1) {
       const card = updatedCards[location][cardIndex]
 
-      removedCard = {
+      events.push({
         type: 'card-remove',
         cardId: card.id,
         instanceId: card.instanceId,
         fromLocation: location,
         round,
         turn,
-      }
+      })
 
       updatedCards[location] = [
         ...updatedCards[location].slice(0, cardIndex),
@@ -367,7 +367,7 @@ function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): Effec
         },
       },
     },
-    events: removedCard ? [removedCard] : [],
+    events,
   }
 }
 
