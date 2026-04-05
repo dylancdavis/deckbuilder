@@ -1,5 +1,4 @@
 import { it, expect } from 'vitest'
-import { drawCards } from '../../utils/game'
 import type { GameState } from '../../utils/game'
 import { handleEffect } from '../../utils/effects'
 import { handleEvent } from '../../utils/ability-processor'
@@ -214,7 +213,8 @@ it('debt loses 6 points when drawn', () => {
     resources: { points: 10 },
   })
 
-  const result = drawCards(gameState, 1)
+  const { game, events } = handleEffect(gameState, { type: 'draw-cards', params: { amount: 1 } })
+  const result = events.reduce((state, event) => handleEvent(state, event), game)
 
   expect(result.game.run!.cards.hand).toHaveLength(1)
   expect(result.game.run!.cards.hand[0].id).toBe('debt')

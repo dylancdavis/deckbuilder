@@ -1,6 +1,5 @@
 import { Resource } from './resource'
 import { keys, selectRandom, values } from './utils'
-import type { Effect } from './effects'
 import type { Run } from './run'
 import type { CardPlayEvent } from './event'
 import type { Ability } from './ability'
@@ -10,6 +9,11 @@ import type { Ability } from './ability'
  * These can be added to any rules card to implement standard game flow.
  */
 export const coreGameFlowAbilities: Ability[] = [
+  // On run-start -> start first round
+  {
+    trigger: { on: 'run-start' },
+    effects: [{ type: 'round-start', params: {} }],
+  },
   // On turn-end with cards in draw pile -> start new turn
   {
     trigger: {
@@ -83,15 +87,7 @@ export interface RulesCard extends Card {
     size: [number, number]
   }
   turnStructure: {
-    drawAmount: number
     playAmount: number | 'any'
-    discardAmount: number | 'all'
-  }
-  endConditions: {
-    rounds: number
-  }
-  effects: {
-    gameStart: Effect[]
   }
   abilities: Ability[]
 }
@@ -157,35 +153,35 @@ export const starterRules: RulesCard = {
     image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
-  turnStructure: {
-    drawAmount: 2,
-    playAmount: 1,
-    discardAmount: 'all',
-  },
-  endConditions: { rounds: 1 },
-  effects: {
-    gameStart: [
-      {
-        type: 'add-cards',
-        params: { location: 'drawPile', cards: { score: 7, 'collect-basic': 1 }, mode: 'shuffle' },
-      },
-    ],
-  },
+  turnStructure: { playAmount: 1 },
   abilities: [
-    ...coreGameFlowAbilities,
-    // Turn structure
     {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      trigger: { on: 'run-start' },
+      effects: [
+        {
+          type: 'add-cards',
+          params: {
+            location: 'drawPile',
+            cards: { score: 7, 'collect-basic': 1 },
+            mode: 'shuffle',
+          },
+        },
+      ],
     },
+    // Before core: discard before turn transition, run-end before refresh
     {
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
-    // Run end condition - end after first (and only) round
     {
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
+    },
+    ...coreGameFlowAbilities,
+    // After core: draw after turn-start fires
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
   ],
 }
@@ -486,52 +482,46 @@ export const testRules: RulesCard = {
     image: 'lightning',
   },
   deckLimits: { size: [0, 100] },
-  turnStructure: {
-    drawAmount: 5,
-    playAmount: 'any',
-    discardAmount: 'all',
-  },
-  endConditions: { rounds: 10 },
-  effects: {
-    gameStart: [
-      {
-        type: 'add-cards',
-        params: {
-          location: 'drawPile',
-          cards: {
-            score: 2,
-            'collect-basic': 2,
-            'double-choice': 2,
-            'choice-draw': 2,
-            'draw-watcher': 1,
-            'draw-bonus': 1,
-            'lucky-draw': 2,
-            'point-draw': 1,
-            'draw-bonus-plus': 1,
-          },
-          mode: 'shuffle',
-        },
-      },
-    ],
-  },
+  turnStructure: { playAmount: 'any' },
   abilities: [
-    ...coreGameFlowAbilities,
-    // Turn structure
     {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 5 } }],
+      trigger: { on: 'run-start' },
+      effects: [
+        {
+          type: 'add-cards',
+          params: {
+            location: 'drawPile',
+            cards: {
+              score: 2,
+              'collect-basic': 2,
+              'double-choice': 2,
+              'choice-draw': 2,
+              'draw-watcher': 1,
+              'draw-bonus': 1,
+              'lucky-draw': 2,
+              'point-draw': 1,
+              'draw-bonus-plus': 1,
+            },
+            mode: 'shuffle',
+          },
+        },
+      ],
     },
     {
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
-    // Run end condition
     {
       trigger: {
         on: 'round-end',
         when: (ctx) => ctx.event.round >= 10,
       },
       effects: [{ type: 'run-end', params: {} }],
+    },
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 5 } }],
     },
   ],
 }
@@ -545,33 +535,24 @@ export const discardTestRules: RulesCard = {
     image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
-  turnStructure: {
-    drawAmount: 2,
-    playAmount: 1,
-    discardAmount: 'all',
-  },
-  endConditions: { rounds: 1 },
-  effects: {
-    gameStart: [
-      {
-        type: 'add-cards',
-        params: {
-          location: 'drawPile',
-          cards: { 'hand-board-discard': 1, score: 1 },
-          mode: 'top',
-        },
-      },
-      {
-        type: 'add-cards',
-        params: { location: 'board', cards: { score: 1 }, mode: 'top' },
-      },
-    ],
-  },
+  turnStructure: { playAmount: 1 },
   abilities: [
-    ...coreGameFlowAbilities,
     {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      trigger: { on: 'run-start' },
+      effects: [
+        {
+          type: 'add-cards',
+          params: {
+            location: 'drawPile',
+            cards: { 'hand-board-discard': 1, score: 1 },
+            mode: 'top',
+          },
+        },
+        {
+          type: 'add-cards',
+          params: { location: 'board', cards: { score: 1 }, mode: 'top' },
+        },
+      ],
     },
     {
       trigger: { on: 'turn-end' },
@@ -580,6 +561,11 @@ export const discardTestRules: RulesCard = {
     {
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
+    },
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
   ],
 }
@@ -593,29 +579,20 @@ export const moveTestRules: RulesCard = {
     image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
-  turnStructure: {
-    drawAmount: 2,
-    playAmount: 1,
-    discardAmount: 'all',
-  },
-  endConditions: { rounds: 1 },
-  effects: {
-    gameStart: [
-      {
-        type: 'add-cards',
-        params: {
-          location: 'drawPile',
-          cards: { 'hand-to-board': 1, score: 1 },
-          mode: 'top',
-        },
-      },
-    ],
-  },
+  turnStructure: { playAmount: 1 },
   abilities: [
-    ...coreGameFlowAbilities,
     {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      trigger: { on: 'run-start' },
+      effects: [
+        {
+          type: 'add-cards',
+          params: {
+            location: 'drawPile',
+            cards: { 'hand-to-board': 1, score: 1 },
+            mode: 'top',
+          },
+        },
+      ],
     },
     {
       trigger: { on: 'turn-end' },
@@ -624,6 +601,11 @@ export const moveTestRules: RulesCard = {
     {
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
+    },
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
   ],
 }
@@ -637,29 +619,20 @@ export const choiceTestRules: RulesCard = {
     image: 'lightning',
   },
   deckLimits: { size: [0, 4] },
-  turnStructure: {
-    drawAmount: 1,
-    playAmount: 1,
-    discardAmount: 'all',
-  },
-  endConditions: { rounds: 1 },
-  effects: {
-    gameStart: [
-      {
-        type: 'add-cards',
-        params: {
-          location: 'drawPile',
-          cards: { 'choice-add-choice': 1 },
-          mode: 'top',
-        },
-      },
-    ],
-  },
+  turnStructure: { playAmount: 1 },
   abilities: [
-    ...coreGameFlowAbilities,
     {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+      trigger: { on: 'run-start' },
+      effects: [
+        {
+          type: 'add-cards',
+          params: {
+            location: 'drawPile',
+            cards: { 'choice-add-choice': 1 },
+            mode: 'top',
+          },
+        },
+      ],
     },
     {
       trigger: { on: 'turn-end' },
@@ -668,6 +641,11 @@ export const choiceTestRules: RulesCard = {
     {
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
+    },
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
     },
   ],
 }

@@ -2,14 +2,14 @@
  * Game run utility functions
  */
 
-import { moveItem, moveItems, shuffle } from './utils.ts'
+import { moveItem, moveItems } from './utils.ts'
 import { toArray } from './counter.ts'
-import { playableCards, type CardInstance, type PlayableCardID } from './cards.ts'
-import { handleEffects } from './effects.ts'
+import { playableCards, type CardInstance } from './cards.ts'
 import type { GameState } from './game.ts'
 import type { Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
-import type { Event } from './event.ts'
+import type { Event, RunStartEvent } from './event.ts'
+import { handleEvent } from './ability-processor.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -76,8 +76,8 @@ export function moveCards(run: Run, fromLocation: Location, toLocation: Location
  * Populates a run's draw pile with cards from the deck's counter.
  */
 export function populateDrawPile(run: Run): Run {
-  const shuffledIds: PlayableCardID[] = shuffle(toArray(run.deck.cards))
-  const cardsToAdd = shuffledIds.map((id) => ({
+  const ids = toArray(run.deck.cards)
+  const cardsToAdd = ids.map((id) => ({
     ...playableCards[id],
     instanceId: crypto.randomUUID(),
   }))
@@ -92,33 +92,6 @@ export function populateDrawPile(run: Run): Run {
 }
 
 /**
- * Process the game-start effects of the rules card, if any.
- */
-export function processStartOfGame(gameState: GameState): GameState {
-  const run = gameState.game.run
-  if (!run) {
-    throw new Error('Cannot process start of game without an active run')
-  }
-  if (run.deck.rulesCard == null) {
-    throw new Error('Tried to process a run without a rules card.')
-  }
-
-  const gameStartEffects = run.deck.rulesCard.effects.gameStart
-
-  if (!gameStartEffects) return gameState
-
-  return handleEffects(gameState, gameStartEffects)
-}
-
-/**
- * Move cards from the draw pile to the hand according to the rules card.
- */
-export function drawFirstHand(run: Run) {
-  const drawAmount = run.deck.rulesCard?.turnStructure?.drawAmount || 0
-  return moveCards(run, 'drawPile', 'hand', drawAmount)
-}
-
-/**
  * Creates a new run from a deck with populated draw pile.
  */
 export function makeRun(deck: Deck): Run {
@@ -126,7 +99,7 @@ export function makeRun(deck: Deck): Run {
     deck: deck,
     cards: { drawPile: [], hand: [], board: [], discardPile: [] },
     resources: { points: 0 },
-    stats: { turns: 1, rounds: 1 },
+    stats: { turns: 0, rounds: 0 },
     events: [],
   }
 
@@ -134,8 +107,9 @@ export function makeRun(deck: Deck): Run {
 }
 
 /**
- * Initializes a new run from the selected deck in gameState and processes game-start effects.
- * Returns updated GameState which may include changes to collection or modals.
+ * Initializes a new run from the selected deck in gameState.
+ * Emits a run-start event which triggers the ability chain:
+ * run-start → round-start → turn-start → draw cards.
  */
 export function initializeRun(gameState: GameState): GameState {
   const selectedDeckKey = gameState.ui.collection.selectedDeck
@@ -149,25 +123,15 @@ export function initializeRun(gameState: GameState): GameState {
   }
 
   const run = makeRun(deck)
-
-  // Create game state with the new run for processing start effects
   const stateWithRun: GameState = {
     ...gameState,
-    game: {
-      ...gameState.game,
-      run: run,
-    },
+    game: { ...gameState.game, run },
   }
 
-  const stateWithStartEffects = processStartOfGame(stateWithRun)
-  const runWithStartEffects = stateWithStartEffects.game.run as Run
-  const runWithHand = drawFirstHand(runWithStartEffects)
-
-  return {
-    ...stateWithStartEffects,
-    game: {
-      ...stateWithStartEffects.game,
-      run: runWithHand,
-    },
+  const runStartEvent: RunStartEvent = {
+    type: 'run-start',
+    round: run.stats.rounds,
+    turn: run.stats.turns,
   }
+  return handleEvent(stateWithRun, runStartEvent)
 }

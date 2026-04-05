@@ -18,14 +18,7 @@ const run = computed(() => {
 })
 
 const isEndOfRun = computed(() => {
-  if (!run.value.deck.rulesCard) return false
-
-  const { rounds: maxRounds } = run.value.deck.rulesCard.endConditions
-  const currentRound = run.value.stats.rounds
-  const isLastRound = currentRound >= maxRounds
-  const deckIsEmpty = run.value.cards.drawPile.length === 0
-
-  return isLastRound && deckIsEmpty
+  return run.value.cards.drawPile.length === 0
 })
 
 const noActionsLeft = computed(() => {

@@ -1,20 +1,16 @@
 import { describe, it, expect } from 'vitest'
-import {
-  moveCardByIndex,
-  moveCards,
-  populateDrawPile,
-  processStartOfGame,
-  type Run,
-} from '../../utils/run.js'
+import { moveCardByIndex, moveCards, populateDrawPile, type Run } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
 import {
   playableCards,
+  coreGameFlowAbilities,
   type CardInstance,
   type RulesCard,
   type PlayableCardID,
 } from '../../utils/cards.ts'
 import type { GameState } from '../../utils/game.ts'
-import type { AddCardsEffect } from '@/utils/effects.ts'
+import { handleEvent } from '../../utils/ability-processor.ts'
+import type { RunStartEvent } from '../../utils/event.ts'
 
 // Helper to wrap a Run in a minimal GameState for testing
 const wrapInGameState = (run: Run): GameState => ({
@@ -35,21 +31,16 @@ const baseRules: RulesCard = {
     image: 'scarab',
   },
   deckLimits: { size: [0, 0] },
-  turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
-  endConditions: { rounds: 1 },
-  effects: {
-    gameStart: [],
-  },
-  abilities: [],
-}
-
-const addThreeScore: AddCardsEffect = {
-  type: 'add-cards',
-  params: {
-    location: 'drawPile',
-    cards: { score: 3 },
-    mode: 'shuffle',
-  },
+  turnStructure: { playAmount: 1 },
+  abilities: [
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+    },
+    { trigger: { on: 'round-end' }, effects: [{ type: 'run-end', params: {} }] },
+    ...coreGameFlowAbilities,
+    { trigger: { on: 'turn-start' }, effects: [{ type: 'draw-cards', params: { amount: 1 } }] },
+  ],
 }
 
 const rulesWithAddedCards: RulesCard = {
@@ -61,10 +52,25 @@ const rulesWithAddedCards: RulesCard = {
     image: 'scarab',
   },
   deckLimits: { size: [0, 0] },
-  turnStructure: { drawAmount: 1, playAmount: 1, discardAmount: 0 },
-  endConditions: { rounds: 1 },
-  effects: { gameStart: [addThreeScore] },
-  abilities: [],
+  turnStructure: { playAmount: 1 },
+  abilities: [
+    {
+      trigger: { on: 'run-start' },
+      effects: [
+        {
+          type: 'add-cards',
+          params: { location: 'drawPile', cards: { score: 3 }, mode: 'shuffle' },
+        },
+      ],
+    },
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+    },
+    { trigger: { on: 'round-end' }, effects: [{ type: 'run-end', params: {} }] },
+    ...coreGameFlowAbilities,
+    { trigger: { on: 'turn-start' }, effects: [{ type: 'draw-cards', params: { amount: 1 } }] },
+  ],
 }
 
 const card = (id: PlayableCardID, instanceId: string): CardInstance => ({
@@ -186,17 +192,32 @@ const populatedHandRunNoAdded: Run = {
   events: [],
 }
 
-describe('processStartOfGame', () => {
-  it("doesn't modify cards in draw-pile when no cards are added", () => {
+describe('run-start event', () => {
+  it("doesn't modify cards in draw-pile when no run-start add-cards ability", () => {
     const gameState = wrapInGameState(populatedHandRunNoAdded)
-    const result = processStartOfGame(gameState)
-    expect(result.game.run!.cards.drawPile).toEqual(populatedHandRunNoAdded.cards.drawPile)
+    const event: RunStartEvent = { type: 'run-start', round: 0, turn: 0 }
+    const result = handleEvent(gameState, event)
+    // Draw pile should contain original cards plus any drawn to hand via the ability chain
+    const allCards = [
+      ...result.game.run!.cards.drawPile,
+      ...result.game.run!.cards.hand,
+      ...result.game.run!.cards.discardPile,
+    ]
+    const idCounter = pileToIdCounter(allCards)
+    expect(idCounter).toEqual(pileToIdCounter(populatedHandRunNoAdded.cards.drawPile))
   })
 
-  it('adds cards to draw-pile from rules card', () => {
+  it('adds cards to draw-pile from rules card run-start ability', () => {
     const gameState = wrapInGameState(populatedHandRun)
-    const result = processStartOfGame(gameState)
-    const idCounter = pileToIdCounter(result.game.run!.cards.drawPile)
+    const event: RunStartEvent = { type: 'run-start', round: 0, turn: 0 }
+    const result = handleEvent(gameState, event)
+    // All cards should be accounted for across locations
+    const allCards = [
+      ...result.game.run!.cards.drawPile,
+      ...result.game.run!.cards.hand,
+      ...result.game.run!.cards.discardPile,
+    ]
+    const idCounter = pileToIdCounter(allCards)
     expect(idCounter).toEqual({ score: 6, 'collect-basic': 2, 'dual-score': 1 })
   })
 })

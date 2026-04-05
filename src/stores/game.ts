@@ -6,9 +6,10 @@ import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/car
 import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
-import { drawCards, type GameState } from '@/utils/game.ts'
+import type { GameState } from '@/utils/game.ts'
 import { handleEffect } from '@/utils/effects.ts'
 import { handleEvent } from '@/utils/ability-processor.ts'
+import type { TurnEndEvent } from '@/utils/event.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -85,6 +86,11 @@ export const useGameStore = defineStore('game', () => {
   function startRun() {
     gameState.value.ui.currentView = ['run']
     gameState.value = initializeRun(gameState.value)
+
+    // Handle edge case: run-start abilities immediately ended the run
+    if (gameState.value.game.run?.events.some((e) => e.type === 'run-end')) {
+      endRun()
+    }
   }
 
   function endRun() {
@@ -158,76 +164,17 @@ export const useGameStore = defineStore('game', () => {
     const run = gameState.value.game.run
     if (!run || !run.deck.rulesCard) return
 
-    // Increment turn counter
-    run.stats.turns += 1
-
-    const turnStructure = run.deck.rulesCard.turnStructure
-
-    // Handle discarding cards from hand to discard pile
-    const discardAmount = turnStructure.discardAmount
-    if (discardAmount === 'all') {
-      // Move all cards from hand to discard pile
-      const cardsToDiscard = run.cards.hand.length
-      if (cardsToDiscard > 0) {
-        run.cards.discardPile.push(...run.cards.hand)
-        run.cards.hand = []
-      }
-    } else if (typeof discardAmount === 'number' && discardAmount > 0) {
-      // Move specified number of cards from hand to discard pile
-      const cardsToDiscard = Math.min(discardAmount, run.cards.hand.length)
-      for (let i = 0; i < cardsToDiscard; i++) {
-        const card = run.cards.hand.shift()
-        if (card) {
-          run.cards.discardPile.push(card)
-        }
-      }
+    const turnEndEvent: TurnEndEvent = {
+      type: 'turn-end',
+      round: run.stats.rounds,
+      turn: run.stats.turns,
     }
+    gameState.value = handleEvent(gameState.value, turnEndEvent)
 
-    // Check if round should end (draw pile empty after trying to draw)
-    const shouldEndRound = run.cards.drawPile.length === 0
-
-    if (shouldEndRound) {
-      // End of round: reshuffle all cards into new draw pile and start new round
-      startNewRound()
-    } else {
-      // Draw new cards from draw pile to hand
-      gameState.value = drawCards(gameState.value, turnStructure.drawAmount)
-    }
-  }
-
-  function startNewRound() {
-    const run = gameState.value.game.run
-    if (!run || !run.deck.rulesCard) return
-
-    // Increment round counter
-    run.stats.rounds += 1
-
-    // Check if run should end based on rules card end conditions
-    const endConditions = run.deck.rulesCard.endConditions
-    if (endConditions.rounds && run.stats.rounds >= endConditions.rounds) {
-      // End the run
+    // If run-end occurred during ability processing, clean up
+    if (gameState.value.game.run?.events.some((e) => e.type === 'run-end')) {
       endRun()
-      return
     }
-
-    // Collect all cards from hand, board, and discard pile
-    const allCards = [...run.cards.hand, ...run.cards.board, ...run.cards.discardPile]
-
-    // Shuffle the collected cards
-    allCards.sort(() => Math.random() - 0.5)
-
-    // Create new draw pile and clear other locations
-    run.cards.drawPile = allCards
-    run.cards.hand = []
-    run.cards.board = []
-    run.cards.discardPile = []
-
-    // Reset turns to 1 for the new round
-    run.stats.turns = 1
-
-    // Draw starting hand for new round
-    const turnStructure = run.deck.rulesCard.turnStructure
-    gameState.value = drawCards(gameState.value, turnStructure.drawAmount)
   }
 
   return {
@@ -247,7 +194,6 @@ export const useGameStore = defineStore('game', () => {
     startRun,
     tryPlayCard,
     nextTurn,
-    startNewRound,
     endRun,
     changeDeckName,
     addCardToDeck,
