@@ -184,7 +184,6 @@ export function findMatchingAbilities(
       matches.push({ card: rulesCard, ability })
   }
 
-  // TODO: also check rules card
   for (const location of locations) {
     for (const card of run.cards[location]) {
       for (const ability of card.abilities) {
