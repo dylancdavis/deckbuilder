@@ -822,13 +822,3 @@ export function handleEffect(gameState: GameState, effect: Effect): EffectResult
       return handleIdentity(gameState)
   }
 }
-
-/**
- * Applies multiple effects to a game state sequentially, returning the final game state.
- */
-export function handleEffects(gameState: GameState, effects: Effect[]): GameState {
-  return effects.reduce(
-    (currentState, effect) => handleEffect(currentState, effect).game,
-    gameState,
-  )
-}
