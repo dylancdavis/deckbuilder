@@ -8,8 +8,8 @@ import { playableCards, type CardInstance } from './cards.ts'
 import type { GameState } from './game.ts'
 import type { Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
-import type { Event, RunStartEvent } from './event.ts'
-import { handleEvent } from './ability-processor.ts'
+import type { Event } from './event.ts'
+import { handleEffect } from './ability-processor.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -128,10 +128,5 @@ export function initializeRun(gameState: GameState): GameState {
     game: { ...gameState.game, run },
   }
 
-  const runStartEvent: RunStartEvent = {
-    type: 'run-start',
-    round: run.stats.rounds,
-    turn: run.stats.turns,
-  }
-  return handleEvent(stateWithRun, runStartEvent)
+  return handleEffect(stateWithRun, { type: 'run-start', params: {} })
 }

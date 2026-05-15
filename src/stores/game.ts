@@ -7,9 +7,7 @@ import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import type { GameState } from '@/utils/game.ts'
-import { handleEffect } from '@/utils/effects.ts'
-import { handleEvent } from '@/utils/ability-processor.ts'
-import type { TurnEndEvent } from '@/utils/event.ts'
+import { handleEffect } from '@/utils/ability-processor.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -59,7 +57,7 @@ export const useGameStore = defineStore('game', () => {
     viewData: {
       modalView: null,
       cardOptions: [],
-      resolver: null,
+      pendingChoice: null,
     },
   })
 
@@ -153,23 +151,19 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function tryPlayCard(instanceId: string) {
-    const { game, events } = handleEffect(gameState.value, {
+    gameState.value = handleEffect(gameState.value, {
       type: 'play-card',
       params: { instanceId },
     })
-    gameState.value = events.reduce((state, event) => handleEvent(state, event), game)
   }
 
   function nextTurn() {
-    const run = gameState.value.game.run
-    if (!run || !run.deck.rulesCard) return
+    if (!gameState.value.game.run?.deck.rulesCard) return
 
-    const turnEndEvent: TurnEndEvent = {
+    gameState.value = handleEffect(gameState.value, {
       type: 'turn-end',
-      round: run.stats.rounds,
-      turn: run.stats.turns,
-    }
-    gameState.value = handleEvent(gameState.value, turnEndEvent)
+      params: {},
+    })
 
     // If run-end occurred during ability processing, clean up
     if (gameState.value.game.run?.events.some((e) => e.type === 'run-end')) {

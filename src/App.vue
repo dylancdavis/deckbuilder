@@ -5,7 +5,7 @@ import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
 import CardChoiceModal from './components/CardChoiceModal.vue'
 import type { CardID } from './utils/cards'
-import type { GameState } from './utils/game'
+import { resolveChoice } from './utils/ability-processor'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
 
@@ -30,21 +30,8 @@ async function handleSelect(cardId: CardID) {
   // Capture state of cards in hand and discard pile before resolving the choice
   const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
 
-  // Get the resolver and clear the modal before calling it
-  // (resolver may open a new modal, so we need clean state)
-  const resolver = gameStore.gameState.viewData.resolver!
-  const stateWithModalCleared: GameState = {
-    ...gameStore.gameState,
-    viewData: {
-      ...gameStore.gameState.viewData,
-      modalView: null,
-      resolver: null,
-      cardOptions: [],
-    },
-  }
-
-  // Resolve the choice effect (moves card to discard and applies chosen effect)
-  gameStore.gameState = resolver(stateWithModalCleared, cardId)
+  // Resolve the choice effect (resolveChoice clears the modal internally)
+  gameStore.gameState = resolveChoice(gameStore.gameState, cardId)
 
   // Wait for Vue to re-render
   await nextTick()
