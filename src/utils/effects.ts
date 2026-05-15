@@ -1,21 +1,17 @@
 import type { Counter } from './counter'
-import { toArray, mergeCounters, subtractCounters } from './counter'
+import { add, sub } from './counter'
 import { playableCards, type CardID, type CardInstance, type PlayableCardID } from './cards'
 import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
 import { shuffle, placeItems } from './utils'
 import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
-import { matchesCard } from './card-matchers'
 import type {
   CardAddEvent,
   CardCollectEvent,
   CardDestroyEvent,
-  CardDiscardEvent,
   CardDrawEvent,
-  CardMoveEvent,
   CardPlayEvent,
-  CardRemoveEvent,
   DeckRefreshEvent,
   Event,
   ResourceChangeEvent,
@@ -169,12 +165,7 @@ export type Effect =
   | RunEndEffect
   | RefreshDeckEffect
 
-type EffectResult = { game: GameState; events: Event[] }
-
-/** No-op handler — returns game state unchanged with no events. */
-function handleIdentity(gameState: GameState): EffectResult {
-  return { game: gameState, events: [] }
-}
+type EffectResult = { game: GameState; event: Event | null }
 
 function handleUpdateResource(gameState: GameState, effect: UpdateResourceEffect): EffectResult {
   const run = gameState.game.run!
@@ -216,38 +207,40 @@ function handleUpdateResource(gameState: GameState, effect: UpdateResourceEffect
         },
       },
     },
-    events: [event],
+    event,
   }
 }
 
+/**
+ * Adds a single card to a location. The decomposition layer breaks
+ * multi-card counters into individual add-cards effects.
+ */
 function handleAddCards(gameState: GameState, effect: AddCardsEffect): EffectResult {
   const run = gameState.game.run!
   const round = run.stats.rounds
   const turn = run.stats.turns
   const { location, cards, mode } = effect.params
-  const shuffledIDs = shuffle(toArray(cards))
-  const cardsToAdd = shuffledIDs.map((id) => ({
-    ...playableCards[id],
+
+  // Pick one card from the counter (decomposition ensures single-card counters)
+  const cardId = Object.keys(cards)[0] as PlayableCardID | undefined
+  if (!cardId) return { game: gameState, event: null }
+
+  const card: CardInstance = {
+    ...playableCards[cardId],
     instanceId: crypto.randomUUID(),
-  }))
-  const existingCards = run.cards[location]
-  let newCardArr: CardInstance[]
-  if (mode === 'top') {
-    newCardArr = [...cardsToAdd, ...existingCards]
-  } else if (mode === 'bottom') {
-    newCardArr = [...existingCards, ...cardsToAdd]
-  } else {
-    newCardArr = shuffle([...existingCards, ...cardsToAdd])
   }
 
-  const events: CardAddEvent[] = cardsToAdd.map((card) => ({
+  const existingCards = run.cards[location]
+  const newCardArr = placeItems(existingCards, [card], mode === 'shuffle' ? 'shuffle' : mode)
+
+  const event: CardAddEvent = {
     type: 'card-add',
     cardId: card.id,
     instanceId: card.instanceId,
     toLocation: location,
     round,
     turn,
-  }))
+  }
 
   return {
     game: {
@@ -263,22 +256,29 @@ function handleAddCards(gameState: GameState, effect: AddCardsEffect): EffectRes
         },
       },
     },
-    events,
+    event,
   }
 }
 
+/**
+ * Collects a single card into the collection. The decomposition layer
+ * breaks multi-card counters into individual collect-card effects.
+ */
 function handleCollectCard(gameState: GameState, effect: CollectCardEffect): EffectResult {
   const run = gameState.game.run!
   const round = run.stats.rounds
   const turn = run.stats.turns
   const { cards } = effect.params
 
-  const events: CardCollectEvent[] = toArray(cards).map((cardId) => ({
+  const cardId = Object.keys(cards)[0] as CardID | undefined
+  if (!cardId) return { game: gameState, event: null }
+
+  const event: CardCollectEvent = {
     type: 'card-collect',
     cardId,
     round,
     turn,
-  }))
+  }
 
   return {
     game: {
@@ -287,26 +287,33 @@ function handleCollectCard(gameState: GameState, effect: CollectCardEffect): Eff
         ...gameState.game,
         collection: {
           ...gameState.game.collection,
-          cards: mergeCounters(gameState.game.collection.cards, cards),
+          cards: add(gameState.game.collection.cards, cardId, cards[cardId] ?? 1),
         },
       },
     },
-    events,
+    event,
   }
 }
 
+/**
+ * Destroys a single card from the collection. The decomposition layer
+ * breaks multi-card counters into individual destroy-card effects.
+ */
 function handleDestroyCard(gameState: GameState, effect: DestroyCardEffect): EffectResult {
   const run = gameState.game.run!
   const round = run.stats.rounds
   const turn = run.stats.turns
   const { cards } = effect.params
 
-  const events: CardDestroyEvent[] = toArray(cards).map((cardId) => ({
+  const cardId = Object.keys(cards)[0] as CardID | undefined
+  if (!cardId) return { game: gameState, event: null }
+
+  const event: CardDestroyEvent = {
     type: 'card-destroy',
     cardId,
     round,
     turn,
-  }))
+  }
 
   return {
     game: {
@@ -315,23 +322,26 @@ function handleDestroyCard(gameState: GameState, effect: DestroyCardEffect): Eff
         ...gameState.game,
         collection: {
           ...gameState.game.collection,
-          cards: subtractCounters(gameState.game.collection.cards, cards),
+          cards: sub(gameState.game.collection.cards, cardId, cards[cardId] ?? 1),
         },
       },
     },
-    events,
+    event,
   }
 }
 
+/**
+ * Removes a single card by instanceId from any location.
+ * Self-references and matchers must be resolved by the decomposition layer.
+ */
 function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): EffectResult {
-  if ('matching' in effect.params) throw new Error('Card matcher removal not yet implemented')
+  if ('matching' in effect.params) throw new Error('Card matcher removal must be decomposed first')
+  if (effect.params.instanceId === 'self') throw new Error('Self reference must be decomposed first')
 
   const run = gameState.game.run!
   const round = run.stats.rounds
   const turn = run.stats.turns
-  const events: CardRemoveEvent[] = []
   const { instanceId } = effect.params
-
   const updatedCards = { ...run.cards }
 
   for (const location of locations) {
@@ -339,36 +349,36 @@ function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): Effec
     if (cardIndex !== -1) {
       const card = updatedCards[location][cardIndex]
 
-      events.push({
-        type: 'card-remove',
-        cardId: card.id,
-        instanceId: card.instanceId,
-        fromLocation: location,
-        round,
-        turn,
-      })
-
       updatedCards[location] = [
         ...updatedCards[location].slice(0, cardIndex),
         ...updatedCards[location].slice(cardIndex + 1),
       ]
-      break
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: updatedCards,
+            },
+          },
+        },
+        event: {
+          type: 'card-remove',
+          cardId: card.id,
+          instanceId: card.instanceId,
+          fromLocation: location,
+          round,
+          turn,
+        },
+      }
     }
   }
 
-  return {
-    game: {
-      ...gameState,
-      game: {
-        ...gameState.game,
-        run: {
-          ...run,
-          cards: updatedCards,
-        },
-      },
-    },
-    events,
-  }
+  // Card not found — skip
+  return { game: gameState, event: null }
 }
 
 function handleTurnStart(gameState: GameState): EffectResult {
@@ -394,7 +404,7 @@ function handleTurnStart(gameState: GameState): EffectResult {
         },
       },
     },
-    events: [event],
+    event,
   }
 }
 
@@ -408,7 +418,7 @@ function handleTurnEnd(gameState: GameState): EffectResult {
 
   return {
     game: gameState,
-    events: [event],
+    event,
   }
 }
 
@@ -436,49 +446,46 @@ function handleRoundStart(gameState: GameState): EffectResult {
         },
       },
     },
-    events: [event],
+    event,
   }
 }
 
 function handleRoundEnd(gameState: GameState): EffectResult {
   const run = gameState.game.run!
-  const event: Event = {
-    type: 'round-end',
-    round: run.stats.rounds,
-    turn: run.stats.turns,
-  }
 
   return {
     game: gameState,
-    events: [event],
+    event: {
+      type: 'round-end',
+      round: run.stats.rounds,
+      turn: run.stats.turns,
+    },
   }
 }
 
 function handleRunStart(gameState: GameState): EffectResult {
   const run = gameState.game.run!
-  const event: Event = {
-    type: 'run-start',
-    round: run.stats.rounds,
-    turn: run.stats.turns,
-  }
 
   return {
     game: gameState,
-    events: [event],
+    event: {
+      type: 'run-start',
+      round: run.stats.rounds,
+      turn: run.stats.turns,
+    },
   }
 }
 
 function handleRunEnd(gameState: GameState): EffectResult {
   const run = gameState.game.run!
-  const event: Event = {
-    type: 'run-end',
-    round: run.stats.rounds,
-    turn: run.stats.turns,
-  }
 
   return {
     game: gameState,
-    events: [event],
+    event: {
+      type: 'run-end',
+      round: run.stats.rounds,
+      turn: run.stats.turns,
+    },
   }
 }
 
@@ -514,7 +521,7 @@ function handleRefreshDeck(gameState: GameState): EffectResult {
         },
       },
     },
-    events: [event],
+    event,
   }
 }
 
@@ -579,26 +586,30 @@ function handlePlayCard(gameState: GameState, effect: PlayCardEffect): EffectRes
         },
       },
     },
-    events: [event],
+    event,
   }
 }
 
-function handleDrawCards(gameState: GameState, effect: DrawCardsEffect): EffectResult {
+/**
+ * Draws a single card from the top of the draw pile.
+ * The decomposition layer breaks draw-cards { amount: N } into N individual calls.
+ */
+function handleDrawCard(gameState: GameState): EffectResult {
   const run = gameState.game.run!
-  const round = run.stats.rounds
-  const turn = run.stats.turns
-  const { amount } = effect.params
   const drawPile = run.cards.drawPile
-  const cardsToDraw = drawPile.slice(0, amount)
-  const remainingDrawPile = drawPile.slice(amount)
 
-  const events: CardDrawEvent[] = cardsToDraw.map((card) => ({
+  if (drawPile.length === 0) return { game: gameState, event: null }
+
+  const card = drawPile[0]
+  const remainingDrawPile = drawPile.slice(1)
+
+  const event: CardDrawEvent = {
     type: 'card-draw',
     cardId: card.id,
     instanceId: card.instanceId,
-    round,
-    turn,
-  }))
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
 
   return {
     game: {
@@ -610,176 +621,131 @@ function handleDrawCards(gameState: GameState, effect: DrawCardsEffect): EffectR
           cards: {
             ...run.cards,
             drawPile: remainingDrawPile,
-            hand: [...run.cards.hand, ...cardsToDraw],
+            hand: [...run.cards.hand, card],
           },
         },
       },
     },
-    events,
-  }
-}
-
-function handleDiscardCards(gameState: GameState, effect: DiscardCardsEffect): EffectResult {
-  const run = gameState.game.run!
-  const round = run.stats.rounds
-  const turn = run.stats.turns
-  const events: CardDiscardEvent[] = []
-  const updatedCards = { ...run.cards }
-
-  if ('instanceIds' in effect.params) {
-    for (const instanceId of effect.params.instanceIds) {
-      for (const location of locations) {
-        const idx = updatedCards[location].findIndex((c) => c.instanceId === instanceId)
-        if (idx !== -1) {
-          const card = updatedCards[location][idx]
-          updatedCards[location] = [
-            ...updatedCards[location].slice(0, idx),
-            ...updatedCards[location].slice(idx + 1),
-          ]
-          updatedCards.discardPile = [...updatedCards.discardPile, card]
-          events.push({
-            type: 'card-discard',
-            cardId: card.id,
-            instanceId: card.instanceId,
-            fromLocation: location,
-            round,
-            turn,
-          })
-          break
-        }
-      }
-    }
-  } else {
-    const { from } = effect.params
-    let cardsToDiscard: CardInstance[]
-    let remaining: CardInstance[]
-
-    if ('matching' in effect.params) {
-      const { matching } = effect.params
-      cardsToDiscard = updatedCards[from].filter((c) => matchesCard(c, matching))
-      remaining = updatedCards[from].filter((c) => !matchesCard(c, matching))
-    } else {
-      const count =
-        effect.params.amount === 'all' ? updatedCards[from].length : effect.params.amount
-      cardsToDiscard = updatedCards[from].slice(0, count)
-      remaining = updatedCards[from].slice(count)
-    }
-
-    updatedCards[from] = remaining
-    updatedCards.discardPile = [...updatedCards.discardPile, ...cardsToDiscard]
-
-    for (const card of cardsToDiscard) {
-      events.push({
-        type: 'card-discard',
-        cardId: card.id,
-        instanceId: card.instanceId,
-        fromLocation: from,
-        round,
-        turn,
-      })
-    }
-  }
-
-  return {
-    game: {
-      ...gameState,
-      game: {
-        ...gameState.game,
-        run: {
-          ...run,
-          cards: updatedCards,
-        },
-      },
-    },
-    events,
-  }
-}
-
-function handleMoveCard(gameState: GameState, effect: MoveCardEffect): EffectResult {
-  const run = gameState.game.run!
-  const round = run.stats.rounds
-  const turn = run.stats.turns
-  const { to, position } = effect.params
-  const events: CardMoveEvent[] = []
-  const updatedCards = { ...run.cards }
-  let cardsToMove: CardInstance[] = []
-
-  if ('instanceIds' in effect.params) {
-    for (const instanceId of effect.params.instanceIds) {
-      for (const location of locations) {
-        const idx = updatedCards[location].findIndex((c) => c.instanceId === instanceId)
-        if (idx !== -1) {
-          const card = updatedCards[location][idx]
-          updatedCards[location] = [
-            ...updatedCards[location].slice(0, idx),
-            ...updatedCards[location].slice(idx + 1),
-          ]
-          cardsToMove.push(card)
-          events.push({
-            type: 'card-move',
-            cardId: card.id,
-            instanceId: card.instanceId,
-            fromLocation: location,
-            toLocation: to,
-            round,
-            turn,
-          })
-          break
-        }
-      }
-    }
-  } else {
-    const { from } = effect.params
-    let remaining: CardInstance[]
-
-    if ('matching' in effect.params) {
-      const { matching } = effect.params
-      cardsToMove = updatedCards[from].filter((c) => matchesCard(c, matching))
-      remaining = updatedCards[from].filter((c) => !matchesCard(c, matching))
-    } else {
-      const count =
-        effect.params.amount === 'all' ? updatedCards[from].length : effect.params.amount
-      cardsToMove = updatedCards[from].slice(0, count)
-      remaining = updatedCards[from].slice(count)
-    }
-
-    updatedCards[from] = remaining
-
-    for (const card of cardsToMove) {
-      events.push({
-        type: 'card-move',
-        cardId: card.id,
-        instanceId: card.instanceId,
-        fromLocation: from,
-        toLocation: to,
-        round,
-        turn,
-      })
-    }
-  }
-
-  updatedCards[to] = placeItems(updatedCards[to], cardsToMove, position)
-
-  return {
-    game: {
-      ...gameState,
-      game: {
-        ...gameState.game,
-        run: {
-          ...run,
-          cards: updatedCards,
-        },
-      },
-    },
-    events,
+    event,
   }
 }
 
 /**
- * Handles a given effect and updates the event log if the effect successfully generated events.
- * Returns the new GameState and any generated events.
+ * Discards a single card by instanceId.
+ * The decomposition layer resolves instanceIds[], amount, and matching variants
+ * into individual discard-cards effects with a single instanceId.
  */
-export function handleEffect(gameState: GameState, effect: Effect): EffectResult {
+function handleDiscardCard(gameState: GameState, effect: DiscardCardsEffect): EffectResult {
+  if (!('instanceIds' in effect.params) || effect.params.instanceIds.length !== 1) {
+    throw new Error('Discard effect must be decomposed to single instanceId before applying')
+  }
+
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const instanceId = effect.params.instanceIds[0]
+  const updatedCards = { ...run.cards }
+
+  for (const location of locations) {
+    const idx = updatedCards[location].findIndex((c) => c.instanceId === instanceId)
+    if (idx !== -1) {
+      const card = updatedCards[location][idx]
+      updatedCards[location] = [
+        ...updatedCards[location].slice(0, idx),
+        ...updatedCards[location].slice(idx + 1),
+      ]
+      updatedCards.discardPile = [...updatedCards.discardPile, card]
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: updatedCards,
+            },
+          },
+        },
+        event: {
+          type: 'card-discard',
+          cardId: card.id,
+          instanceId: card.instanceId,
+          fromLocation: location,
+          round,
+          turn,
+        },
+      }
+    }
+  }
+
+  // Card not found — skip
+  return { game: gameState, event: null }
+}
+
+/**
+ * Moves a single card by instanceId to a destination.
+ * The decomposition layer resolves instanceIds[], amount, and matching variants
+ * into individual move-card effects with a single instanceId.
+ */
+function handleMoveCard(gameState: GameState, effect: MoveCardEffect): EffectResult {
+  if (!('instanceIds' in effect.params) || effect.params.instanceIds.length !== 1) {
+    throw new Error('Move effect must be decomposed to single instanceId before applying')
+  }
+
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { to, position } = effect.params
+  const instanceId = effect.params.instanceIds[0] as string
+  const updatedCards = { ...run.cards }
+
+  for (const location of locations) {
+    const idx = updatedCards[location].findIndex((c) => c.instanceId === instanceId)
+    if (idx !== -1) {
+      const card = updatedCards[location][idx]
+      updatedCards[location] = [
+        ...updatedCards[location].slice(0, idx),
+        ...updatedCards[location].slice(idx + 1),
+      ]
+      updatedCards[to] = placeItems(updatedCards[to], [card], position)
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: updatedCards,
+            },
+          },
+        },
+        event: {
+          type: 'card-move',
+          cardId: card.id,
+          instanceId: card.instanceId,
+          fromLocation: location,
+          toLocation: to,
+          round,
+          turn,
+        },
+      }
+    }
+  }
+
+  // Card not found — skip
+  return { game: gameState, event: null }
+}
+
+/**
+ * Applies a single atomic effect to the game state.
+ * Returns the updated state and at most one event.
+ *
+ * Compound effects (multi-card, matching, self-references) must be decomposed
+ * by the orchestrator before reaching this function.
+ */
+export function applyEffect(gameState: GameState, effect: Effect): EffectResult {
   if (!gameState.game.run) throw new Error('No active run in game state')
 
   switch (effect.type) {
@@ -794,7 +760,7 @@ export function handleEffect(gameState: GameState, effect: Effect): EffectResult
     case 'remove-card':
       return handleRemoveCard(gameState, effect)
     case 'draw-cards':
-      return handleDrawCards(gameState, effect)
+      return handleDrawCard(gameState)
     case 'turn-start':
       return handleTurnStart(gameState)
     case 'turn-end':
@@ -810,15 +776,13 @@ export function handleEffect(gameState: GameState, effect: Effect): EffectResult
     case 'refresh-deck':
       return handleRefreshDeck(gameState)
     case 'discard-cards':
-      return handleDiscardCards(gameState, effect)
+      return handleDiscardCard(gameState, effect)
     case 'move-card':
       return handleMoveCard(gameState, effect)
     case 'play-card':
       return handlePlayCard(gameState, effect)
-    // TODO: implement these effect handlers
     case 'retrigger-card':
     case 'card-choice':
-      console.warn('unimplemented effect handle; falling back to no-op')
-      return handleIdentity(gameState)
+      throw new Error(`${effect.type} must be handled by the orchestrator, not applyEffect`)
   }
 }

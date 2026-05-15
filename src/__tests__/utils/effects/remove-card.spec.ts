@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { handleEffect } from '../../../utils/effects'
+import { applyEffect } from '../../../utils/effects'
 import type { RemoveCardEffect } from '../../../utils/effects'
 import { score } from '../../../utils/cards'
 import { createTestGameState } from './shared'
@@ -25,7 +25,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
     expect(result.game.game.run!.cards.drawPile[0].instanceId).toBe('card-1')
@@ -51,7 +51,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.game.run!.cards.hand[0].instanceId).toBe('card-2')
@@ -73,7 +73,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.run!.cards.board).toHaveLength(0)
   })
@@ -97,7 +97,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
@@ -119,7 +119,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(0)
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
@@ -142,7 +142,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(1)
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
@@ -164,7 +164,7 @@ describe('RemoveCardEffect', () => {
       },
     }
 
-    handleEffect(gameState, effect)
+    applyEffect(gameState, effect)
 
     expect(gameState.game.run!.cards.drawPile).toHaveLength(1) // Original unchanged
   })

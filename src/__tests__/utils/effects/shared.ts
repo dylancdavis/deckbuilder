@@ -49,6 +49,6 @@ export const createTestGameState = (runOverrides: Partial<Run> = {}): GameState 
   viewData: {
     modalView: null,
     cardOptions: [],
-    resolver: null,
+    pendingChoice: null,
   },
 })

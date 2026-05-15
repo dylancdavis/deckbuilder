@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { handleEffect } from '../../../utils/effects'
+import { applyEffect } from '../../../utils/effects'
 import type { CollectCardEffect } from '../../../utils/effects'
 import { createTestGameState } from './shared'
 
@@ -13,7 +13,7 @@ describe('CollectCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.collection.cards).toEqual({ score: 1 })
   })
@@ -27,27 +27,9 @@ describe('CollectCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.collection.cards).toEqual({ 'dual-score': 3 })
-  })
-
-  it('adds multiple different cards to collection', () => {
-    const gameState = createTestGameState()
-    const effect: CollectCardEffect = {
-      type: 'collect-card',
-      params: {
-        cards: { score: 2, 'collect-basic': 1, 'dual-score': 1 },
-      },
-    }
-
-    const result = handleEffect(gameState, effect)
-
-    expect(result.game.game.collection.cards).toEqual({
-      score: 2,
-      'collect-basic': 1,
-      'dual-score': 1,
-    })
   })
 
   it('merges with existing cards in collection', () => {
@@ -57,16 +39,15 @@ describe('CollectCardEffect', () => {
     const effect: CollectCardEffect = {
       type: 'collect-card',
       params: {
-        cards: { score: 2, 'dual-score': 1 },
+        cards: { score: 1 },
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.collection.cards).toEqual({
-      score: 7, // 5 + 2
+      score: 6, // 5 + 1
       'point-reset': 1,
-      'dual-score': 1,
     })
   })
 
@@ -79,7 +60,7 @@ describe('CollectCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.collection.cards).toEqual({ 'starter-rules': 1 })
   })
@@ -95,7 +76,7 @@ describe('CollectCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     expect(result.game.game.collection.cards).toEqual({ score: 3 })
   })
@@ -107,11 +88,11 @@ describe('CollectCardEffect', () => {
     const effect: CollectCardEffect = {
       type: 'collect-card',
       params: {
-        cards: { 'dual-score': 2 },
+        cards: { 'dual-score': 1 },
       },
     }
 
-    handleEffect(gameState, effect)
+    applyEffect(gameState, effect)
 
     expect(gameState.game.collection.cards).toEqual({ score: 5 }) // Original unchanged
   })
@@ -125,7 +106,7 @@ describe('CollectCardEffect', () => {
       },
     }
 
-    const result = handleEffect(gameState, effect)
+    const result = applyEffect(gameState, effect)
 
     // Run state should be unchanged
     expect(result.game.game.run!.resources.points).toBe(10)

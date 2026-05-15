@@ -2,7 +2,20 @@ import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID } from './cards.ts'
 import type { Event } from './event.ts'
-import { getCardChoices } from './cards.ts'
+import type { CardChoiceEffect } from './effects.ts'
+import type { EffectContext, EffectQueueItem } from './ability-processor.ts'
+
+/**
+ * Data representing a paused card-choice interaction.
+ * Stored on game state so the pending work is inspectable data, not closures.
+ */
+export type PendingChoice = {
+  cardOptions: CardID[]
+  tags: string[]
+  choiceEffect: CardChoiceEffect
+  context: EffectContext
+  remainingQueue: EffectQueueItem[]
+}
 
 export type GameState = {
   game: {
@@ -18,34 +31,7 @@ export type GameState = {
   viewData: {
     modalView: 'card-choice' | null
     cardOptions: CardID[]
-    resolver: ((gameState: GameState, chosenCard: CardID) => GameState) | null
-  }
-}
-
-/**
- * Pure function that opens a card choice modal by setting the viewData.
- * Returns a new game state with the modal opened and card options populated.
- *
- * @param gameState - The current game state
- * @param options - Number of card options to present
- * @param tags - Tags to filter card choices
- * @param resolver - Pure function to process gamestate update when a card is chosen
- * @returns A new game state with the modal opened
- */
-export function openCardChoiceModal(
-  gameState: GameState,
-  options: number,
-  tags: string[],
-  resolver: (game: GameState, chosenCard: CardID) => GameState,
-): GameState {
-  const choices = getCardChoices(options, tags)
-  return {
-    ...gameState,
-    viewData: {
-      modalView: 'card-choice',
-      cardOptions: choices,
-      resolver: resolver,
-    },
+    pendingChoice: PendingChoice | null
   }
 }
 

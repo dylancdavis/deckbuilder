@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { handleEffect } from '../../../utils/effects'
+import { applyEffect } from '../../../utils/effects'
 import type { UpdateResourceEffect } from '../../../utils/effects'
 import { Resource } from '../../../utils/resource'
 import { createTestGameState } from './shared'
@@ -13,7 +13,7 @@ describe('UpdateResourceEffect', () => {
         params: { resource: Resource.POINTS, delta: 3 },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(8)
     })
@@ -25,7 +25,7 @@ describe('UpdateResourceEffect', () => {
         params: { resource: Resource.POINTS, delta: -4 },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(6)
     })
@@ -37,7 +37,7 @@ describe('UpdateResourceEffect', () => {
         params: { resource: Resource.POINTS, delta: 0 },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(7)
     })
@@ -51,7 +51,7 @@ describe('UpdateResourceEffect', () => {
         params: { resource: Resource.POINTS, set: 4 },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(4)
     })
@@ -63,7 +63,7 @@ describe('UpdateResourceEffect', () => {
         params: { resource: Resource.POINTS, set: 0 },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(0)
     })
@@ -80,7 +80,7 @@ describe('UpdateResourceEffect', () => {
         },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(8)
     })
@@ -98,7 +98,7 @@ describe('UpdateResourceEffect', () => {
         },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(3)
     })
@@ -113,7 +113,7 @@ describe('UpdateResourceEffect', () => {
         },
       }
 
-      const result = handleEffect(gameState, effect)
+      const result = applyEffect(gameState, effect)
 
       expect(result.game.game.run!.resources.points).toBe(6)
     })
@@ -126,7 +126,7 @@ describe('UpdateResourceEffect', () => {
       params: { resource: Resource.POINTS, delta: 3 },
     }
 
-    handleEffect(gameState, effect)
+    applyEffect(gameState, effect)
 
     expect(gameState.game.run!.resources.points).toBe(5) // Original unchanged
   })

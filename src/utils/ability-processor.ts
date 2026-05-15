@@ -1,28 +1,33 @@
 /**
- * Ability processing system for the event-driven trigger architecture.
+ * Effect processing pipeline.
  *
- * The ability processor uses a queue-based approach with continuations to handle
- * interactive effects like card-choice. When an event fires, all matching abilities
- * are queued, then processed sequentially. If any effect requires user input,
- * the processor captures the remaining work as a "continuation" and returns early.
+ * The pipeline follows a decompose → apply → cascade loop:
+ * 1. DECOMPOSE: Break compound effects into atomic, single-card effects (just-in-time)
+ * 2. APPLY: Execute atomic effect → state change + 0 or 1 event
+ * 3. CASCADE: Event → find matching abilities → their effects enter step 1
+ *
+ * Card-choice effects pause the pipeline by storing pending work as inspectable
+ * data on the game state. The UI calls resolveChoice to resume.
  */
 
 import type { Ability, Trigger, TriggerContext } from './ability'
-import { type CardInstance, type PlayableCard, type RulesCard } from './cards'
+import { type CardInstance, type PlayableCard, type RulesCard, getCardChoices } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
-import type { GameState } from './game'
+import type { GameState, PendingChoice } from './game'
 import { matchesCard, type TargetSpec } from './card-matchers'
-import { handleEffect, type Effect } from './effects'
-import { logEvent, openCardChoiceModal } from './game'
+import { applyEffect, type Effect, type CardChoiceEffect } from './effects'
+import { logEvent } from './game'
 import { values, entries } from './utils'
+import { toArray } from './counter'
+import type { CardID } from './cards'
 
 /**
- * Context passed to handleEffect for resolving 'self' references
+ * Context passed to effect processing for resolving 'self' references
  * and providing source card information.
  */
-type EffectContext = {
+export type EffectContext = {
   sourceCard: CardInstance | RulesCard
   event: Event
 }
@@ -31,112 +36,386 @@ type EffectContext = {
  * Represents a single effect waiting to be processed in the queue.
  * Each effect from an ability becomes its own queue item.
  */
-type EffectQueueItem = {
+export type EffectQueueItem = {
   context: EffectContext
   effect: Effect
 }
 
 /**
- * Given an `event` and `gameState`, adds event to run
- * and triggers all relevant abilities
+ * Single entry point for all game actions. Takes a high-level effect,
+ * decomposes it, applies atomic effects, and cascades triggered abilities.
+ *
+ * @param gameState - The current game state
+ * @param effect - The effect to handle (may be compound)
+ * @param context - Optional context for self-reference resolution
+ * @returns Updated game state after all effects and cascades resolve
  */
-export function handleEvent(gameState: GameState, event: Event): GameState {
-  if (!gameState.game.run) throw new Error('Cannot handle event with no run')
+export function handleEffect(
+  gameState: GameState,
+  effect: Effect,
+  context?: EffectContext,
+): GameState {
+  if (!gameState.game.run) throw new Error('Cannot handle effect with no run')
 
-  const gameWithEventLogged = logEvent(gameState, event)
-  const abilities = findMatchingAbilities(gameWithEventLogged.game.run, event)
-
-  // Flatten abilities into individual effect queue items
-  const queue: EffectQueueItem[] = abilities.flatMap((match) =>
-    match.ability.effects.map((effect) => ({
-      context: { sourceCard: match.card, event },
+  const queue: EffectQueueItem[] = [
+    {
+      context: context ?? { sourceCard: gameState.game.run.deck.rulesCard!, event: { type: 'run-start', round: 0, turn: 0 } as Event },
       effect,
-    })),
-  )
+    },
+  ]
 
-  return processEffectQueue(gameWithEventLogged, queue)
+  return drainQueue(gameState, queue)
 }
 
 /**
- * Processes a queue of effects, handling card-choice by capturing continuations.
- * This function can be called initially by handleEvent, or by a resolver
- * after a card-choice has been made.
+ * Called by the UI when the user makes a card choice.
+ * Reads the pending choice from state, generates effects from the choice handler,
+ * and resumes queue processing.
  *
- * @param gameState - The current game state
- * @param queue - The queue of effects to process
- * @returns Updated game state after processing the queue
+ * @param gameState - The current game state (must have a pending choice)
+ * @param chosenCard - The card the user selected
+ * @returns Updated game state after choice effects and remaining queue resolve
  */
-function processEffectQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
+export function resolveChoice(gameState: GameState, chosenCard: CardID): GameState {
+  const pending = gameState.viewData.pendingChoice
+  if (!pending) throw new Error('No pending choice to resolve')
+
+  const choiceEffects = pending.choiceEffect.params.choiceHandler(chosenCard)
+  const choiceItems: EffectQueueItem[] = choiceEffects.map((effect) => ({
+    context: pending.context,
+    effect,
+  }))
+
+  // Clear the pending choice and resume processing
+  const clearedState: GameState = {
+    ...gameState,
+    viewData: {
+      modalView: null,
+      cardOptions: [],
+      pendingChoice: null,
+    },
+  }
+
+  return drainQueue(clearedState, [...choiceItems, ...pending.remainingQueue])
+}
+
+/**
+ * Core processing loop. Drains a queue of effects by decomposing, applying,
+ * and cascading each one. Pauses on card-choice effects.
+ */
+function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
   let currentState = gameState
+  let i = 0
 
-  for (let i = 0; i < queue.length; i++) {
+  while (i < queue.length) {
     const { context, effect } = queue[i]
+    i++
 
-    // Non-choice effects are non-blocking and can be resolved directly
-    if (effect.type !== 'card-choice') {
-      currentState = resolveEffect(currentState, effect, context)
-      continue
+    // Card-choice: pause processing, store remaining queue as data
+    if (effect.type === 'card-choice') {
+      const remainingQueue = queue.slice(i)
+      return openCardChoice(currentState, effect, context, remainingQueue)
     }
 
-    // Handle card-choice by capturing continuation and returning early
-    const remainingQueue = queue.slice(i + 1)
-    const { options, tags, choiceHandler } = effect.params
+    // Decompose compound effects into atomic ones
+    const decomposed = decomposeEffect(effect, context, currentState.game.run!)
+    if (!decomposed) continue // Nothing to do (pile empty, no matches, etc.)
 
-    // Resolver continues processing after user makes a choice
-    const resolver = (gs: GameState, chosenCard: Parameters<typeof choiceHandler>[0]) => {
-      const choiceEffects = choiceHandler(chosenCard)
-      // Prepend choice-generated effects to the remaining queue
-      const choiceItems: EffectQueueItem[] = choiceEffects.map((e) => ({ context, effect: e }))
-      return processEffectQueue(gs, [...choiceItems, ...remainingQueue])
+    const { atomic, remaining } = decomposed
+
+    // If there's remaining work from this decomposition, insert it next in queue
+    if (remaining) {
+      queue.splice(i, 0, { context, effect: remaining })
     }
 
-    return openCardChoiceModal(currentState, options, tags, resolver)
+    // Resolve self references for playable cards
+    const resolvedEffect =
+      context.sourceCard.type === 'playable'
+        ? transformSelfReferences(atomic, context.sourceCard.instanceId)
+        : atomic
+
+    // Apply the atomic effect
+    const { game, event } = applyEffect(currentState, resolvedEffect)
+    currentState = game
+
+    // Cascade: if the effect produced an event, find triggered abilities
+    if (event) {
+      currentState = logEvent(currentState, event)
+      const abilities = findMatchingAbilities(currentState.game.run!, event)
+
+      // Insert triggered effects depth-first (immediately after current position)
+      const triggeredItems: EffectQueueItem[] = abilities.flatMap((match) =>
+        match.ability.effects.map((e) => ({
+          context: { sourceCard: match.card, event },
+          effect: e,
+        })),
+      )
+
+      if (triggeredItems.length > 0) {
+        queue.splice(i, 0, ...triggeredItems)
+      }
+    }
   }
 
   return currentState
 }
 
 /**
- * Wrapper around handleEffect to resolve dynamic references.
- * Currently just 'self' references but will be expanded
+ * Decomposes a compound effect into an atomic effect to execute now,
+ * plus the remaining compound effect (if any).
  *
- * @param gameState - The current game state
- * @param effect - The effect to process
- * @param context - Context containing the source card
- * @returns Updated game state and any events produced by the effect
+ * Returns null if there's nothing to do (pile empty, no matches, etc.).
  */
-function handleEffectWithContext(
-  gameState: GameState,
+function decomposeEffect(
   effect: Effect,
   context: EffectContext,
-): { game: GameState; events: Event[] } {
-  // No need to do self-resolution on rules cards
-  if (context.sourceCard.type === 'rules') return handleEffect(gameState, effect)
-  // Transform 'self' references to actual instanceId
-  const transformedEffect = transformSelfReferences(effect, context.sourceCard.instanceId)
-  return handleEffect(gameState, transformedEffect)
+  run: Run,
+): { atomic: Effect; remaining: Effect | null } | null {
+  switch (effect.type) {
+    // --- Amount-based: resolve one card at a time ---
+
+    case 'draw-cards': {
+      if (effect.params.amount <= 0) return null
+      if (run.cards.drawPile.length === 0) return null
+      const remaining: Effect | null =
+        effect.params.amount > 1
+          ? { type: 'draw-cards', params: { amount: effect.params.amount - 1 } }
+          : null
+      // Atomic draw-cards with amount 1 is handled directly by applyEffect
+      return {
+        atomic: { type: 'draw-cards', params: { amount: 1 } },
+        remaining,
+      }
+    }
+
+    // --- Multi-card counters: decompose one card ID at a time ---
+
+    case 'add-cards': {
+      const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
+      const firstId = cardIds[0]
+      const { location, mode } = effect.params
+
+      const atomic: Effect = {
+        type: 'add-cards',
+        params: { location, cards: { [firstId]: 1 }, mode },
+      }
+
+      // Build remaining counter without the first card
+      const remainingIds = cardIds.slice(1)
+      if (remainingIds.length === 0) return { atomic, remaining: null }
+
+      const remainingCards: Record<string, number> = {}
+      for (const id of remainingIds) {
+        remainingCards[id] = (remainingCards[id] ?? 0) + 1
+      }
+      return {
+        atomic,
+        remaining: { type: 'add-cards', params: { location, cards: remainingCards, mode } },
+      }
+    }
+
+    case 'collect-card': {
+      const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
+      const firstId = cardIds[0]
+
+      const atomic: Effect = {
+        type: 'collect-card',
+        params: { cards: { [firstId]: 1 } },
+      }
+
+      const remainingIds = cardIds.slice(1)
+      if (remainingIds.length === 0) return { atomic, remaining: null }
+
+      const remainingCards: Record<string, number> = {}
+      for (const id of remainingIds) {
+        remainingCards[id] = (remainingCards[id] ?? 0) + 1
+      }
+      return {
+        atomic,
+        remaining: { type: 'collect-card', params: { cards: remainingCards } },
+      }
+    }
+
+    case 'destroy-card': {
+      const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
+      const firstId = cardIds[0]
+
+      const atomic: Effect = {
+        type: 'destroy-card',
+        params: { cards: { [firstId]: 1 } },
+      }
+
+      const remainingIds = cardIds.slice(1)
+      if (remainingIds.length === 0) return { atomic, remaining: null }
+
+      const remainingCards: Record<string, number> = {}
+      for (const id of remainingIds) {
+        remainingCards[id] = (remainingCards[id] ?? 0) + 1
+      }
+      return {
+        atomic,
+        remaining: { type: 'destroy-card', params: { cards: remainingCards } },
+      }
+    }
+
+    // --- Instance ID lists: decompose one at a time ---
+
+    case 'discard-cards': {
+      if ('instanceIds' in effect.params) {
+        const ids = effect.params.instanceIds
+        if (ids.length === 0) return null
+        const remaining: Effect | null =
+          ids.length > 1
+            ? { type: 'discard-cards', params: { instanceIds: ids.slice(1) } }
+            : null
+        return {
+          atomic: { type: 'discard-cards', params: { instanceIds: [ids[0]] } },
+          remaining,
+        }
+      }
+
+      // Amount or matching variant: resolve against current state
+      const { from } = effect.params
+      const pile = run.cards[from]
+
+      if ('matching' in effect.params) {
+        // Resolve all matching instanceIds upfront
+        const { matching } = effect.params
+        const matchingIds = pile
+          .filter((c) => matchesCard(c, matching))
+          .map((c) => c.instanceId)
+        if (matchingIds.length === 0) return null
+        // Convert to instanceIds variant for serial processing
+        const asInstanceIds: Effect = {
+          type: 'discard-cards',
+          params: { instanceIds: matchingIds },
+        }
+        return decomposeEffect(asInstanceIds, context, run)
+      }
+
+      // Amount variant
+      const count = effect.params.amount === 'all' ? pile.length : effect.params.amount
+      if (count <= 0 || pile.length === 0) return null
+      const instanceIds = pile.slice(0, count).map((c) => c.instanceId)
+      const asInstanceIds: Effect = {
+        type: 'discard-cards',
+        params: { instanceIds },
+      }
+      return decomposeEffect(asInstanceIds, context, run)
+    }
+
+    case 'move-card': {
+      const { to, position } = effect.params
+
+      if ('instanceIds' in effect.params) {
+        const ids = effect.params.instanceIds
+        if (ids.length === 0) return null
+        const remaining: Effect | null =
+          ids.length > 1
+            ? { type: 'move-card', params: { instanceIds: ids.slice(1), to, position } }
+            : null
+        return {
+          atomic: { type: 'move-card', params: { instanceIds: [ids[0]], to, position } },
+          remaining,
+        }
+      }
+
+      // Amount or matching variant: resolve against current state
+      const { from } = effect.params
+      const pile = run.cards[from]
+
+      if ('matching' in effect.params) {
+        const { matching } = effect.params
+        const matchingIds = pile
+          .filter((c) => matchesCard(c, matching))
+          .map((c) => c.instanceId)
+        if (matchingIds.length === 0) return null
+        const asInstanceIds: Effect = {
+          type: 'move-card',
+          params: { instanceIds: matchingIds, to, position },
+        }
+        return decomposeEffect(asInstanceIds, context, run)
+      }
+
+      const count = effect.params.amount === 'all' ? pile.length : effect.params.amount
+      if (count <= 0 || pile.length === 0) return null
+      const instanceIds = pile.slice(0, count).map((c) => c.instanceId)
+      const asInstanceIds: Effect = {
+        type: 'move-card',
+        params: { instanceIds, to, position },
+      }
+      return decomposeEffect(asInstanceIds, context, run)
+    }
+
+    // --- Self-reference resolution ---
+
+    case 'remove-card': {
+      if ('matching' in effect.params) {
+        // Resolve matching to instanceIds, then remove each
+        // For now, throw as this was already unimplemented
+        throw new Error('Card matcher removal not yet implemented')
+      }
+      // Self-reference will be resolved by transformSelfReferences in drainQueue
+      // Already atomic
+      return { atomic: effect, remaining: null }
+    }
+
+    // --- Already atomic effects (pass through) ---
+
+    case 'update-resource':
+    case 'play-card':
+    case 'retrigger-card':
+    case 'turn-start':
+    case 'turn-end':
+    case 'round-start':
+    case 'round-end':
+    case 'run-start':
+    case 'run-end':
+    case 'refresh-deck':
+      return { atomic: effect, remaining: null }
+
+    // card-choice is handled in drainQueue before decomposition
+    case 'card-choice':
+      throw new Error('card-choice should be handled in drainQueue, not decomposeEffect')
+  }
 }
 
 /**
- * Resolves an effect fully, including cascading any events it produces.
- * This is the high-level entry point for effect processing during ability resolution.
- *
- * @param gameState - The current game state
- * @param effect - The effect to resolve
- * @param context - Context containing the source card and triggering event
- * @returns Updated game state after effect and all cascaded events are resolved
+ * Stores a card-choice as inspectable data on the game state,
+ * pausing the effect queue until the user makes a selection.
  */
-function resolveEffect(gameState: GameState, effect: Effect, context: EffectContext): GameState {
-  const { game, events } = handleEffectWithContext(gameState, effect, context)
-  return events.reduce((state, event) => handleEvent(state, event), game)
+function openCardChoice(
+  gameState: GameState,
+  effect: CardChoiceEffect,
+  context: EffectContext,
+  remainingQueue: EffectQueueItem[],
+): GameState {
+  const { options, tags } = effect.params
+  const choices = getCardChoices(options, tags)
+
+  const pendingChoice: PendingChoice = {
+    cardOptions: choices,
+    tags,
+    choiceEffect: effect,
+    context,
+    remainingQueue,
+  }
+
+  return {
+    ...gameState,
+    viewData: {
+      modalView: 'card-choice',
+      cardOptions: choices,
+      pendingChoice,
+    },
+  }
 }
 
 /**
  * Resolves 'self' references in an effect to actual instanceId values.
- *
- * @param effect - The effect to transform
- * @param instanceId - The instanceId to use for 'self'
- * @returns The effect with 'self' replaced by the actual instanceId
  */
 function transformSelfReferences(effect: Effect, instanceId: string): Effect {
   if ('instanceId' in effect.params && effect.params.instanceId === 'self') {
@@ -167,10 +446,6 @@ function transformSelfReferences(effect: Effect, instanceId: string): Effect {
  * Find all abilities that match an event, in execution order.
  * Abilities are processed in the order cards appear in their locations.
  * Locations are checked in order: board, hand, stack, discardPile, drawPile.
- *
- * @param event - The event to match against
- * @param run - The current run state
- * @returns Array of matching card/ability pairs
  */
 export function findMatchingAbilities(
   run: Run,
@@ -198,14 +473,7 @@ export function findMatchingAbilities(
 }
 
 /**
- * Check if a specifies trigger on a card should resolve for an event.
- *
- * @param event - The event to check
- * @param sourceCard - The card to check
- * @param cardLocation - The location of the card being checked
- * @param trigger - The trigger to evaluate
- * @param run - The current run state
- * @returns true if the trigger matches the event
+ * Check if a trigger on a card should resolve for an event.
  */
 export function matchesTrigger(
   event: Event,
@@ -253,12 +521,6 @@ export function matchesTrigger(
 
 /**
  * Check if the target specification matches the event's card.
- *
- * @param event - The card event
- * @param sourceCard - The card with the ability
- * @param target - The target specification
- * @param run - The current run state
- * @returns true if the target matches
  */
 function matchesTarget(
   event: CardEvent,
@@ -283,11 +545,6 @@ function matchesTarget(
 
 /**
  * Check if an activated ability can be used (costs and limits).
- *
- * @param trigger - The trigger to check
- * @param sourceCard - The card with the ability
- * @param run - The current run state
- * @returns true if the ability can be activated
  */
 export function canActivate(trigger: Trigger, sourceCard: CardInstance, run: Run): boolean {
   // Check resource costs
@@ -320,16 +577,11 @@ export function canActivate(trigger: Trigger, sourceCard: CardInstance, run: Run
 
 /**
  * Get activation count for a card this turn/round/run.
- *
- * @param sourceCard - The card to count activations for
- * @param run - The current run state
- * @returns Object with turn, round, and run counts
  */
 function getActivationCount(
   sourceCard: CardInstance,
   run: Run,
 ): { turn: number; round: number; run: number } {
-  // Count card-activate events for this card
   const activations = run.events.filter(
     (e) =>
       e.type === 'card-activate' &&
@@ -349,10 +601,6 @@ function getActivationCount(
 
 /**
  * Searches all locations for a card by instance ID, returning the card and where it was found.
- *
- * @param instanceId - The instance ID to find
- * @param run - The current run state
- * @returns Object with location, index, and card instance, or undefined if not found
  */
 export function locateCard(
   instanceId: string,
@@ -369,10 +617,6 @@ export function locateCard(
 
 /**
  * Searches all locations for a card by instance ID, returning the card.
- *
- * @param instanceId - The instance ID to find
- * @param run - The current run state
- * @returns The card instance, or null if not found
  */
 function findCard(instanceId: string, run: Run): CardInstance | undefined {
   for (const cards of values(run.cards)) {
@@ -386,9 +630,6 @@ function findCard(instanceId: string, run: Run): CardInstance | undefined {
  * Determines if a card should go to the board (asset) or discard pile (action).
  * Derived from the card's abilities - if any ability has a board location
  * requirement, the card is an asset.
- *
- * @param card - The card to check
- * @returns true if the card has board-based abilities
  */
 export function isAsset(card: PlayableCard): boolean {
   return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
