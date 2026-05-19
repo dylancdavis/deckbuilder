@@ -59,7 +59,10 @@ export function handleEffect(
 
   const queue: EffectQueueItem[] = [
     {
-      context: context ?? { sourceCard: gameState.game.run.deck.rulesCard!, event: { type: 'run-start', round: 0, turn: 0 } as Event },
+      context: context ?? {
+        sourceCard: gameState.game.run.deck.rulesCard!,
+        event: { type: 'run-start', round: 0, turn: 0 } as Event,
+      },
       effect,
     },
   ]
@@ -166,16 +169,11 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
  *
  * Returns null if there's nothing to do (pile empty, no matches, etc.).
  */
-function decomposeEffect(
-  effect: Effect,
-  run: Run,
-): { atomic: Effect; remaining: Effect | null } | null {
+function decomposeEffect(effect: Effect, run: Run): { atomic: Effect; remaining: Effect | null } {
   switch (effect.type) {
     // --- Amount-based: resolve one card at a time ---
 
     case 'draw-cards': {
-      if (effect.params.amount <= 0) return null
-      if (run.cards.drawPile.length === 0) return null
       const remaining: Effect | null =
         effect.params.amount > 1
           ? { type: 'draw-cards', params: { amount: effect.params.amount - 1 } }
@@ -191,7 +189,6 @@ function decomposeEffect(
 
     case 'add-cards': {
       const cardIds = toArray(effect.params.cards)
-      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
       const { location, mode } = effect.params
 
@@ -216,7 +213,6 @@ function decomposeEffect(
 
     case 'collect-card': {
       const cardIds = toArray(effect.params.cards)
-      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
 
       const atomic: Effect = {
@@ -239,7 +235,6 @@ function decomposeEffect(
 
     case 'destroy-card': {
       const cardIds = toArray(effect.params.cards)
-      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
 
       const atomic: Effect = {
@@ -265,11 +260,8 @@ function decomposeEffect(
     case 'discard-cards': {
       if ('instanceIds' in effect.params) {
         const ids = effect.params.instanceIds
-        if (ids.length === 0) return null
         const remaining: Effect | null =
-          ids.length > 1
-            ? { type: 'discard-cards', params: { instanceIds: ids.slice(1) } }
-            : null
+          ids.length > 1 ? { type: 'discard-cards', params: { instanceIds: ids.slice(1) } } : null
         return {
           atomic: { type: 'discard-cards', params: { instanceIds: [ids[0]] } },
           remaining,
@@ -283,10 +275,7 @@ function decomposeEffect(
       if ('matching' in effect.params) {
         // Resolve all matching instanceIds upfront
         const { matching } = effect.params
-        const matchingIds = pile
-          .filter((c) => matchesCard(c, matching))
-          .map((c) => c.instanceId)
-        if (matchingIds.length === 0) return null
+        const matchingIds = pile.filter((c) => matchesCard(c, matching)).map((c) => c.instanceId)
         // Convert to instanceIds variant for serial processing
         const asInstanceIds: Effect = {
           type: 'discard-cards',
@@ -297,7 +286,6 @@ function decomposeEffect(
 
       // Amount variant
       const count = effect.params.amount === 'all' ? pile.length : effect.params.amount
-      if (count <= 0 || pile.length === 0) return null
       const instanceIds = pile.slice(0, count).map((c) => c.instanceId)
       const asInstanceIds: Effect = {
         type: 'discard-cards',
@@ -311,7 +299,6 @@ function decomposeEffect(
 
       if ('instanceIds' in effect.params) {
         const ids = effect.params.instanceIds
-        if (ids.length === 0) return null
         const remaining: Effect | null =
           ids.length > 1
             ? { type: 'move-card', params: { instanceIds: ids.slice(1), to, position } }
@@ -328,10 +315,7 @@ function decomposeEffect(
 
       if ('matching' in effect.params) {
         const { matching } = effect.params
-        const matchingIds = pile
-          .filter((c) => matchesCard(c, matching))
-          .map((c) => c.instanceId)
-        if (matchingIds.length === 0) return null
+        const matchingIds = pile.filter((c) => matchesCard(c, matching)).map((c) => c.instanceId)
         const asInstanceIds: Effect = {
           type: 'move-card',
           params: { instanceIds: matchingIds, to, position },
@@ -340,7 +324,6 @@ function decomposeEffect(
       }
 
       const count = effect.params.amount === 'all' ? pile.length : effect.params.amount
-      if (count <= 0 || pile.length === 0) return null
       const instanceIds = pile.slice(0, count).map((c) => c.instanceId)
       const asInstanceIds: Effect = {
         type: 'move-card',
