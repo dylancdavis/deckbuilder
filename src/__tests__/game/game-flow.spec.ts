@@ -3,13 +3,21 @@ import { createPinia, setActivePinia } from 'pinia'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import App from '../../App.vue'
 
-// Mock shuffle to preserve order
+// Mock shuffle to preserve order. placeItems shims the original because it
+// calls shuffle internally — the module-internal binding isn't reachable
+// through vi.mock's export replacement.
 vi.mock('../../utils/utils', async (importOriginal) => {
   const original = await importOriginal<typeof import('../../utils/utils')>()
+  const shuffle = <T>(arr: T[]): T[] => [...arr]
   return {
     ...original,
-    shuffle: <T>(arr: T[]) => [...arr],
+    shuffle,
     selectRandom: <T>(arr: T[], n?: number) => arr.slice(0, n),
+    placeItems: <T>(existing: T[], incoming: T[], position?: 'top' | 'bottom' | 'shuffle') => {
+      if (position === 'top') return [...incoming, ...existing]
+      if (position === 'shuffle') return shuffle([...existing, ...incoming])
+      return [...existing, ...incoming]
+    },
   }
 })
 
