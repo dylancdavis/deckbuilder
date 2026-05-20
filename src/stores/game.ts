@@ -151,19 +151,21 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function tryPlayCard(instanceId: string) {
-    gameState.value = handleEffect(gameState.value, {
-      type: 'play-card',
-      params: { instanceId },
-    })
+    gameState.value = handleEffect(
+      gameState.value,
+      { type: 'play-card', params: { instanceId } },
+      { kind: 'player' },
+    )
   }
 
   function nextTurn() {
     if (!gameState.value.game.run?.deck.rulesCard) return
 
-    gameState.value = handleEffect(gameState.value, {
-      type: 'turn-end',
-      params: {},
-    })
+    gameState.value = handleEffect(
+      gameState.value,
+      { type: 'turn-end', params: {} },
+      { kind: 'player' },
+    )
 
     // If run-end occurred during ability processing, clean up
     if (gameState.value.game.run?.events.some((e) => e.type === 'run-end')) {

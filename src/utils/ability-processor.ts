@@ -24,13 +24,16 @@ import { toArray } from './counter'
 import type { CardID } from './cards'
 
 /**
- * Context passed to effect processing for resolving 'self' references
- * and providing source card information.
+ * Context passed to effect processing.
+ *
+ * - `player`: a top-level action the player initiated (run-start, turn-end, play-card).
+ *   No source card; 'self' references are illegal and will throw at apply time.
+ * - `ability`: an effect cascaded from an ability that matched an event. `sourceCard`
+ *   identifies the card whose ability produced the effect; `event` is the trigger.
  */
-export type EffectContext = {
-  sourceCard: CardInstance | RulesCard
-  event: Event
-}
+export type EffectContext =
+  | { kind: 'player' }
+  | { kind: 'ability'; sourceCard: CardInstance | RulesCard; event: Event }
 
 /**
  * Represents a single effect waiting to be processed in the queue.
@@ -45,29 +48,18 @@ export type EffectQueueItem = {
  * Single entry point for all game actions. Takes a high-level effect,
  * decomposes it, applies atomic effects, and cascades triggered abilities.
  *
- * @param gameState - The current game state
- * @param effect - The effect to handle (may be compound)
- * @param context - Optional context for self-reference resolution
- * @returns Updated game state after all effects and cascades resolve
+ * Player-driven actions (run-start, turn-end, play-card) should pass
+ * `{ kind: 'player' }`. Internal callers resuming a cascade pass an
+ * ability context.
  */
 export function handleEffect(
   gameState: GameState,
   effect: Effect,
-  context?: EffectContext,
+  context: EffectContext,
 ): GameState {
   if (!gameState.game.run) throw new Error('Cannot handle effect with no run')
 
-  const queue: EffectQueueItem[] = [
-    {
-      context: context ?? {
-        sourceCard: gameState.game.run.deck.rulesCard!,
-        event: { type: 'run-start', round: 0, turn: 0 } as Event,
-      },
-      effect,
-    },
-  ]
-
-  return drainQueue(gameState, queue)
+  return drainQueue(gameState, [{ context, effect }])
 }
 
 /**
@@ -131,9 +123,10 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
       queue.splice(i, 0, { context, effect: remaining })
     }
 
-    // Resolve self references for playable cards
+    // Resolve self references when the source is a playable card.
+    // Player and rules-card contexts have no 'self' to resolve.
     const resolvedEffect =
-      context.sourceCard.type === 'playable'
+      context.kind === 'ability' && context.sourceCard.type === 'playable'
         ? transformSelfReferences(atomic, context.sourceCard.instanceId)
         : atomic
 
@@ -149,7 +142,7 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
       // Insert triggered effects depth-first (immediately after current position)
       const triggeredItems: EffectQueueItem[] = abilities.flatMap((match) =>
         match.ability.effects.map((e) => ({
-          context: { sourceCard: match.card, event },
+          context: { kind: 'ability', sourceCard: match.card, event },
           effect: e,
         })),
       )

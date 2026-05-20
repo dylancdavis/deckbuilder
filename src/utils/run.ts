@@ -128,5 +128,5 @@ export function initializeRun(gameState: GameState): GameState {
     game: { ...gameState.game, run },
   }
 
-  return handleEffect(stateWithRun, { type: 'run-start', params: {} })
+  return handleEffect(stateWithRun, { type: 'run-start', params: {} }, { kind: 'player' })
 }
