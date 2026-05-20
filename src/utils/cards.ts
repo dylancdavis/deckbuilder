@@ -544,7 +544,7 @@ export const discardTestRules: RulesCard = {
           type: 'add-cards',
           params: {
             location: 'drawPile',
-            cards: { 'hand-board-discard': 1, score: 1 },
+            cards: { score: 1, 'hand-board-discard': 1 },
             mode: 'top',
           },
         },
@@ -588,7 +588,7 @@ export const moveTestRules: RulesCard = {
           type: 'add-cards',
           params: {
             location: 'drawPile',
-            cards: { 'hand-to-board': 1, score: 1 },
+            cards: { score: 1, 'hand-to-board': 1 },
             mode: 'top',
           },
         },
