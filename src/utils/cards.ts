@@ -898,7 +898,7 @@ export const choiceAddChoice: PlayableCard = {
   id: 'choice-add-choice',
   name: 'Choice Add Choice',
   description:
-    'Choose a basic card to add to hand, add a score to hand, then choose a test card to add to hand.',
+    'Choose a basic card to add to hand. Add a Dual Score to hand. Choose a test card to add to hand.',
   abilities: [
     {
       trigger: { on: 'card-play', target: 'self' },
