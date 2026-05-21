@@ -1,17 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { handleEffect } from '../../../utils/effects'
-import { handleEvent } from '../../../utils/ability-processor'
+import { handleEffect } from '../../../utils/ability-processor'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from '../effects/shared'
 import { Resource } from '../../../utils/resource'
 import type { GameState } from '../../../utils/game'
 import type { PlayCardEffect } from '../../../utils/effects'
 
-/** Helper that mirrors what the store does: handleEffect + reduce events through handleEvent */
 function playCard(gameState: GameState, instanceId: string): GameState {
   const effect: PlayCardEffect = { type: 'play-card', params: { instanceId } }
-  const { game, events } = handleEffect(gameState, effect)
-  return events.reduce((state, event) => handleEvent(state, event), game)
+  return handleEffect(gameState, effect, { kind: 'player' })
 }
 
 describe('play-card effect', () => {

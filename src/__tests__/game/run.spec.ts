@@ -9,17 +9,15 @@ import {
   type PlayableCardID,
 } from '../../utils/cards.ts'
 import type { GameState } from '../../utils/game.ts'
-import { handleEvent } from '../../utils/ability-processor.ts'
-import type { RunStartEvent } from '../../utils/event.ts'
+import { handleEffect } from '../../utils/ability-processor.ts'
 
-// Helper to wrap a Run in a minimal GameState for testing
 const wrapInGameState = (run: Run): GameState => ({
   game: {
     collection: { cards: {}, decks: {} },
     run,
   },
   ui: { currentView: ['run'], collection: { selectedDeck: null } },
-  viewData: { modalView: null, cardOptions: [], resolver: null },
+  viewData: { modalView: null, cardOptions: [], pendingChoice: null },
 })
 
 const baseRules: RulesCard = {
@@ -195,9 +193,7 @@ const populatedHandRunNoAdded: Run = {
 describe('run-start event', () => {
   it("doesn't modify cards in draw-pile when no run-start add-cards ability", () => {
     const gameState = wrapInGameState(populatedHandRunNoAdded)
-    const event: RunStartEvent = { type: 'run-start', round: 0, turn: 0 }
-    const result = handleEvent(gameState, event)
-    // Draw pile should contain original cards plus any drawn to hand via the ability chain
+    const result = handleEffect(gameState, { type: 'run-start', params: {} }, { kind: 'player' })
     const allCards = [
       ...result.game.run!.cards.drawPile,
       ...result.game.run!.cards.hand,
@@ -209,9 +205,7 @@ describe('run-start event', () => {
 
   it('adds cards to draw-pile from rules card run-start ability', () => {
     const gameState = wrapInGameState(populatedHandRun)
-    const event: RunStartEvent = { type: 'run-start', round: 0, turn: 0 }
-    const result = handleEvent(gameState, event)
-    // All cards should be accounted for across locations
+    const result = handleEffect(gameState, { type: 'run-start', params: {} }, { kind: 'player' })
     const allCards = [
       ...result.game.run!.cards.drawPile,
       ...result.game.run!.cards.hand,

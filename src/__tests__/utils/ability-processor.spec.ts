@@ -3,7 +3,7 @@ import {
   matchesTrigger,
   findMatchingAbilities,
   canActivate,
-  handleEvent,
+  handleEffect,
   isAsset,
 } from '../../utils/ability-processor'
 import type { Ability, Trigger } from '../../utils/ability'
@@ -625,15 +625,22 @@ describe('findMatchingAbilities', () => {
   })
 })
 
-describe('handleEvent', () => {
+describe('handleEffect ability cascade', () => {
+  const PLAY_CARD_1: import('../../utils/effects').PlayCardEffect = {
+    type: 'play-card',
+    params: { instanceId: 'card-1' },
+  }
+
   it('throws when no run exists', () => {
     const gameState = createTestGameState()
     gameState.game.run = null
 
-    expect(() => handleEvent(gameState, PLAY_EVENT)).toThrow('Cannot handle event with no run')
+    expect(() => handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })).toThrow(
+      'Cannot handle effect with no run',
+    )
   })
 
-  it('applies update-resource effects', () => {
+  it('applies update-resource effects from card-play abilities', () => {
     const ability: Ability = {
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 5 } }],
@@ -644,7 +651,7 @@ describe('handleEvent', () => {
       resources: { points: 10 },
     })
 
-    const result = handleEvent(gameState, PLAY_EVENT)
+    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(15)
   })
@@ -663,7 +670,7 @@ describe('handleEvent', () => {
       resources: { points: 0 },
     })
 
-    const result = handleEvent(gameState, PLAY_EVENT)
+    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(8)
   })
@@ -683,14 +690,13 @@ describe('handleEvent', () => {
       cards: { ...EMPTY_PILES, hand: [card1, card2] },
       resources: { points: 0 },
     })
-    const event = createCardPlayEvent('card-3')
 
-    const result = handleEvent(gameState, event)
+    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(3)
   })
 
-  it('opens card choice modal and stores resolver', () => {
+  it('opens card choice modal and stores pending choice', () => {
     const ability: Ability = {
       trigger: { on: 'card-play', target: 'self' },
       effects: [
@@ -711,10 +717,10 @@ describe('handleEvent', () => {
       cards: { ...EMPTY_PILES, hand: [card] },
     })
 
-    const result = handleEvent(gameState, PLAY_EVENT)
+    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.viewData.modalView).toBe('card-choice')
-    expect(result.viewData.resolver).not.toBeNull()
+    expect(result.viewData.pendingChoice).not.toBeNull()
   })
 
   it('resolves self references in remove-card effects', () => {
@@ -727,10 +733,10 @@ describe('handleEvent', () => {
       cards: { ...EMPTY_PILES, hand: [card] },
     })
 
-    const result = handleEvent(gameState, PLAY_EVENT)
+    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
 
-    // Card should be removed
     expect(result.game.run!.cards.hand).toHaveLength(0)
+    expect(result.game.run!.cards.discardPile).toHaveLength(0)
   })
 })
 

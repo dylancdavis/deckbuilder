@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { handleEvent } from '../utils/ability-processor'
-import { handleEffect } from '../utils/effects'
+import { handleEffect, resolveChoice } from '../utils/ability-processor'
 import type { GameState } from '../utils/game'
 import type { Run } from '../utils/run'
 import { doubleChoice, starterRules } from '../utils/cards'
@@ -38,14 +37,17 @@ function createTestGameState(run: Run): GameState {
     viewData: {
       modalView: null,
       cardOptions: [],
-      resolver: null,
+      pendingChoice: null,
     },
   }
 }
 
 function playCard(gameState: GameState, instanceId: string): GameState {
-  const { game, events } = handleEffect(gameState, { type: 'play-card', params: { instanceId } })
-  return events.reduce((state, event) => handleEvent(state, event), game)
+  return handleEffect(
+    gameState,
+    { type: 'play-card', params: { instanceId } },
+    { kind: 'player' },
+  )
 }
 
 describe('ability-processor', () => {
@@ -63,9 +65,8 @@ describe('ability-processor', () => {
 
       const result = playCard(gameState, 'test-instance-1')
 
-      // First modal should be open
       expect(result.viewData.modalView).toBe('card-choice')
-      expect(result.viewData.resolver).not.toBeNull()
+      expect(result.viewData.pendingChoice).not.toBeNull()
       expect(result.viewData.cardOptions.length).toBeGreaterThan(0)
     })
 
@@ -80,30 +81,15 @@ describe('ability-processor', () => {
       })
       const gameState = createTestGameState(run)
 
-      // Step 1: Play the card - first modal should open
       const afterFirstModal = playCard(gameState, 'test-instance-1')
       expect(afterFirstModal.viewData.modalView).toBe('card-choice')
-      expect(afterFirstModal.viewData.resolver).not.toBeNull()
+      expect(afterFirstModal.viewData.pendingChoice).not.toBeNull()
 
-      // Step 2: Simulate clearing the modal and making a choice
-      const resolver = afterFirstModal.viewData.resolver!
-      const stateWithModalCleared: GameState = {
-        ...afterFirstModal,
-        viewData: {
-          ...afterFirstModal.viewData,
-          modalView: null,
-          resolver: null,
-          cardOptions: [],
-        },
-      }
-
-      // Pick any card from the options
       const firstChoice = afterFirstModal.viewData.cardOptions[0]
-      const afterFirstChoice = resolver(stateWithModalCleared, firstChoice)
+      const afterFirstChoice = resolveChoice(afterFirstModal, firstChoice)
 
-      // Step 3: Second modal should be open
       expect(afterFirstChoice.viewData.modalView).toBe('card-choice')
-      expect(afterFirstChoice.viewData.resolver).not.toBeNull()
+      expect(afterFirstChoice.viewData.pendingChoice).not.toBeNull()
       expect(afterFirstChoice.viewData.cardOptions.length).toBeGreaterThan(0)
     })
 
@@ -118,34 +104,18 @@ describe('ability-processor', () => {
       })
       const gameState = createTestGameState(run)
 
-      // Step 1: Play the card
       const afterFirstModal = playCard(gameState, 'test-instance-1')
-      const resolver1 = afterFirstModal.viewData.resolver!
-      const clearedState1: GameState = {
-        ...afterFirstModal,
-        viewData: { modalView: null, resolver: null, cardOptions: [] },
-      }
       const firstChoice = afterFirstModal.viewData.cardOptions[0]
 
-      // Step 2: Make first choice
-      const afterFirstChoice = resolver1(clearedState1, firstChoice)
+      const afterFirstChoice = resolveChoice(afterFirstModal, firstChoice)
       expect(afterFirstChoice.viewData.modalView).toBe('card-choice')
 
-      const resolver2 = afterFirstChoice.viewData.resolver!
-      const clearedState2: GameState = {
-        ...afterFirstChoice,
-        viewData: { modalView: null, resolver: null, cardOptions: [] },
-      }
       const secondChoice = afterFirstChoice.viewData.cardOptions[0]
+      const afterSecondChoice = resolveChoice(afterFirstChoice, secondChoice)
 
-      // Step 3: Make second choice
-      const afterSecondChoice = resolver2(clearedState2, secondChoice)
-
-      // Should be done - no modal open
       expect(afterSecondChoice.viewData.modalView).toBeNull()
-      expect(afterSecondChoice.viewData.resolver).toBeNull()
+      expect(afterSecondChoice.viewData.pendingChoice).toBeNull()
 
-      // Both cards should be collected
       expect(afterSecondChoice.game.collection.cards[firstChoice]).toBe(1)
       expect(afterSecondChoice.game.collection.cards[secondChoice]).toBe(
         firstChoice === secondChoice ? 2 : 1,

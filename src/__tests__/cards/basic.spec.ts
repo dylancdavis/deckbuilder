@@ -1,7 +1,6 @@
 import { it, expect } from 'vitest'
 import type { GameState } from '../../utils/game'
-import { handleEffect } from '../../utils/effects'
-import { handleEvent } from '../../utils/ability-processor'
+import { handleEffect } from '../../utils/ability-processor'
 import {
   score,
   dualScore,
@@ -19,8 +18,11 @@ import {
 import { createTestGameState } from '../utils/effects/shared'
 
 function playCard(gameState: GameState, instanceId: string): GameState {
-  const { game, events } = handleEffect(gameState, { type: 'play-card', params: { instanceId } })
-  return events.reduce((state, event) => handleEvent(state, event), game)
+  return handleEffect(
+    gameState,
+    { type: 'play-card', params: { instanceId } },
+    { kind: 'player' },
+  )
 }
 
 it('score gains 1 point', () => {
@@ -213,8 +215,11 @@ it('debt loses 6 points when drawn', () => {
     resources: { points: 10 },
   })
 
-  const { game, events } = handleEffect(gameState, { type: 'draw-cards', params: { amount: 1 } })
-  const result = events.reduce((state, event) => handleEvent(state, event), game)
+  const result = handleEffect(
+    gameState,
+    { type: 'draw-cards', params: { amount: 1 } },
+    { kind: 'player' },
+  )
 
   expect(result.game.run!.cards.hand).toHaveLength(1)
   expect(result.game.run!.cards.hand[0].id).toBe('debt')
