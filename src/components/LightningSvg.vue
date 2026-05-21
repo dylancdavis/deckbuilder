@@ -19,13 +19,12 @@ const props = withDefaults(
 )
 
 const gradientId = `lightning-gradient-${props.cardId}`
+const defaultGradient: [string, string] = ['#ffffff', '#c8d4dc']
+const effectiveGradient = computed<[string, string]>(
+  () => props.fillGradient ?? defaultGradient,
+)
 
-const fillValue = computed(() => {
-  if (props.fillGradient) {
-    return `url(#${gradientId})`
-  }
-  return props.fillColor
-})
+const fillValue = computed(() => `url(#${gradientId})`)
 
 const pathStyle = computed(() => ({
   stroke: props.borderColor,
@@ -55,10 +54,10 @@ const svgStyle = computed(() => ({
     aria-labelledby="lightning-title lightning-desc"
     :style="svgStyle"
   >
-    <defs v-if="fillGradient">
+    <defs>
       <linearGradient :id="gradientId" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" :style="{ stopColor: fillGradient[0] }" />
-        <stop offset="100%" :style="{ stopColor: fillGradient[1] }" />
+        <stop offset="0%" :style="{ stopColor: effectiveGradient[0] }" />
+        <stop offset="100%" :style="{ stopColor: effectiveGradient[1] }" />
       </linearGradient>
     </defs>
     <title id="lightning-title">Lightning currency symbol</title>
