@@ -88,9 +88,9 @@
   border-radius: calc(var(--card-width) * 16 / 250);
   background: #093153ff;
   background: linear-gradient(
-    0deg,
-    var(--card-gradient-start, #093153ff) 0%,
-    var(--card-gradient-end, #1077d2) 100%
+    135deg,
+    var(--card-gradient-end, #1077d2) 0%,
+    var(--card-gradient-start, #093153ff) 100%
   );
 }
 
