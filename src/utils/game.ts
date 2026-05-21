@@ -6,8 +6,10 @@ import type { CardChoiceEffect } from './effects.ts'
 import type { EffectContext, EffectQueueItem } from './ability-processor.ts'
 
 /**
- * Data representing a paused card-choice interaction.
- * Stored on game state so the pending work is inspectable data, not closures.
+ * A paused card-choice interaction: the remaining queue, the choice effect that
+ * paused it, and the context to resume under. The choice effect carries the
+ * `choiceHandler` closure, so this isn't fully serializable, but the queue and
+ * control state are plain data instead of a stored resolver.
  */
 export type PendingChoice = {
   cardOptions: CardID[]
