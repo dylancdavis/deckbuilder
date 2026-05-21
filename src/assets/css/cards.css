@@ -87,11 +87,23 @@
   border: calc(var(--card-width) * 1 / 250) solid var(--inner-border-color);
   border-radius: calc(var(--card-width) * 16 / 250);
   background: #093153ff;
-  background: linear-gradient(
-    135deg,
-    var(--card-gradient-end, #1077d2) 0%,
-    var(--card-gradient-start, #093153ff) 100%
-  );
+  background:
+    conic-gradient(
+      from 90deg at 50% -40%,
+      rgba(255, 255, 255, 0) 45deg,
+      rgba(255, 255, 255, 0.14) 60deg,
+      rgba(255, 255, 255, 0) 75deg,
+      rgba(255, 255, 255, 0.12) 90deg,
+      rgba(255, 255, 255, 0) 105deg,
+      rgba(255, 255, 255, 0.14) 120deg,
+      rgba(255, 255, 255, 0) 135deg,
+      rgba(255, 255, 255, 0) 360deg
+    ),
+    linear-gradient(
+      135deg,
+      var(--card-gradient-end, #1077d2) 0%,
+      var(--card-gradient-start, #093153ff) 100%
+    );
 }
 
 .card-description {
