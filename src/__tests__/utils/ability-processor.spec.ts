@@ -4,10 +4,11 @@ import {
   findMatchingAbilities,
   canActivate,
   handleEffect,
+  resolveChoice,
   isAsset,
 } from '../../utils/ability-processor'
 import type { Ability, Trigger } from '../../utils/ability'
-import type { CardInstance, PlayableCard } from '../../utils/cards'
+import { doubleChoice, type CardInstance, type PlayableCard } from '../../utils/cards'
 import type {
   CardPlayEvent,
   CardDrawEvent,
@@ -789,5 +790,53 @@ describe('isAsset', () => {
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
 
     expect(isAsset(card)).toBe(true)
+  })
+})
+
+describe('double choice card', () => {
+  function playDoubleChoice() {
+    const cardInstance = { ...doubleChoice, instanceId: 'test-instance-1' }
+    const gameState = createTestGameState({
+      cards: { ...EMPTY_PILES, hand: [cardInstance] },
+    })
+    return handleEffect(
+      gameState,
+      { type: 'play-card', params: { instanceId: 'test-instance-1' } },
+      { kind: 'player' },
+    )
+  }
+
+  it('opens the first modal when a card with two choices is played', () => {
+    const result = playDoubleChoice()
+
+    expect(result.viewData.modalView).toBe('card-choice')
+    expect(result.viewData.pendingChoice).not.toBeNull()
+    expect(result.viewData.cardOptions.length).toBeGreaterThan(0)
+  })
+
+  it('opens the second modal after the first choice is made', () => {
+    const afterFirstModal = playDoubleChoice()
+    const firstChoice = afterFirstModal.viewData.cardOptions[0]
+
+    const afterFirstChoice = resolveChoice(afterFirstModal, firstChoice)
+
+    expect(afterFirstChoice.viewData.modalView).toBe('card-choice')
+    expect(afterFirstChoice.viewData.pendingChoice).not.toBeNull()
+    expect(afterFirstChoice.viewData.cardOptions.length).toBeGreaterThan(0)
+  })
+
+  it('completes after the second choice is made', () => {
+    const afterFirstModal = playDoubleChoice()
+    const firstChoice = afterFirstModal.viewData.cardOptions[0]
+    const afterFirstChoice = resolveChoice(afterFirstModal, firstChoice)
+    const secondChoice = afterFirstChoice.viewData.cardOptions[0]
+    const afterSecondChoice = resolveChoice(afterFirstChoice, secondChoice)
+
+    expect(afterSecondChoice.viewData.modalView).toBeNull()
+    expect(afterSecondChoice.viewData.pendingChoice).toBeNull()
+    expect(afterSecondChoice.game.collection.cards[firstChoice]).toBe(1)
+    expect(afterSecondChoice.game.collection.cards[secondChoice]).toBe(
+      firstChoice === secondChoice ? 2 : 1,
+    )
   })
 })
