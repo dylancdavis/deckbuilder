@@ -65,6 +65,8 @@ export interface Card {
   type: 'rules' | 'playable'
   tags?: string[]
   art: CardArt
+  attack?: number
+  defense?: number
 }
 
 export interface PlayableCard extends Card {
