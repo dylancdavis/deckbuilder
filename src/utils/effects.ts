@@ -9,6 +9,7 @@ import type { CardMatcher } from './card-matchers'
 import type {
   CardAddEvent,
   CardCollectEvent,
+  CardDamageEvent,
   CardDestroyEvent,
   CardDrawEvent,
   CardPlayEvent,
@@ -109,6 +110,14 @@ export type RetriggerCardEffect = {
   }
 }
 
+export type DamageEffect = {
+  type: 'damage'
+  params: {
+    instanceId: string
+    amount: number
+  }
+}
+
 // Lifecycle effects
 export type TurnStartEffect = {
   type: 'turn-start'
@@ -157,6 +166,7 @@ export type Effect =
   | MoveCardEffect
   | PlayCardEffect
   | RetriggerCardEffect
+  | DamageEffect
   | TurnStartEffect
   | TurnEndEffect
   | RoundStartEffect
@@ -739,6 +749,71 @@ function handleMoveCard(gameState: GameState, effect: MoveCardEffect): EffectRes
 }
 
 /**
+ * Damages a card by reducing its defense.
+ * No-op if the card has no defense property.
+ */
+function handleDamage(gameState: GameState, effect: DamageEffect): EffectResult {
+  const run = gameState.game.run!
+  const round = run.stats.rounds
+  const turn = run.stats.turns
+  const { instanceId, amount } = effect.params
+
+  // Find the card in any location
+  for (const location of locations) {
+    const idx = run.cards[location].findIndex((c) => c.instanceId === instanceId)
+    if (idx !== -1) {
+      const card = run.cards[location][idx]
+
+      // No defense property = no-op
+      if (card.defense === undefined) {
+        return { game: gameState, event: null }
+      }
+
+      const oldDefense = card.defense
+      const newDefense = Math.max(0, oldDefense - amount)
+
+      const updatedCard = { ...card, defense: newDefense }
+      const updatedLocation = [
+        ...run.cards[location].slice(0, idx),
+        updatedCard,
+        ...run.cards[location].slice(idx + 1),
+      ]
+
+      const event: CardDamageEvent = {
+        type: 'card-damage',
+        cardId: card.id,
+        instanceId,
+        damage: amount,
+        oldDefense,
+        newDefense,
+        round,
+        turn,
+      }
+
+      return {
+        game: {
+          ...gameState,
+          game: {
+            ...gameState.game,
+            run: {
+              ...run,
+              cards: {
+                ...run.cards,
+                [location]: updatedLocation,
+              },
+            },
+          },
+        },
+        event,
+      }
+    }
+  }
+
+  // Card not found — skip
+  return { game: gameState, event: null }
+}
+
+/**
  * Applies a single atomic effect to the game state.
  * Returns the updated state and at most one event.
  *
@@ -781,6 +856,8 @@ export function applyEffect(gameState: GameState, effect: Effect): EffectResult 
       return handleMoveCard(gameState, effect)
     case 'play-card':
       return handlePlayCard(gameState, effect)
+    case 'damage':
+      return handleDamage(gameState, effect)
     case 'retrigger-card':
     case 'card-choice':
       throw new Error(`${effect.type} must be handled by the orchestrator, not applyEffect`)

@@ -127,6 +127,7 @@ export type Event =
   | CardDestroyEvent
   | CardMoveEvent
   | CardActivateEvent
+  | CardDamageEvent
   | TurnStartEvent
   | TurnEndEvent
   | RoundStartEvent

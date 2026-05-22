@@ -343,6 +343,7 @@ function decomposeEffect(effect: Effect, run: Run): { atomic: Effect; remaining:
     case 'update-resource':
     case 'play-card':
     case 'retrigger-card':
+    case 'damage':
     case 'turn-start':
     case 'turn-end':
     case 'round-start':
