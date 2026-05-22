@@ -107,6 +107,15 @@ export type ResourceChangeEvent = BaseEvent & {
   delta: number
 }
 
+export type CardDamageEvent = BaseEvent & {
+  type: 'card-damage'
+  cardId: PlayableCardID
+  instanceId: string
+  damage: number
+  oldDefense: number
+  newDefense: number
+}
+
 // Union Type
 export type Event =
   | CardDrawEvent
