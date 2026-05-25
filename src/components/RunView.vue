@@ -95,6 +95,18 @@ async function nextTurn() {
   })
 }
 
+function canAttackWith(card: CardInstance): boolean {
+  if (card.attack === undefined || card.attack <= 0) return false
+  return run.value.cards.board.some(
+    (c) => c.defense !== undefined && c.instanceId !== card.instanceId,
+  )
+}
+
+function onBoardCardClick(card: CardInstance) {
+  if (!canAttackWith(card)) return
+  gameStore.startAttack(card.instanceId)
+}
+
 async function playCard(instanceId: string) {
   // Capture state of all cards in hand and discard pile
   const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
@@ -144,12 +156,16 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
       <!-- Board Display -->
       <div class="hand-group">
         <div class="empty-pile">
-          <CardItem
+          <div
             v-for="card in run.cards.board"
-            :key="card.name"
-            :card="card"
+            :key="card.instanceId || card.name"
+            class="board-card-wrapper"
+            :class="{ 'board-card-attacker': canAttackWith(card) }"
             data-testid="board-card"
-          />
+            @click="onBoardCardClick(card)"
+          >
+            <CardItem :card="card" />
+          </div>
         </div>
       </div>
 
@@ -368,5 +384,19 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 .chip-cards-played {
   background-color: #555;
   border-color: #777;
+}
+
+.board-card-wrapper {
+  display: inline-block;
+}
+
+.board-card-attacker {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.board-card-attacker:hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
 }
 </style>

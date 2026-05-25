@@ -4,6 +4,7 @@ import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
 import CardChoiceModal from './components/CardChoiceModal.vue'
+import AttackTargetModal from './components/AttackTargetModal.vue'
 import type { CardID } from './utils/cards'
 import { resolveChoice } from './utils/ability-processor'
 import { gsap } from 'gsap'
@@ -63,5 +64,11 @@ async function handleSelect(cardId: CardID) {
     v-if="modalView === 'card-choice'"
     :card-options="gameStore.cardOptions"
     :handle-select="handleSelect"
+  />
+  <AttackTargetModal
+    v-if="modalView === 'attack-target'"
+    :targets="gameStore.attackTargets"
+    :handle-select="gameStore.resolveAttack"
+    :handle-cancel="gameStore.cancelAttack"
   />
 </template>

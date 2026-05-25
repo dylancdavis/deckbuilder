@@ -17,7 +17,7 @@ const wrapInGameState = (run: Run): GameState => ({
     run,
   },
   ui: { currentView: ['run'], collection: { selectedDeck: null } },
-  viewData: { modalView: null, cardOptions: [], pendingChoice: null },
+  viewData: { modalView: null, cardOptions: [], pendingChoice: null, pendingAttack: null },
 })
 
 const baseRules: RulesCard = {
