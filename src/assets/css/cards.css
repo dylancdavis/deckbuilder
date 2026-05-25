@@ -15,6 +15,33 @@
   border-radius: calc(var(--card-width) * 16 / 250);
   /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
   background-color: var(--card-border-color);
+  position: relative;
+}
+
+.card-stat {
+  position: absolute;
+  bottom: calc(var(--card-width) * -8 / 250);
+  width: calc(var(--card-width) * 40 / 250);
+  height: calc(var(--card-width) * 40 / 250);
+  border-radius: 50%;
+  border: var(--card-border);
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  font-size: calc(var(--card-width) * 22 / 250);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 calc(var(--card-width) * 2 / 250) calc(var(--card-width) * 4 / 250) rgba(0, 0, 0, 0.4);
+}
+
+.card-attack {
+  left: calc(var(--card-width) * -8 / 250);
+  background: radial-gradient(circle at 30% 30%, #ff6b6b, #b81d1d);
+}
+
+.card-defense {
+  right: calc(var(--card-width) * -8 / 250);
+  background: radial-gradient(circle at 30% 30%, #6bb8ff, #1d4eb8);
 }
 
 .collection-view .card-container {

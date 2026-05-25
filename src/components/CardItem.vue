@@ -102,5 +102,7 @@ const svgProps = computed(() => ({
         </template>
       </div>
     </div>
+    <div v-if="card.attack !== undefined" class="card-stat card-attack">{{ card.attack }}</div>
+    <div v-if="card.defense !== undefined" class="card-stat card-defense">{{ card.defense }}</div>
   </div>
 </template>
