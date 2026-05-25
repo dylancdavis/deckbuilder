@@ -474,6 +474,38 @@ export const lastResort: PlayableCard = {
   },
 }
 
+export const basicEntity: PlayableCard = {
+  type: 'playable',
+  id: 'basic-entity',
+  name: 'Basic Entity',
+  description: '',
+  attack: 1,
+  defense: 1,
+  abilities: [],
+  cost: 2,
+  tags: ['basic', 'entity'],
+  art: {
+    gradient: ['#2c5364', '#0f2027'],
+    image: 'scarab',
+  },
+}
+
+export const targetDummy: PlayableCard = {
+  type: 'playable',
+  id: 'target-dummy',
+  name: 'Target Dummy',
+  description: '',
+  attack: 0,
+  defense: 1,
+  abilities: [],
+  cost: 1,
+  tags: ['test', 'entity'],
+  art: {
+    gradient: ['#bdc3c7', '#2c3e50'],
+    image: 'scarab',
+  },
+}
+
 // Test rules card with no limits for manual testing
 export const testRules: RulesCard = {
   type: 'rules',
@@ -978,6 +1010,8 @@ export const playableCards = {
   'hand-board-discard': handBoardDiscard,
   'hand-to-board': handToBoard,
   'choice-add-choice': choiceAddChoice,
+  'basic-entity': basicEntity,
+  'target-dummy': targetDummy,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }
