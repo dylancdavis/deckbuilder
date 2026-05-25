@@ -82,6 +82,16 @@ export interface CardInstance extends PlayableCard {
   instanceId: string
 }
 
+/**
+ * Determines if a card should go to the board (asset) or discard pile (action).
+ * A card is an asset if any ability requires a board location, or if it has
+ * attack/defense stats (entities live on the board to be attacked/targeted).
+ */
+export function isAsset(card: PlayableCard): boolean {
+  if (card.attack !== undefined || card.defense !== undefined) return true
+  return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
+}
+
 export interface RulesCard extends Card {
   id: RulesCardID
   type: 'rules'

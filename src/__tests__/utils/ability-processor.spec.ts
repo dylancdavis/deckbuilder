@@ -5,10 +5,9 @@ import {
   canActivate,
   handleEffect,
   resolveChoice,
-  isAsset,
 } from '../../utils/ability-processor'
 import type { Ability, Trigger } from '../../utils/ability'
-import { doubleChoice, type CardInstance, type PlayableCard } from '../../utils/cards'
+import { doubleChoice, isAsset, type CardInstance, type PlayableCard } from '../../utils/cards'
 import type {
   CardPlayEvent,
   CardDrawEvent,

@@ -1,6 +1,12 @@
 import type { Counter } from './counter'
 import { add, sub } from './counter'
-import { playableCards, type CardID, type CardInstance, type PlayableCardID } from './cards'
+import {
+  playableCards,
+  isAsset,
+  type CardID,
+  type CardInstance,
+  type PlayableCardID,
+} from './cards'
 import { Resource } from './resource'
 import { type Run, type Location, locations } from './run'
 import { shuffle, placeItems } from './utils'
@@ -565,12 +571,7 @@ function handlePlayCard(gameState: GameState, effect: PlayCardEffect): EffectRes
 
   const card = run.cards.hand[cardIndex]
 
-  // Determine destination: board if asset (has board-location abilities or stats), otherwise discard
-  const isAsset =
-    card.attack !== undefined ||
-    card.defense !== undefined ||
-    card.abilities.some((a) => a.trigger.locations?.includes('board'))
-  const destination = isAsset ? 'board' : 'discardPile'
+  const destination = isAsset(card) ? 'board' : 'discardPile'
 
   // Move card from hand to destination
   const newHand = [...run.cards.hand.slice(0, cardIndex), ...run.cards.hand.slice(cardIndex + 1)]

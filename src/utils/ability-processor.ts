@@ -11,7 +11,7 @@
  */
 
 import type { Ability, Trigger, TriggerContext } from './ability'
-import { type CardInstance, type PlayableCard, type RulesCard, getCardChoices } from './cards'
+import { type CardInstance, type RulesCard, getCardChoices } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
@@ -604,12 +604,3 @@ function findCard(instanceId: string, run: Run): CardInstance | undefined {
   return undefined
 }
 
-/**
- * Determines if a card should go to the board (asset) or discard pile (action).
- * A card is an asset if any ability requires a board location, or if it has
- * attack/defense stats (entities live on the board to be attacked/targeted).
- */
-export function isAsset(card: PlayableCard): boolean {
-  if (card.attack !== undefined || card.defense !== undefined) return true
-  return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
-}
