@@ -604,9 +604,10 @@ function findCard(instanceId: string, run: Run): CardInstance | undefined {
 
 /**
  * Determines if a card should go to the board (asset) or discard pile (action).
- * Derived from the card's abilities - if any ability has a board location
- * requirement, the card is an asset.
+ * A card is an asset if any ability requires a board location, or if it has
+ * attack/defense stats (entities live on the board to be attacked/targeted).
  */
 export function isAsset(card: PlayableCard): boolean {
+  if (card.attack !== undefined || card.defense !== undefined) return true
   return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
 }

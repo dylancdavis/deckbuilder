@@ -565,8 +565,11 @@ function handlePlayCard(gameState: GameState, effect: PlayCardEffect): EffectRes
 
   const card = run.cards.hand[cardIndex]
 
-  // Determine destination: board if asset (has board-location abilities), otherwise discard
-  const isAsset = card.abilities.some((a) => a.trigger.locations?.includes('board'))
+  // Determine destination: board if asset (has board-location abilities or stats), otherwise discard
+  const isAsset =
+    card.attack !== undefined ||
+    card.defense !== undefined ||
+    card.abilities.some((a) => a.trigger.locations?.includes('board'))
   const destination = isAsset ? 'board' : 'discardPile'
 
   // Move card from hand to destination
