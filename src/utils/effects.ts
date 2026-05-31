@@ -74,8 +74,15 @@ export type CardChoiceEffect = {
 
 export type RemoveCardEffect = {
   type: 'remove-card'
-  params: { instanceId: string | 'self' } | { matching: CardMatcher }
+  params: { instanceId: InstanceRef } | { matching: CardMatcher }
 }
+
+/**
+ * An instance reference inside an effect. A concrete instanceId is used as-is.
+ * 'self' resolves to the source card of the triggering ability.
+ * 'target' resolves to the card referenced by the cascading card event.
+ */
+export type InstanceRef = string | 'self' | 'target'
 
 export type DrawCardsEffect = {
   type: 'draw-cards'
@@ -85,7 +92,7 @@ export type DrawCardsEffect = {
 export type DiscardCardsEffect = {
   type: 'discard-cards'
   params:
-    | { instanceIds: string[] }
+    | { instanceIds: InstanceRef[] }
     | { from: Location; amount: number | 'all' }
     | { from: Location; matching: CardMatcher }
 }
@@ -93,7 +100,7 @@ export type DiscardCardsEffect = {
 export type MoveCardEffect = {
   type: 'move-card'
   params: (
-    | { instanceIds: (string | 'self')[] }
+    | { instanceIds: InstanceRef[] }
     | { from: Location; amount: number | 'all' }
     | { from: Location; matching: CardMatcher }
   ) & {

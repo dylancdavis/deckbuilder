@@ -1,7 +1,7 @@
 import { Resource } from './resource'
 import { keys, selectRandom, values } from './utils'
 import type { Run } from './run'
-import type { CardPlayEvent } from './event'
+import type { CardPlayEvent, CardDamageEvent } from './event'
 import type { Ability } from './ability'
 
 /**
@@ -44,6 +44,14 @@ export const coreGameFlowAbilities: Ability[] = [
   {
     trigger: { on: 'round-start' },
     effects: [{ type: 'turn-start', params: {} }],
+  },
+  // A damaged card on the board whose defense hits 0 is discarded.
+  {
+    trigger: {
+      on: 'card-damage',
+      when: (ctx) => (ctx.event as CardDamageEvent).newDefense === 0,
+    },
+    effects: [{ type: 'discard-cards', params: { instanceIds: ['target'] } }],
   },
 ]
 

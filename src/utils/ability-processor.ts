@@ -124,12 +124,12 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
       queue.splice(i, 0, { context, effect: remaining })
     }
 
-    // Resolve self references when the source is a playable card.
-    // Player and rules-card contexts have no 'self' to resolve.
+    // Resolve 'self' and 'target' references against the current context.
+    // - 'self' resolves to the source card's instanceId (playable cards only).
+    // - 'target' resolves to the cascading event's instanceId (card events only).
+    // Player contexts have neither; rules-card sources resolve 'target' only.
     const resolvedEffect =
-      context.kind === 'ability' && context.sourceCard.type === 'playable'
-        ? transformSelfReferences(atomic, context.sourceCard.instanceId)
-        : atomic
+      context.kind === 'ability' ? transformReferences(atomic, context) : atomic
 
     // Apply the atomic effect
     const { game, event } = applyEffect(currentState, resolvedEffect)
@@ -393,27 +393,40 @@ function openCardChoice(
 }
 
 /**
- * Resolves 'self' references in an effect to actual instanceId values.
+ * Resolves 'self' and 'target' references in an effect against the ability
+ * context. 'self' becomes the source card's instanceId (playable only);
+ * 'target' becomes the cascading event's instanceId (card events only).
+ * Unresolved tokens are left in place; the apply layer treats them as missing.
  */
-function transformSelfReferences(effect: Effect, instanceId: string): Effect {
-  if ('instanceId' in effect.params && effect.params.instanceId === 'self') {
-    return {
-      ...effect,
-      params: {
-        ...effect.params,
-        instanceId: instanceId,
-      },
-    } as Effect
+function transformReferences(
+  effect: Effect,
+  context: Extract<EffectContext, { kind: 'ability' }>,
+): Effect {
+  const selfId =
+    context.sourceCard.type === 'playable' ? context.sourceCard.instanceId : undefined
+  const targetId = isCardEvent(context.event) ? context.event.instanceId : undefined
+
+  const resolve = (id: string): string => {
+    if (id === 'self') return selfId ?? id
+    if (id === 'target') return targetId ?? id
+    return id
   }
-  if ('instanceIds' in effect.params) {
-    const ids = effect.params.instanceIds as (string | 'self')[]
-    if (ids.includes('self')) {
+
+  if ('instanceId' in effect.params && typeof effect.params.instanceId === 'string') {
+    const resolved = resolve(effect.params.instanceId)
+    if (resolved !== effect.params.instanceId) {
       return {
         ...effect,
-        params: {
-          ...effect.params,
-          instanceIds: ids.map((id) => (id === 'self' ? instanceId : id)),
-        },
+        params: { ...effect.params, instanceId: resolved },
+      } as Effect
+    }
+  }
+  if ('instanceIds' in effect.params) {
+    const ids = effect.params.instanceIds as string[]
+    if (ids.some((id) => id === 'self' || id === 'target')) {
+      return {
+        ...effect,
+        params: { ...effect.params, instanceIds: ids.map(resolve) },
       } as Effect
     }
   }

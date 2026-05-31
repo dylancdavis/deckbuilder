@@ -96,6 +96,34 @@ describe('attack flow', () => {
       expect(store.modalView).toBe(null)
       expect(store.pendingAttack).toBe(null)
     })
+
+    it('discards a board card whose defense is reduced to 0', () => {
+      const attacker = makeInstance({ ...basicEntity, attack: 5 }, 'atk-1')
+      const target = makeInstance({ ...targetDummy, defense: 2 }, 'tgt-1')
+      const store = setupRunWithBoard([attacker, target])
+
+      store.startAttack('atk-1')
+      store.resolveAttack('tgt-1')
+
+      const run = store.run!
+      expect(run.cards.board.find((c) => c.instanceId === 'tgt-1')).toBeUndefined()
+      const discarded = run.cards.discardPile.find((c) => c.instanceId === 'tgt-1')
+      expect(discarded).toBeDefined()
+      expect(discarded!.defense).toBe(0)
+    })
+
+    it('leaves a board card on the board when defense stays above 0', () => {
+      const attacker = makeInstance({ ...basicEntity, attack: 1 }, 'atk-1')
+      const target = makeInstance({ ...targetDummy, defense: 3 }, 'tgt-1')
+      const store = setupRunWithBoard([attacker, target])
+
+      store.startAttack('atk-1')
+      store.resolveAttack('tgt-1')
+
+      const run = store.run!
+      expect(run.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(2)
+      expect(run.cards.discardPile).toHaveLength(0)
+    })
   })
 
   describe('cancelAttack', () => {
