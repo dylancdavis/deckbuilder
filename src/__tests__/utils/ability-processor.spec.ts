@@ -738,6 +738,30 @@ describe('handleEffect ability cascade', () => {
     expect(result.game.run!.cards.hand).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(0)
   })
+
+  it("resolves 'target' to the triggering event's card, not the ability source", () => {
+    // Watcher on board removes any other played card. If 'target' didn't resolve,
+    // remove-card would receive the literal string 'target' and throw.
+    const ability: Ability = {
+      trigger: { on: 'card-play', target: 'other' },
+      effects: [{ type: 'remove-card', params: { instanceId: 'target' } }],
+    }
+    const watcher = createCard({ instanceId: 'watcher', abilities: [ability] })
+    const played = createCard({ instanceId: 'played', abilities: [] })
+    const gameState = createTestGameState({
+      cards: { ...EMPTY_PILES, hand: [played], board: [watcher] },
+    })
+
+    const result = handleEffect(
+      gameState,
+      { type: 'play-card', params: { instanceId: 'played' } },
+      { kind: 'player' },
+    )
+
+    expect(result.game.run!.cards.board.map((c) => c.instanceId)).toEqual(['watcher'])
+    expect(result.game.run!.cards.hand).toHaveLength(0)
+    expect(result.game.run!.cards.discardPile).toHaveLength(0)
+  })
 })
 
 describe('isAsset', () => {

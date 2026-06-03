@@ -96,6 +96,18 @@ describe('attack flow', () => {
       expect(store.modalView).toBe(null)
       expect(store.pendingAttack).toBe(null)
     })
+
+    it('discards the target via core rule when defense reaches 0', () => {
+      const attacker = makeInstance({ ...basicEntity, attack: 1 }, 'atk-1')
+      const target = makeInstance({ ...targetDummy, defense: 1 }, 'tgt-1')
+      const store = setupRunWithBoard([attacker, target])
+
+      store.startAttack('atk-1')
+      store.resolveAttack('tgt-1')
+
+      expect(store.run!.cards.board.map((c) => c.instanceId)).toEqual(['atk-1'])
+      expect(store.run!.cards.discardPile.map((c) => c.instanceId)).toEqual(['tgt-1'])
+    })
   })
 
   describe('cancelAttack', () => {
