@@ -153,6 +153,7 @@ export type CardEvent =
   | CardMoveEvent
   | CardAddEvent
   | CardActivateEvent
+  | CardDamageEvent
 
 /**
  * Type guard to check if an event is a card-related event.
