@@ -72,9 +72,16 @@ export type CardChoiceEffect = {
   }
 }
 
+/**
+ * Symbolic card references resolved by the ability processor before apply.
+ * - 'self': the card owning the triggered ability
+ * - 'target': the card the triggering event is about
+ */
+export type CardRef = string | 'self' | 'target'
+
 export type RemoveCardEffect = {
   type: 'remove-card'
-  params: { instanceId: string | 'self' } | { matching: CardMatcher }
+  params: { instanceId: CardRef } | { matching: CardMatcher }
 }
 
 export type DrawCardsEffect = {
@@ -85,7 +92,7 @@ export type DrawCardsEffect = {
 export type DiscardCardsEffect = {
   type: 'discard-cards'
   params:
-    | { instanceIds: string[] }
+    | { instanceIds: CardRef[] }
     | { from: Location; amount: number | 'all' }
     | { from: Location; matching: CardMatcher }
 }
@@ -93,7 +100,7 @@ export type DiscardCardsEffect = {
 export type MoveCardEffect = {
   type: 'move-card'
   params: (
-    | { instanceIds: (string | 'self')[] }
+    | { instanceIds: CardRef[] }
     | { from: Location; amount: number | 'all' }
     | { from: Location; matching: CardMatcher }
   ) & {
@@ -112,14 +119,14 @@ export type PlayCardEffect = {
 export type RetriggerCardEffect = {
   type: 'retrigger-card'
   params: {
-    instanceId: string | 'self'
+    instanceId: CardRef
   }
 }
 
 export type DamageEffect = {
   type: 'damage'
   params: {
-    instanceId: string
+    instanceId: CardRef
     amount: number
   }
 }
