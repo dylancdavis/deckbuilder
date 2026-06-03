@@ -124,12 +124,9 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
       queue.splice(i, 0, { context, effect: remaining })
     }
 
-    // Resolve self references when the source is a playable card.
-    // Player and rules-card contexts have no 'self' to resolve.
-    const resolvedEffect =
-      context.kind === 'ability' && context.sourceCard.type === 'playable'
-        ? transformSelfReferences(atomic, context.sourceCard.instanceId)
-        : atomic
+    // Resolve symbolic references ('self' → source card, 'target' → event's card).
+    // Unresolved symbols pass through and throw at apply time.
+    const resolvedEffect = resolveSymbolicReferences(atomic, context)
 
     // Apply the atomic effect
     const { game, event } = applyEffect(currentState, resolvedEffect)
@@ -393,26 +390,45 @@ function openCardChoice(
 }
 
 /**
- * Resolves 'self' references in an effect to actual instanceId values.
+ * Resolves symbolic card references in effect params to actual instanceIds.
+ *
+ * - `'self'`: the card that owns the triggered ability (only valid when the
+ *   source is a playable card — rules cards have no instance).
+ * - `'target'`: the card the triggering event is about (only valid when the
+ *   event is a card event).
+ *
+ * Symbols that can't be resolved in the current context pass through unchanged
+ * and will throw at apply time, surfacing authoring errors.
  */
-function transformSelfReferences(effect: Effect, instanceId: string): Effect {
-  if ('instanceId' in effect.params && effect.params.instanceId === 'self') {
-    return {
-      ...effect,
-      params: {
-        ...effect.params,
-        instanceId: instanceId,
-      },
-    } as Effect
+function resolveSymbolicReferences(effect: Effect, context: EffectContext): Effect {
+  if (context.kind !== 'ability') return effect
+
+  const refs: Record<string, string> = {}
+  if (context.sourceCard.type === 'playable') {
+    refs.self = context.sourceCard.instanceId
+  }
+  if (isCardEvent(context.event)) {
+    refs.target = context.event.instanceId
+  }
+  if (Object.keys(refs).length === 0) return effect
+
+  if ('instanceId' in effect.params && typeof effect.params.instanceId === 'string') {
+    const resolved = refs[effect.params.instanceId]
+    if (resolved !== undefined) {
+      return {
+        ...effect,
+        params: { ...effect.params, instanceId: resolved },
+      } as Effect
+    }
   }
   if ('instanceIds' in effect.params) {
-    const ids = effect.params.instanceIds as (string | 'self')[]
-    if (ids.includes('self')) {
+    const ids = effect.params.instanceIds as string[]
+    if (ids.some((id) => id in refs)) {
       return {
         ...effect,
         params: {
           ...effect.params,
-          instanceIds: ids.map((id) => (id === 'self' ? instanceId : id)),
+          instanceIds: ids.map((id) => refs[id] ?? id),
         },
       } as Effect
     }
