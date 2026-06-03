@@ -9,6 +9,14 @@ import type { Ability } from './ability'
  * These can be added to any rules card to implement standard game flow.
  */
 export const coreGameFlowAbilities: Ability[] = [
+  // Cards reduced to 0 defense by damage are discarded.
+  {
+    trigger: {
+      on: 'card-damage',
+      when: (ctx) => ctx.event.type === 'card-damage' && ctx.event.newDefense === 0,
+    },
+    effects: [{ type: 'discard-cards', params: { instanceIds: ['target'] } }],
+  },
   // On run-start -> start first round
   {
     trigger: { on: 'run-start' },
