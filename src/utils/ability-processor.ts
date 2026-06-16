@@ -36,10 +36,10 @@ export type EffectContext =
   | { kind: 'ability'; sourceCard: CardInstance | RulesCard; event: Event }
 
 /**
- * Represents a single effect waiting to be processed in the queue.
- * Each effect from an ability becomes its own queue item.
+ * Represents a single effect waiting to be processed on the stack.
+ * Each effect from an ability becomes its own stack item.
  */
-export type EffectQueueItem = {
+export type EffectStackItem = {
   context: EffectContext
   effect: Effect
 }
@@ -59,24 +59,24 @@ export function handleEffect(
 ): GameState {
   if (!gameState.game.run) throw new Error('Cannot handle effect with no run')
 
-  return drainQueue(gameState, [{ context, effect }])
+  return drainStack(gameState, [{ context, effect }])
 }
 
 /**
  * Called by the UI when the user makes a card choice.
  * Reads the pending choice from state, generates effects from the choice handler,
- * and resumes queue processing.
+ * and resumes stack processing.
  *
  * @param gameState - The current game state (must have a pending choice)
  * @param chosenCard - The card the user selected
- * @returns Updated game state after choice effects and remaining queue resolve
+ * @returns Updated game state after choice effects and the remaining stack resolve
  */
 export function resolveChoice(gameState: GameState, chosenCard: CardID): GameState {
   const pending = gameState.viewData.pendingChoice
   if (!pending) throw new Error('No pending choice to resolve')
 
   const choiceEffects = pending.choiceEffect.params.choiceHandler(chosenCard)
-  const choiceItems: EffectQueueItem[] = choiceEffects.map((effect) => ({
+  const choiceItems: EffectStackItem[] = choiceEffects.map((effect) => ({
     context: pending.context,
     effect,
   }))
@@ -92,27 +92,28 @@ export function resolveChoice(gameState: GameState, chosenCard: CardID): GameSta
     },
   }
 
-  return drainQueue(clearedState, [...choiceItems, ...pending.remainingQueue])
+  return drainStack(clearedState, [...choiceItems, ...pending.remainingStack])
 }
 
 /**
- * Core processing loop. Treats `queue` as a depth-first work stack: shift the
- * next item off the front, decompose/apply/cascade it, and unshift any new work
+ * Core processing loop. The front of `stack` is the top: shift the next item
+ * off the front, decompose/apply/cascade it, and unshift any new work
  * (triggered abilities, decomposition remainder) back onto the front so it
- * resolves before the rest. Pauses on card-choice effects.
+ * resolves before the rest. Front-anchored so a pushed batch reads in
+ * execution order (depth-first). Pauses on card-choice effects.
  *
- * `queue` is owned by the caller (built fresh in handleEffect/resolveChoice),
+ * `stack` is owned by the caller (built fresh in handleEffect/resolveChoice),
  * so mutating it in place is safe.
  */
-function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
+function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
   let currentState = gameState
 
-  while (queue.length > 0) {
-    const { context, effect } = queue.shift()!
+  while (stack.length > 0) {
+    const { context, effect } = stack.shift()!
 
-    // Card-choice: pause processing. After the shift, `queue` is exactly the
+    // Card-choice: pause processing. After the shift, `stack` is exactly the
     // remaining work, so it can be stored as-is.
-    if (effect.type === 'card-choice') return openCardChoice(currentState, effect, context, queue)
+    if (effect.type === 'card-choice') return openCardChoice(currentState, effect, context, stack)
 
     // Decompose compound effects into atomic ones
     const decomposed = decomposeEffect(effect, currentState.game.run!)
@@ -129,7 +130,7 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
     currentState = game
 
     // Cascade: if the effect produced an event, find triggered abilities
-    const triggeredItems: EffectQueueItem[] = []
+    const triggeredItems: EffectStackItem[] = []
     if (event) {
       currentState = logEvent(currentState, event)
       const abilities = findMatchingAbilities(currentState.game.run!, event)
@@ -146,7 +147,7 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
     // decomposition remainder — a single unshift so the array reads in final
     // front-to-back order (depth-first).
     const next = remaining ? [...triggeredItems, { context, effect: remaining }] : triggeredItems
-    if (next.length > 0) queue.unshift(...next)
+    if (next.length > 0) stack.unshift(...next)
   }
 
   return currentState
@@ -329,7 +330,7 @@ function decomposeEffect(effect: Effect, run: Run): { atomic: Effect; remaining:
         // For now, throw as this was already unimplemented
         throw new Error('Card matcher removal not yet implemented')
       }
-      // Self-reference will be resolved by resolveSymbolicReferences in drainQueue
+      // Self-reference will be resolved by resolveSymbolicReferences in drainStack
       // Already atomic
       return { atomic: effect, remaining: null }
     }
@@ -349,21 +350,21 @@ function decomposeEffect(effect: Effect, run: Run): { atomic: Effect; remaining:
     case 'refresh-deck':
       return { atomic: effect, remaining: null }
 
-    // card-choice is handled in drainQueue before decomposition
+    // card-choice is handled in drainStack before decomposition
     case 'card-choice':
-      throw new Error('card-choice should be handled in drainQueue, not decomposeEffect')
+      throw new Error('card-choice should be handled in drainStack, not decomposeEffect')
   }
 }
 
 /**
  * Stores a card-choice as inspectable data on the game state,
- * pausing the effect queue until the user makes a selection.
+ * pausing the effect stack until the user makes a selection.
  */
 function openCardChoice(
   gameState: GameState,
   effect: CardChoiceEffect,
   context: EffectContext,
-  remainingQueue: EffectQueueItem[],
+  remainingStack: EffectStackItem[],
 ): GameState {
   const { options, tags } = effect.params
   const choices = getCardChoices(options, tags)
@@ -373,7 +374,7 @@ function openCardChoice(
     tags,
     choiceEffect: effect,
     context,
-    remainingQueue,
+    remainingStack,
   }
 
   return {
