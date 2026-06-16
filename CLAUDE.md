@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Make **atomic commits**: one logical change per commit.
 Review diffs, confirm correctness, and use clear messages that describe what and why.
-Commits made by Claude should be prefixed with [Claude], and should be one line only.
+Commit messages should be one line only.
 
 ## Testing
 
