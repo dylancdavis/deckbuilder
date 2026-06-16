@@ -329,7 +329,7 @@ function decomposeEffect(effect: Effect, run: Run): { atomic: Effect; remaining:
         // For now, throw as this was already unimplemented
         throw new Error('Card matcher removal not yet implemented')
       }
-      // Self-reference will be resolved by transformSelfReferences in drainQueue
+      // Self-reference will be resolved by resolveSymbolicReferences in drainQueue
       // Already atomic
       return { atomic: effect, remaining: null }
     }
