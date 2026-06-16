@@ -96,33 +96,29 @@ export function resolveChoice(gameState: GameState, chosenCard: CardID): GameSta
 }
 
 /**
- * Core processing loop. Drains a queue of effects by decomposing, applying,
- * and cascading each one. Pauses on card-choice effects.
+ * Core processing loop. Treats `queue` as a depth-first work stack: shift the
+ * next item off the front, decompose/apply/cascade it, and unshift any new work
+ * (triggered abilities, decomposition remainder) back onto the front so it
+ * resolves before the rest. Pauses on card-choice effects.
+ *
+ * `queue` is owned by the caller (built fresh in handleEffect/resolveChoice),
+ * so mutating it in place is safe.
  */
 function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
   let currentState = gameState
-  let i = 0
 
-  while (i < queue.length) {
-    const { context, effect } = queue[i]
-    i++
+  while (queue.length > 0) {
+    const { context, effect } = queue.shift()!
 
-    // Card-choice: pause processing, store remaining queue as data
-    if (effect.type === 'card-choice') {
-      const remainingQueue = queue.slice(i)
-      return openCardChoice(currentState, effect, context, remainingQueue)
-    }
+    // Card-choice: pause processing. After the shift, `queue` is exactly the
+    // remaining work, so it can be stored as-is.
+    if (effect.type === 'card-choice') return openCardChoice(currentState, effect, context, queue)
 
     // Decompose compound effects into atomic ones
     const decomposed = decomposeEffect(effect, currentState.game.run!)
     if (!decomposed) continue // Nothing to do (pile empty, no matches, etc.)
 
     const { atomic, remaining } = decomposed
-
-    // If there's remaining work from this decomposition, insert it next in queue
-    if (remaining) {
-      queue.splice(i, 0, { context, effect: remaining })
-    }
 
     // Resolve symbolic references ('self' → source card, 'target' → event's card).
     // Unresolved symbols pass through and throw at apply time.
@@ -133,22 +129,24 @@ function drainQueue(gameState: GameState, queue: EffectQueueItem[]): GameState {
     currentState = game
 
     // Cascade: if the effect produced an event, find triggered abilities
+    const triggeredItems: EffectQueueItem[] = []
     if (event) {
       currentState = logEvent(currentState, event)
       const abilities = findMatchingAbilities(currentState.game.run!, event)
-
-      // Insert triggered effects depth-first (immediately after current position)
-      const triggeredItems: EffectQueueItem[] = abilities.flatMap((match) =>
+      const cascaded = abilities.flatMap((match) =>
         match.ability.effects.map((e) => ({
-          context: { kind: 'ability', sourceCard: match.card, event },
+          context: { kind: 'ability' as const, sourceCard: match.card, event },
           effect: e,
         })),
       )
-
-      if (triggeredItems.length > 0) {
-        queue.splice(i, 0, ...triggeredItems)
-      }
+      triggeredItems.push(...cascaded)
     }
+
+    // Push new work onto the front, triggered effects first, then this effect's
+    // decomposition remainder — a single unshift so the array reads in final
+    // front-to-back order (depth-first).
+    const next = remaining ? [...triggeredItems, { context, effect: remaining }] : triggeredItems
+    if (next.length > 0) queue.unshift(...next)
   }
 
   return currentState
@@ -619,4 +617,3 @@ function findCard(instanceId: string, run: Run): CardInstance | undefined {
   }
   return undefined
 }
-
