@@ -164,7 +164,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             data-testid="board-card"
             @click="onBoardCardClick(card)"
           >
-            <CardItem :card="card" />
+            <CardItem :card="card" :tilt="TILT_PRESETS.minimal" />
           </div>
         </div>
       </div>

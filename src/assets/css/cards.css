@@ -76,6 +76,7 @@
   flex-direction: column;
   gap: calc(var(--card-width) * 8 / 250);
   text-align: center;
+  color: var(--card-border-color);
   background-color: #ebebeb;
   background: linear-gradient(#ccc, #919191);
   border-radius: calc(var(--card-width) * 12 / 250);

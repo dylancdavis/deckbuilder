@@ -206,6 +206,9 @@ button.advance:active {
     0.1s transform ease,
     0.1s filter ease,
     0.15s box-shadow ease;
+}
+
+.hand-group .flip-card .card-container {
   cursor: pointer;
 }
 
@@ -216,7 +219,7 @@ button.advance:active {
     0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 
-.hand-group .card-container:active {
+.hand-group .flip-card .card-container:active {
   transform: scale(1);
   filter: brightness(1.2);
 }
