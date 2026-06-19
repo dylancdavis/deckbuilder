@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick } from 'vue'
+import { computed } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import CardBack from './CardBack.vue'
 import FlashValue from './FlashValue.vue'
 import type { CardInstance } from '@/utils/cards'
-import { gsap } from 'gsap'
-import { Flip } from 'gsap/Flip'
 import { TILT_PRESETS } from '@/composables/useTilt'
+import { useCardFlip } from '@/composables/useCardFlip'
 
-gsap.registerPlugin(Flip)
+const { animateCardMove } = useCardFlip()
 
 const gameStore = useGameStore()
 const run = computed(() => {
@@ -78,21 +77,8 @@ function discardPile(cards: CardInstance[]) {
 }
 
 async function nextTurn() {
-  // Capture state of all cards before next turn (hand, discard, draw pile)
-  const state = Flip.getState('.flip-card, .discard-pile [data-flip-id], .draw-pile [data-flip-id]')
-
-  // Execute next turn logic (discards hand cards, then draws new cards)
-  gameStore.nextTurn()
-
-  // Wait for Vue to re-render
-  await nextTick()
-
-  // Animate all card movements (hand to discard, draw pile to hand)
-  Flip.from(state, {
-    targets: '.flip-card, .discard-pile [data-flip-id], .draw-pile [data-flip-id]',
-    duration: 0.2,
-    ease: 'power2.inOut',
-  })
+  // Discards the hand, then draws a new hand (hand→discard, draw→hand)
+  await animateCardMove(() => gameStore.nextTurn(), { ease: 'power2.inOut' })
 }
 
 function canAttackWith(card: CardInstance): boolean {
@@ -108,21 +94,9 @@ function onBoardCardClick(card: CardInstance) {
 }
 
 async function playCard(instanceId: string) {
-  // Capture state of all cards in hand and discard pile
-  const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
-
-  // Make the state change
-  gameStore.tryPlayCard(instanceId)
-
-  // Wait for Vue to re-render
-  await nextTick()
-
-  // Animate from previous state to current state
-  Flip.from(state, {
-    targets: '.flip-card, .discard-pile [data-flip-id]',
-    duration: 0.2,
-    ease: 'power2',
-  })
+  // Plays a card from hand: asset→board or non-asset→discard, plus any
+  // board→discard moves triggered by its abilities.
+  await animateCardMove(() => gameStore.tryPlayCard(instanceId))
 }
 
 const drawPileData = computed(() => drawPile(run.value.cards.drawPile))
@@ -159,6 +133,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           <div
             v-for="card in run.cards.board"
             :key="card.instanceId || card.name"
+            :data-flip-id="card.instanceId"
             class="board-card-wrapper"
             :class="{ 'board-card-attacker': canAttackWith(card) }"
             data-testid="board-card"

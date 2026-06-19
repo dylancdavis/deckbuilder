@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick } from 'vue'
+import { computed } from 'vue'
 import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
@@ -7,10 +7,9 @@ import CardChoiceModal from './components/CardChoiceModal.vue'
 import AttackTargetModal from './components/AttackTargetModal.vue'
 import type { CardID } from './utils/cards'
 import { resolveChoice } from './utils/ability-processor'
-import { gsap } from 'gsap'
-import { Flip } from 'gsap/Flip'
+import { useCardFlip } from './composables/useCardFlip'
 
-gsap.registerPlugin(Flip)
+const { animateCardMove } = useCardFlip()
 
 const gameStore = useGameStore()
 const view = computed(() => gameStore.view)
@@ -28,21 +27,15 @@ function getView(viewName: string[]) {
 }
 
 async function handleSelect(cardId: CardID) {
-  // Capture state of cards in hand and discard pile before resolving the choice
-  const state = Flip.getState('.flip-card, .discard-pile [data-flip-id]')
-
-  // Resolve the choice effect (resolveChoice clears the modal internally)
-  gameStore.gameState = resolveChoice(gameStore.gameState, cardId)
-
-  // Wait for Vue to re-render
-  await nextTick()
-
-  // Animate card movement from hand to discard pile
-  Flip.from(state, {
-    targets: '.flip-card, .discard-pile [data-flip-id]',
-    duration: 0.2,
-    ease: 'power2',
+  // resolveChoice clears the modal internally and may move cards between zones
+  await animateCardMove(() => {
+    gameStore.gameState = resolveChoice(gameStore.gameState, cardId)
   })
+}
+
+async function handleAttackTarget(targetInstanceId: string) {
+  // Resolving an attack can move board cards to the discard pile
+  await animateCardMove(() => gameStore.resolveAttack(targetInstanceId))
 }
 </script>
 
@@ -68,7 +61,7 @@ async function handleSelect(cardId: CardID) {
   <AttackTargetModal
     v-if="modalView === 'attack-target'"
     :targets="gameStore.attackTargets"
-    :handle-select="gameStore.resolveAttack"
+    :handle-select="handleAttackTarget"
     :handle-cancel="gameStore.cancelAttack"
   />
 </template>
