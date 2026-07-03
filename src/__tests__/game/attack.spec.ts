@@ -97,6 +97,25 @@ describe('attack flow', () => {
       expect(store.pendingAttack).toBe(null)
     })
 
+    it('logs a card-attack event identifying the attacker before the damage event', () => {
+      const attacker = makeInstance({ ...basicEntity, attack: 3 }, 'atk-1')
+      const target = makeInstance({ ...targetDummy, defense: 5 }, 'tgt-1')
+      const store = setupRunWithBoard([attacker, target])
+
+      store.startAttack('atk-1')
+      store.resolveAttack('tgt-1')
+
+      expect(store.run!.events.map((e) => e.type)).toEqual(['card-attack', 'card-damage'])
+      expect(store.run!.events[0]).toMatchObject({
+        type: 'card-attack',
+        cardId: 'basic-entity',
+        instanceId: 'atk-1',
+        targetCardId: 'target-dummy',
+        targetInstanceId: 'tgt-1',
+        amount: 3,
+      })
+    })
+
     it('discards the target via core rule when defense reaches 0', () => {
       const attacker = makeInstance({ ...basicEntity, attack: 1 }, 'atk-1')
       const target = makeInstance({ ...targetDummy, defense: 1 }, 'tgt-1')
