@@ -14,6 +14,7 @@ import type { GameState } from './game'
 import type { CardMatcher } from './card-matchers'
 import type {
   CardAddEvent,
+  CardAttackEvent,
   CardCollectEvent,
   CardDamageEvent,
   CardDestroyEvent,
@@ -131,6 +132,15 @@ export type DamageEffect = {
   }
 }
 
+export type AttackEffect = {
+  type: 'attack'
+  params: {
+    /** The attacking card */
+    instanceId: CardRef
+    targetInstanceId: CardRef
+  }
+}
+
 // Lifecycle effects
 export type TurnStartEffect = {
   type: 'turn-start'
@@ -180,6 +190,7 @@ export type Effect =
   | PlayCardEffect
   | RetriggerCardEffect
   | DamageEffect
+  | AttackEffect
   | TurnStartEffect
   | TurnEndEffect
   | RoundStartEffect
@@ -825,6 +836,39 @@ function handleDamage(gameState: GameState, effect: DamageEffect): EffectResult 
 }
 
 /**
+ * Declares an attack: emits a card-attack event without changing state.
+ * The decomposition layer follows this with a damage effect on the target,
+ * so abilities can react to the attack itself, separately from the damage
+ * it causes.
+ */
+function handleAttack(gameState: GameState, effect: AttackEffect): EffectResult {
+  const run = gameState.game.run!
+  const { instanceId, targetInstanceId } = effect.params
+
+  const cardsInPlay = locations.flatMap((location) => run.cards[location])
+  const attacker = cardsInPlay.find((c) => c.instanceId === instanceId)
+  const target = cardsInPlay.find((c) => c.instanceId === targetInstanceId)
+
+  // Attacker or target not found, or attacker cannot attack — skip
+  if (!attacker || attacker.attack === undefined || !target) {
+    return { game: gameState, event: null }
+  }
+
+  const event: CardAttackEvent = {
+    type: 'card-attack',
+    cardId: attacker.id,
+    instanceId: attacker.instanceId,
+    targetCardId: target.id,
+    targetInstanceId: target.instanceId,
+    amount: attacker.attack,
+    round: run.stats.rounds,
+    turn: run.stats.turns,
+  }
+
+  return { game: gameState, event }
+}
+
+/**
  * Applies a single atomic effect to the game state.
  * Returns the updated state and at most one event.
  *
@@ -869,6 +913,8 @@ export function applyEffect(gameState: GameState, effect: Effect): EffectResult 
       return handlePlayCard(gameState, effect)
     case 'damage':
       return handleDamage(gameState, effect)
+    case 'attack':
+      return handleAttack(gameState, effect)
     case 'retrigger-card':
     case 'card-choice':
       throw new Error(`${effect.type} must be handled by the orchestrator, not applyEffect`)

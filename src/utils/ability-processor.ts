@@ -115,18 +115,19 @@ function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
     // remaining work, so it can be stored as-is.
     if (effect.type === 'card-choice') return openCardChoice(currentState, effect, context, stack)
 
+    // Resolve symbolic references ('self' → source card, 'target' → event's card)
+    // before decomposing, since decomposition may look cards up by instanceId.
+    // Unresolved symbols pass through and throw at apply time.
+    const resolvedEffect = resolveSymbolicReferences(effect, context)
+
     // Decompose compound effects into atomic ones
-    const decomposed = decomposeEffect(effect, currentState.game.run!)
+    const decomposed = decomposeEffect(resolvedEffect, currentState.game.run!)
     if (!decomposed) continue // Nothing to do (pile empty, no matches, etc.)
 
     const { atomic, remaining } = decomposed
 
-    // Resolve symbolic references ('self' → source card, 'target' → event's card).
-    // Unresolved symbols pass through and throw at apply time.
-    const resolvedEffect = resolveSymbolicReferences(atomic, context)
-
     // Apply the atomic effect
-    const { game, event } = applyEffect(currentState, resolvedEffect)
+    const { game, event } = applyEffect(currentState, atomic)
     currentState = game
 
     // Cascade: if the effect produced an event, find triggered abilities
@@ -159,8 +160,27 @@ function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
  *
  * Returns null if there's nothing to do (pile empty, no matches, etc.).
  */
-function decomposeEffect(effect: Effect, run: Run): { atomic: Effect; remaining: Effect | null } {
+function decomposeEffect(
+  effect: Effect,
+  run: Run,
+): { atomic: Effect; remaining: Effect | null } | null {
   switch (effect.type) {
+    // --- Attack: declare the attack, then deal the damage ---
+
+    case 'attack': {
+      const attacker = findCard(effect.params.instanceId, run)
+      if (!attacker || attacker.attack === undefined) return null // Cannot attack
+
+      // The attack declaration resolves (and cascades) before the damage lands,
+      // so "when this card attacks" abilities are pre-damage triggers.
+      return {
+        atomic: effect,
+        remaining: {
+          type: 'damage',
+          params: { instanceId: effect.params.targetInstanceId, amount: attacker.attack },
+        },
+      }
+    }
     // --- Amount-based: resolve one card at a time ---
 
     case 'draw-cards': {
@@ -406,33 +426,31 @@ function resolveSymbolicReferences(effect: Effect, context: EffectContext): Effe
   if (context.sourceCard.type === 'playable') {
     refs.self = context.sourceCard.instanceId
   }
+  // For card-attack events, event.instanceId is the attacker, so 'target'
+  // resolves to the attacker (e.g. retaliation abilities on the attacked card).
   if (isCardEvent(context.event)) {
     refs.target = context.event.instanceId
   }
   if (Object.keys(refs).length === 0) return effect
 
-  if ('instanceId' in effect.params && typeof effect.params.instanceId === 'string') {
-    const resolved = refs[effect.params.instanceId]
-    if (resolved !== undefined) {
-      return {
-        ...effect,
-        params: { ...effect.params, instanceId: resolved },
-      } as Effect
+  const params = effect.params as Record<string, unknown>
+  const updates: Record<string, unknown> = {}
+
+  for (const key of ['instanceId', 'targetInstanceId']) {
+    const value = params[key]
+    if (typeof value === 'string' && refs[value] !== undefined) {
+      updates[key] = refs[value]
     }
   }
-  if ('instanceIds' in effect.params) {
-    const ids = effect.params.instanceIds as string[]
+  if (Array.isArray(params.instanceIds)) {
+    const ids = params.instanceIds as string[]
     if (ids.some((id) => id in refs)) {
-      return {
-        ...effect,
-        params: {
-          ...effect.params,
-          instanceIds: ids.map((id) => refs[id] ?? id),
-        },
-      } as Effect
+      updates.instanceIds = ids.map((id) => refs[id] ?? id)
     }
   }
-  return effect
+
+  if (Object.keys(updates).length === 0) return effect
+  return { ...effect, params: { ...effect.params, ...updates } } as Effect
 }
 
 /**

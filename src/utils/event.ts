@@ -116,6 +116,17 @@ export type CardDamageEvent = BaseEvent & {
   newDefense: number
 }
 
+// An attack declaration, emitted before the damage it causes. `instanceId` is
+// the attacker, so `target: 'self'` in a trigger means "when this card attacks".
+export type CardAttackEvent = BaseEvent & {
+  type: 'card-attack'
+  cardId: PlayableCardID
+  instanceId: string
+  targetCardId: PlayableCardID
+  targetInstanceId: string
+  amount: number
+}
+
 // Union Type
 export type Event =
   | CardDrawEvent
@@ -128,6 +139,7 @@ export type Event =
   | CardMoveEvent
   | CardActivateEvent
   | CardDamageEvent
+  | CardAttackEvent
   | TurnStartEvent
   | TurnEndEvent
   | RoundStartEvent
@@ -154,6 +166,7 @@ export type CardEvent =
   | CardAddEvent
   | CardActivateEvent
   | CardDamageEvent
+  | CardAttackEvent
 
 /**
  * Type guard to check if an event is a card-related event.

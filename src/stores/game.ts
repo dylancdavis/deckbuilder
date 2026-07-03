@@ -184,12 +184,6 @@ export const useGameStore = defineStore('game', () => {
     const pending = gameState.value.viewData.pendingAttack
     if (!run || !pending) return
 
-    const attacker = run.cards.board.find((c) => c.instanceId === pending.attackerInstanceId)
-    if (!attacker || attacker.attack === undefined) {
-      cancelAttack()
-      return
-    }
-
     const clearedState: GameState = {
       ...gameState.value,
       viewData: {
@@ -201,7 +195,10 @@ export const useGameStore = defineStore('game', () => {
 
     gameState.value = handleEffect(
       clearedState,
-      { type: 'damage', params: { instanceId: targetInstanceId, amount: attacker.attack } },
+      {
+        type: 'attack',
+        params: { instanceId: pending.attackerInstanceId, targetInstanceId },
+      },
       { kind: 'player' },
     )
   }
