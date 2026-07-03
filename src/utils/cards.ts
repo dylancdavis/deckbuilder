@@ -524,6 +524,58 @@ export const targetDummy: PlayableCard = {
   },
 }
 
+// Attack test cards: exercise card-attack triggers in actual play
+
+export const striker: PlayableCard = {
+  type: 'playable',
+  id: 'striker',
+  name: 'Striker',
+  description: 'When this card attacks, gain 1 point.',
+  attack: 2,
+  defense: 3,
+  abilities: [
+    {
+      trigger: { on: 'card-attack', target: 'self', locations: ['board'] },
+      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+    },
+  ],
+  cost: 2,
+  tags: ['test', 'entity'],
+  art: {
+    gradient: ['#8b0000', '#ff8c00'],
+    image: 'lightning',
+  },
+}
+
+export const thornDummy: PlayableCard = {
+  type: 'playable',
+  id: 'thorn-dummy',
+  name: 'Thorn Dummy',
+  description: 'When this card is attacked, deal 1 damage to the attacker.',
+  attack: 0,
+  defense: 4,
+  abilities: [
+    {
+      trigger: {
+        on: 'card-attack',
+        locations: ['board'],
+        when: (ctx) =>
+          ctx.event.type === 'card-attack' &&
+          ctx.sourceCard.type === 'playable' &&
+          ctx.event.targetInstanceId === ctx.sourceCard.instanceId,
+      },
+      // 'target' is the card the event is about — for card-attack, the attacker
+      effects: [{ type: 'damage', params: { instanceId: 'target', amount: 1 } }],
+    },
+  ],
+  cost: 1,
+  tags: ['test', 'entity'],
+  art: {
+    gradient: ['#355c3a', '#7ba05b'],
+    image: 'scarab',
+  },
+}
+
 // Test rules card with no limits for manual testing
 export const testRules: RulesCard = {
   type: 'rules',
@@ -702,12 +754,42 @@ export const choiceTestRules: RulesCard = {
   ],
 }
 
+// Rules for exercising attack mechanics: the deck's entities are drawn
+// together on the first turn and can all be played immediately.
+export const attackTestRules: RulesCard = {
+  type: 'rules',
+  id: 'attack-test-rules',
+  name: 'Attack Test Rules',
+  art: {
+    gradient: ['#8b0000', '#2c3e50'],
+    image: 'lightning',
+  },
+  deckLimits: { size: [0, 10] },
+  turnStructure: { playAmount: 'any' },
+  abilities: [
+    {
+      trigger: { on: 'turn-end' },
+      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+    },
+    {
+      trigger: { on: 'round-end' },
+      effects: [{ type: 'run-end', params: {} }],
+    },
+    ...coreGameFlowAbilities,
+    {
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+  ],
+}
+
 export const rulesCards = {
   'starter-rules': starterRules,
   'test-rules': testRules,
   'discard-test-rules': discardTestRules,
   'move-test-rules': moveTestRules,
   'choice-test-rules': choiceTestRules,
+  'attack-test-rules': attackTestRules,
 } as const
 
 // === TEST CARDS FOR PROBLEMATIC SCENARIOS ===
@@ -1030,6 +1112,8 @@ export const playableCards = {
   'choice-add-choice': choiceAddChoice,
   'basic-entity': basicEntity,
   'target-dummy': targetDummy,
+  striker: striker,
+  'thorn-dummy': thornDummy,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }

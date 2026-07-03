@@ -24,3 +24,9 @@ export const choiceTestDeck: Deck = {
   cards: {},
   rulesCard: cards['choice-test-rules'],
 }
+
+export const attackTestDeck: Deck = {
+  name: 'Attack Test Deck',
+  cards: { striker: 1, 'thorn-dummy': 1 },
+  rulesCard: cards['attack-test-rules'],
+}
