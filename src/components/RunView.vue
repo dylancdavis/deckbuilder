@@ -217,20 +217,25 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             </div>
           </div>
         </div>
-        <button
-          data-testid="next-turn-btn"
-          class="next-turn-btn"
-          :class="{
-            'next-turn-btn--highlighted': noActionsLeft && !isEndOfRun,
-            'next-turn-btn--end-run': isEndOfRun,
-          }"
-          @click="nextTurn"
-        >
-          <div class="button-text-main">{{ nextTurnButtonText.main }}</div>
-          <div v-if="nextTurnButtonText.subtitle" class="button-text-subtitle">
-            {{ nextTurnButtonText.subtitle }}
-          </div>
-        </button>
+        <div class="panel-buttons">
+          <button data-testid="event-log-btn" class="event-log-btn" @click="gameStore.openEventLog">
+            Event Log
+          </button>
+          <button
+            data-testid="next-turn-btn"
+            class="next-turn-btn"
+            :class="{
+              'next-turn-btn--highlighted': noActionsLeft && !isEndOfRun,
+              'next-turn-btn--end-run': isEndOfRun,
+            }"
+            @click="nextTurn"
+          >
+            <div class="button-text-main">{{ nextTurnButtonText.main }}</div>
+            <div v-if="nextTurnButtonText.subtitle" class="button-text-subtitle">
+              {{ nextTurnButtonText.subtitle }}
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -300,6 +305,36 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
   grid-template-columns: 1fr 1fr;
   gap: 0.5em;
   width: 100%;
+}
+
+.panel-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 100%;
+}
+
+/* Event log button styling - quieter sibling of the next turn button */
+.event-log-btn {
+  padding: 0.5em 1.5em;
+  font-size: 14px;
+  color: #444;
+  background-color: #ddd;
+  border: 0px;
+  border-radius: 12px;
+  border-bottom: 4px solid #bbb;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  width: 100%;
+}
+
+.event-log-btn:hover {
+  filter: brightness(1.05);
+}
+
+.event-log-btn:active {
+  border-bottom-width: 0px;
 }
 
 /* Next turn button styling - match start run button */

@@ -35,7 +35,7 @@ export type GameState = {
     }
   }
   viewData: {
-    modalView: 'card-choice' | 'attack-target' | null
+    modalView: 'card-choice' | 'attack-target' | 'event-log' | null
     cardOptions: CardID[]
     pendingChoice: PendingChoice | null
     pendingAttack: PendingAttack | null

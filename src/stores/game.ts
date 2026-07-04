@@ -184,6 +184,15 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.viewData.pendingAttack = { attackerInstanceId }
   }
 
+  function openEventLog() {
+    if (!gameState.value.game.run) return
+    gameState.value.viewData.modalView = 'event-log'
+  }
+
+  function closeEventLog() {
+    gameState.value.viewData.modalView = null
+  }
+
   function cancelAttack() {
     gameState.value.viewData.modalView = null
     gameState.value.viewData.pendingAttack = null
@@ -264,5 +273,7 @@ export const useGameStore = defineStore('game', () => {
     startAttack,
     cancelAttack,
     resolveAttack,
+    openEventLog,
+    closeEventLog,
   }
 })

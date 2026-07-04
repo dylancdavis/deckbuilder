@@ -5,6 +5,7 @@ import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
 import CardChoiceModal from './components/CardChoiceModal.vue'
 import AttackTargetModal from './components/AttackTargetModal.vue'
+import EventLogModal from './components/EventLogModal.vue'
 import type { CardID } from './utils/cards'
 import { resolveChoice } from './utils/ability-processor'
 import { useCardFlip } from './composables/useCardFlip'
@@ -63,5 +64,10 @@ async function handleAttackTarget(targetInstanceId: string) {
     :targets="gameStore.attackTargets"
     :handle-select="handleAttackTarget"
     :handle-cancel="gameStore.cancelAttack"
+  />
+  <EventLogModal
+    v-if="modalView === 'event-log'"
+    :events="gameStore.run?.events ?? []"
+    :handle-close="gameStore.closeEventLog"
   />
 </template>
