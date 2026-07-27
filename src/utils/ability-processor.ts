@@ -179,12 +179,13 @@ function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
       const triggeredItems: EffectStackItem[] = findMatchingAbilities(
         currentState.game.run!,
         replaceEvent,
-      ).flatMap((m) =>
-        m.ability.effects.map((e) => ({
+      ).flatMap((m) => {
+        const effects = abilityEffects(m.ability, m.card, replaceEvent, currentState.game.run!)
+        return effects.map((e) => ({
           context: { kind: 'ability' as const, sourceCard: m.card, event: replaceEvent },
           effect: e,
-        })),
-      )
+        }))
+      })
       const substituteItems: EffectStackItem[] = replaceEvent.newEffects.map((e) => ({
         context,
         effect: e,
