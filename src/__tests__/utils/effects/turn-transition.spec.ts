@@ -3,11 +3,12 @@ import { handleEffect } from '../../../utils/ability-processor'
 import { score } from '../../../utils/cards'
 import type { Ability } from '../../../utils/ability'
 import type { CardInstance } from '../../../utils/cards'
+import type { Effect } from '../../../utils/effects'
 import type { GameState } from '../../../utils/game'
 import { Resource } from '../../../utils/resource'
 import { createTestGameState } from './shared'
 
-function marker(delta: number): Ability['effects'] {
+function marker(delta: number): Effect[] {
   return [{ type: 'update-resource', params: { resource: Resource.POINTS, delta } }]
 }
 

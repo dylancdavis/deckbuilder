@@ -10,7 +10,7 @@
  * data on the game state. The UI calls resolveChoice to resume.
  */
 
-import type { Ability, EventTrigger, TriggerContext } from './ability'
+import type { ReactiveAbility, EventTrigger, TriggerContext } from './ability'
 import { type CardInstance, type RulesCard, getCardChoices } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
@@ -448,7 +448,7 @@ function resolveSymbolicReferences(effect: Effect, context: EffectContext): Effe
  * against the trigger context.
  */
 function abilityEffects(
-  ability: Ability,
+  ability: ReactiveAbility,
   sourceCard: CardInstance | RulesCard,
   event: Event,
   run: Run,
@@ -458,12 +458,14 @@ function abilityEffects(
   return ability.effects({ event, sourceCard, targetCard, run })
 }
 
-type AbilityMatch = { card: CardInstance | RulesCard; ability: Ability }
+type AbilityMatch = { card: CardInstance | RulesCard; ability: ReactiveAbility }
 
 /**
- * Find all abilities that match an event, in execution order.
- * Card abilities are ordered by location: board, hand, discardPile, drawPile.
- * Rules card abilities are processed according to their `order` field.
+ * Find all reactive abilities that match an event, in execution order: rules
+ * abilities ordered `before-cards`, then card abilities, then rules abilities
+ * ordered `after-cards`. Card abilities are ordered by location — board, hand,
+ * discardPile, drawPile — and by position within each. Rules abilities keep
+ * their declared order within a group.
  */
 export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
   const beforeCards: AbilityMatch[] = []
@@ -472,6 +474,7 @@ export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
 
   const rulesCard = run.deck.rulesCard!
   for (const ability of rulesCard.abilities) {
+    if (ability.type !== 'reactive') continue
     if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run)) {
       const list = ability.order === 'after-cards' ? afterCards : beforeCards
       list.push({ card: rulesCard, ability })
@@ -481,6 +484,7 @@ export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
   for (const location of locations) {
     for (const card of run.cards[location]) {
       for (const ability of card.abilities) {
+        if (ability.type !== 'reactive') continue
         if (matchesTrigger(event, card, location, ability.trigger, run)) {
           cardMatches.push({ card: card, ability })
         }
