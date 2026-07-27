@@ -10,7 +10,7 @@
  * data on the game state. The UI calls resolveChoice to resume.
  */
 
-import type { Ability, Trigger, TriggerContext } from './ability'
+import type { Ability, EventTrigger, TriggerContext } from './ability'
 import { type CardInstance, type RulesCard, getCardChoices } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
@@ -490,7 +490,7 @@ export function matchesTrigger(
   event: Event,
   sourceCard: CardInstance | RulesCard,
   cardLocation: Location,
-  trigger: Trigger,
+  trigger: EventTrigger,
   run: Run,
 ): boolean {
   // 1. Event type must match
@@ -557,7 +557,7 @@ function matchesTarget(
 /**
  * Check if an activated ability can be used (costs and limits).
  */
-export function canActivate(trigger: Trigger, sourceCard: CardInstance, run: Run): boolean {
+export function canActivate(trigger: EventTrigger, sourceCard: CardInstance, run: Run): boolean {
   // Check resource costs
   if (trigger.costs) {
     for (const [resource, cost] of Object.entries(trigger.costs)) {

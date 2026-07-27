@@ -6,7 +6,7 @@ import {
   handleEffect,
   resolveChoice,
 } from '../../utils/ability-processor'
-import type { Ability, Trigger } from '../../utils/ability'
+import type { Ability, EventTrigger } from '../../utils/ability'
 import { doubleChoice, isAsset, type CardInstance, type PlayableCard } from '../../utils/cards'
 import type {
   CardPlayEvent,
@@ -121,14 +121,14 @@ function createCardActivateEvent(
 describe('matchesTrigger', () => {
   describe('event type matching', () => {
     it('matches when event type equals trigger.on', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'self' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'self' }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(true)
     })
 
     it('does not match when event type differs from trigger.on', () => {
-      const trigger: Trigger = { on: 'card-draw', target: 'self' }
+      const trigger: EventTrigger = { on: 'card-draw', target: 'self' }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(false)
@@ -137,14 +137,14 @@ describe('matchesTrigger', () => {
 
   describe('target matching - self', () => {
     it('matches when target is self and event instanceId matches source card', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'self' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'self' }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(true)
     })
 
     it('does not match when target is self but event instanceId differs', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'self' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'self' }
       const event = createCardPlayEvent('card-2')
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
@@ -154,7 +154,7 @@ describe('matchesTrigger', () => {
 
   describe('target matching - other', () => {
     it('matches when target is other and event instanceId differs from source card', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'other' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'other' }
       const event = createCardPlayEvent('card-2')
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
@@ -162,7 +162,7 @@ describe('matchesTrigger', () => {
     })
 
     it('does not match when target is other but event instanceId matches source card', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'other' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'other' }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(false)
@@ -171,7 +171,7 @@ describe('matchesTrigger', () => {
 
   describe('target matching - any', () => {
     it('matches when target is any regardless of instanceId', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'any' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'any' }
       const event = createCardPlayEvent('card-2')
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
@@ -179,7 +179,7 @@ describe('matchesTrigger', () => {
     })
 
     it('matches when target is any even for same card', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'any' }
+      const trigger: EventTrigger = { on: 'card-play', target: 'any' }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(true)
@@ -190,7 +190,7 @@ describe('matchesTrigger', () => {
     it('matches when CardMatcher criteria are satisfied', () => {
       const sourceCard = createCard({ instanceId: 'source-card' })
       const targetCard = createCard({ instanceId: 'target-card', id: 'score', cost: 0 })
-      const trigger: Trigger = { on: 'card-play', target: { cardId: 'score' } }
+      const trigger: EventTrigger = { on: 'card-play', target: { cardId: 'score' } }
       const event = createCardPlayEvent('target-card', 'score')
       const run = createTestRun({
         cards: { ...EMPTY_PILES, hand: [sourceCard, targetCard] },
@@ -202,7 +202,7 @@ describe('matchesTrigger', () => {
     it('does not match when CardMatcher criteria are not satisfied', () => {
       const sourceCard = createCard({ instanceId: 'source-card' })
       const targetCard = createCard({ instanceId: 'target-card', id: 'debt' })
-      const trigger: Trigger = { on: 'card-play', target: { cardId: 'score' } }
+      const trigger: EventTrigger = { on: 'card-play', target: { cardId: 'score' } }
       const event = createCardPlayEvent('target-card', 'debt')
       const run = createTestRun({
         cards: { ...EMPTY_PILES, hand: [sourceCard, targetCard] },
@@ -213,7 +213,7 @@ describe('matchesTrigger', () => {
 
     it('does not match when target card cannot be found', () => {
       const sourceCard = createCard({ instanceId: 'source-card' })
-      const trigger: Trigger = { on: 'card-play', target: { cardId: 'score' } }
+      const trigger: EventTrigger = { on: 'card-play', target: { cardId: 'score' } }
       const event = createCardPlayEvent('nonexistent-card', 'score')
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [sourceCard] } })
 
@@ -223,28 +223,28 @@ describe('matchesTrigger', () => {
 
   describe('location requirements', () => {
     it('matches when card is in required location', () => {
-      const trigger: Trigger = { on: 'turn-start', locations: ['board'] }
+      const trigger: EventTrigger = { on: 'turn-start', locations: ['board'] }
       const run = createTestRun({ cards: { ...EMPTY_PILES, board: [CARD] } })
 
       expect(matchesTrigger(TURN_START_EVENT, CARD, 'board', trigger, run)).toBe(true)
     })
 
     it('does not match when card is not in required location', () => {
-      const trigger: Trigger = { on: 'turn-start', locations: ['board'] }
+      const trigger: EventTrigger = { on: 'turn-start', locations: ['board'] }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(TURN_START_EVENT, CARD, 'hand', trigger, run)).toBe(false)
     })
 
     it('matches when card is in one of multiple required locations', () => {
-      const trigger: Trigger = { on: 'card-play', target: 'self', locations: ['hand', 'board'] }
+      const trigger: EventTrigger = { on: 'card-play', target: 'self', locations: ['hand', 'board'] }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(true)
     })
 
     it('does not match when card location cannot be found', () => {
-      const trigger: Trigger = { on: 'turn-start', locations: ['board'] }
+      const trigger: EventTrigger = { on: 'turn-start', locations: ['board'] }
       const run = createTestRun({ cards: EMPTY_PILES })
 
       expect(matchesTrigger(TURN_START_EVENT, CARD, 'hand', trigger, run)).toBe(false)
@@ -253,7 +253,7 @@ describe('matchesTrigger', () => {
 
   describe('custom when conditions', () => {
     it('matches when when() returns true', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-play',
         target: 'self',
         when: (ctx) => ctx.run.resources.points === 0,
@@ -267,7 +267,7 @@ describe('matchesTrigger', () => {
     })
 
     it('does not match when when() returns false', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-play',
         target: 'self',
         when: (ctx) => ctx.run.resources.points === 0,
@@ -282,7 +282,7 @@ describe('matchesTrigger', () => {
 
     it('passes correct context to when()', () => {
       let capturedContext: unknown = null
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-play',
         target: 'self',
         when: (ctx) => {
@@ -304,7 +304,7 @@ describe('matchesTrigger', () => {
 
   describe('no target specified', () => {
     it('matches lifecycle events without target', () => {
-      const trigger: Trigger = { on: 'turn-start' }
+      const trigger: EventTrigger = { on: 'turn-start' }
       const run = createTestRun({ cards: { ...EMPTY_PILES, board: [CARD] } })
 
       expect(matchesTrigger(TURN_START_EVENT, CARD, 'board', trigger, run)).toBe(true)
@@ -313,7 +313,7 @@ describe('matchesTrigger', () => {
 
   describe('card-draw events', () => {
     it('matches card-draw event with self target', () => {
-      const trigger: Trigger = { on: 'card-draw', target: 'self' }
+      const trigger: EventTrigger = { on: 'card-draw', target: 'self' }
       const event = createCardDrawEvent('card-1')
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
@@ -323,7 +323,7 @@ describe('matchesTrigger', () => {
     it('matches card-draw event watching other cards', () => {
       const watcherCard = createCard({ instanceId: 'watcher' })
       const drawnCard = createCard({ instanceId: 'drawn-card' })
-      const trigger: Trigger = { on: 'card-draw', target: 'other' }
+      const trigger: EventTrigger = { on: 'card-draw', target: 'other' }
       const event = createCardDrawEvent('drawn-card')
       const run = createTestRun({
         cards: { ...EMPTY_PILES, hand: [watcherCard, drawnCard] },
@@ -337,7 +337,7 @@ describe('matchesTrigger', () => {
 describe('canActivate', () => {
   describe('resource costs', () => {
     it('returns true when player has enough resources', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-activate',
         target: 'self',
         costs: { [Resource.POINTS]: 5 },
@@ -351,7 +351,7 @@ describe('canActivate', () => {
     })
 
     it('returns true when player has exact resources', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-activate',
         target: 'self',
         costs: { [Resource.POINTS]: 5 },
@@ -365,7 +365,7 @@ describe('canActivate', () => {
     })
 
     it('returns false when player lacks resources', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-activate',
         target: 'self',
         costs: { [Resource.POINTS]: 5 },
@@ -379,7 +379,7 @@ describe('canActivate', () => {
     })
 
     it('returns true when no costs specified', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self' }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self' }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         resources: { points: 0 },
@@ -391,7 +391,7 @@ describe('canActivate', () => {
 
   describe('usage limits - perTurn', () => {
     it('returns true when under perTurn limit', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self', limit: { perTurn: 2 } }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self', limit: { perTurn: 2 } }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         stats: { turns: 1, rounds: 1 },
@@ -402,7 +402,7 @@ describe('canActivate', () => {
     })
 
     it('returns false when at perTurn limit', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self', limit: { perTurn: 1 } }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self', limit: { perTurn: 1 } }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         stats: { turns: 1, rounds: 1 },
@@ -413,7 +413,7 @@ describe('canActivate', () => {
     })
 
     it('resets count on new turn', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self', limit: { perTurn: 1 } }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self', limit: { perTurn: 1 } }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         stats: { turns: 2, rounds: 1 },
@@ -426,7 +426,7 @@ describe('canActivate', () => {
 
   describe('usage limits - perRound', () => {
     it('returns false when at perRound limit', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self', limit: { perRound: 1 } }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self', limit: { perRound: 1 } }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         stats: { turns: 2, rounds: 1 },
@@ -437,7 +437,7 @@ describe('canActivate', () => {
     })
 
     it('resets count on new round', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self', limit: { perRound: 1 } }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self', limit: { perRound: 1 } }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         stats: { turns: 1, rounds: 2 },
@@ -450,7 +450,7 @@ describe('canActivate', () => {
 
   describe('usage limits - perRun', () => {
     it('returns false when at perRun limit', () => {
-      const trigger: Trigger = { on: 'card-activate', target: 'self', limit: { perRun: 2 } }
+      const trigger: EventTrigger = { on: 'card-activate', target: 'self', limit: { perRun: 2 } }
       const run = createTestRun({
         cards: { ...EMPTY_PILES, board: [CARD] },
         stats: { turns: 5, rounds: 3 },
@@ -463,7 +463,7 @@ describe('canActivate', () => {
 
   describe('combined costs and limits', () => {
     it('returns false when resources ok but limit reached', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-activate',
         target: 'self',
         costs: { [Resource.POINTS]: 5 },
@@ -480,7 +480,7 @@ describe('canActivate', () => {
     })
 
     it('returns false when limit ok but resources insufficient', () => {
-      const trigger: Trigger = {
+      const trigger: EventTrigger = {
         on: 'card-activate',
         target: 'self',
         costs: { [Resource.POINTS]: 5 },
