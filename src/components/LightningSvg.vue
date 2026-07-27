@@ -20,9 +20,7 @@ const props = withDefaults(
 
 const gradientId = `lightning-gradient-${props.cardId}`
 const defaultGradient: [string, string] = ['#ffffff', '#c8d4dc']
-const effectiveGradient = computed<[string, string]>(
-  () => props.fillGradient ?? defaultGradient,
-)
+const effectiveGradient = computed<[string, string]>(() => props.fillGradient ?? defaultGradient)
 
 const fillValue = computed(() => `url(#${gradientId})`)
 

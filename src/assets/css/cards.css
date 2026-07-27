@@ -34,7 +34,8 @@
   font-size: calc(var(--card-width) * var(--card-stat-font-size) / 250);
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 calc(var(--card-width) * 2 / 250) calc(var(--card-width) * 4 / 250) rgba(0, 0, 0, 0.4);
+  box-shadow: 0 calc(var(--card-width) * 2 / 250) calc(var(--card-width) * 4 / 250)
+    rgba(0, 0, 0, 0.4);
 }
 
 .card-attack {
@@ -151,16 +152,8 @@
   place-items: center;
   padding: calc(var(--card-width) * 8 / 250);
   background:
-    conic-gradient(
-      from 90deg at 2px 2px,
-      transparent 90deg,
-      rgba(0, 0, 0, 0.02) 0
-    ),
-    conic-gradient(
-      from 90deg at 1px 1px,
-      transparent 90deg,
-      rgba(0, 0, 0, 0.012) 0
-    ),
+    conic-gradient(from 90deg at 2px 2px, transparent 90deg, rgba(0, 0, 0, 0.02) 0),
+    conic-gradient(from 90deg at 1px 1px, transparent 90deg, rgba(0, 0, 0, 0.012) 0),
     linear-gradient(#e6e6e6, #fff);
   background-size:
     80% 80%,
