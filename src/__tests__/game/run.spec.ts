@@ -32,12 +32,17 @@ const baseRules: RulesCard = {
   turnStructure: { playAmount: 1 },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
-    { trigger: { on: 'round-end' }, effects: [{ type: 'run-end', params: {} }] },
+    { type: 'reactive', trigger: { on: 'round-end' }, effects: [{ type: 'run-end', params: {} }] },
     ...coreGameFlowAbilities,
-    { trigger: { on: 'turn-start' }, effects: [{ type: 'draw-cards', params: { amount: 1 } }] },
+    {
+      type: 'reactive',
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+    },
   ],
 }
 
@@ -53,6 +58,7 @@ const rulesWithAddedCards: RulesCard = {
   turnStructure: { playAmount: 1 },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'run-start' },
       effects: [
         {
@@ -62,12 +68,17 @@ const rulesWithAddedCards: RulesCard = {
       ],
     },
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
-    { trigger: { on: 'round-end' }, effects: [{ type: 'run-end', params: {} }] },
+    { type: 'reactive', trigger: { on: 'round-end' }, effects: [{ type: 'run-end', params: {} }] },
     ...coreGameFlowAbilities,
-    { trigger: { on: 'turn-start' }, effects: [{ type: 'draw-cards', params: { amount: 1 } }] },
+    {
+      type: 'reactive',
+      trigger: { on: 'turn-start' },
+      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+    },
   ],
 }
 

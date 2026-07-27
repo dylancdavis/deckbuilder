@@ -9,6 +9,7 @@ export type Ability = ReactiveAbility
 
 /** Reacts to events, produces an effect list */
 export type ReactiveAbility = {
+  type: 'reactive'
   trigger: EventTrigger
   effects: Effect[]
 }
