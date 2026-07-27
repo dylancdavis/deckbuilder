@@ -237,7 +237,11 @@ describe('matchesTrigger', () => {
     })
 
     it('matches when card is in one of multiple required locations', () => {
-      const trigger: EventTrigger = { on: 'card-play', target: 'self', locations: ['hand', 'board'] }
+      const trigger: EventTrigger = {
+        on: 'card-play',
+        target: 'self',
+        locations: ['hand', 'board'],
+      }
       const run = createTestRun({ cards: { ...EMPTY_PILES, hand: [CARD] } })
 
       expect(matchesTrigger(PLAY_EVENT, CARD, 'hand', trigger, run)).toBe(true)
@@ -501,6 +505,7 @@ describe('canActivate', () => {
 describe('findMatchingAbilities', () => {
   it('finds abilities matching a card-play event', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [ADD_POINT_EFFECT],
     }
@@ -519,10 +524,12 @@ describe('findMatchingAbilities', () => {
 
   it('finds multiple abilities on the same card', () => {
     const ability1: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [ADD_POINT_EFFECT],
     }
     const ability2: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
@@ -539,10 +546,12 @@ describe('findMatchingAbilities', () => {
 
   it('finds abilities from multiple cards', () => {
     const ability1: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
       effects: [ADD_POINT_EFFECT],
     }
     const ability2: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
@@ -560,6 +569,7 @@ describe('findMatchingAbilities', () => {
 
   it('checks all locations for lifecycle events', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [ADD_POINT_EFFECT],
     }
@@ -577,6 +587,7 @@ describe('findMatchingAbilities', () => {
 
   it('respects trigger.locations for lifecycle events', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'turn-start', locations: ['board'] }, // Only triggers when on board
       effects: [ADD_POINT_EFFECT],
     }
@@ -593,6 +604,7 @@ describe('findMatchingAbilities', () => {
 
   it('checks hand and board cards for card events', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
       effects: [ADD_POINT_EFFECT],
     }
@@ -610,6 +622,7 @@ describe('findMatchingAbilities', () => {
 
   it('returns empty array when no abilities match', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-draw', target: 'self' },
       effects: [ADD_POINT_EFFECT],
     }
@@ -642,6 +655,7 @@ describe('handleEffect ability cascade', () => {
 
   it('applies update-resource effects from card-play abilities', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 5 } }],
     }
@@ -658,6 +672,7 @@ describe('handleEffect ability cascade', () => {
 
   it('applies multiple effects in order', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         { type: 'update-resource', params: { resource: Resource.POINTS, delta: 5 } },
@@ -677,10 +692,12 @@ describe('handleEffect ability cascade', () => {
 
   it('processes abilities from multiple cards', () => {
     const ability1: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
       effects: [ADD_POINT_EFFECT],
     }
     const ability2: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
@@ -698,6 +715,7 @@ describe('handleEffect ability cascade', () => {
 
   it('opens card choice modal and stores pending choice', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -725,6 +743,7 @@ describe('handleEffect ability cascade', () => {
 
   it('resolves self references in remove-card effects', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'remove-card', params: { instanceId: 'self' } }],
     }
@@ -743,6 +762,7 @@ describe('handleEffect ability cascade', () => {
     // Watcher on board removes any other played card. If 'target' didn't resolve,
     // remove-card would receive the literal string 'target' and throw.
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'other' },
       effects: [{ type: 'remove-card', params: { instanceId: 'target' } }],
     }
@@ -767,6 +787,7 @@ describe('handleEffect ability cascade', () => {
 describe('isAsset', () => {
   it('returns true when card has ability with board location', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'turn-start', locations: ['board'] },
       effects: [ADD_POINT_EFFECT],
     }
@@ -777,10 +798,12 @@ describe('isAsset', () => {
 
   it('returns true when any ability has board location', () => {
     const ability1: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [ADD_POINT_EFFECT],
     }
     const ability2: Ability = {
+      type: 'reactive',
       trigger: { on: 'turn-start', locations: ['board'] },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
@@ -791,6 +814,7 @@ describe('isAsset', () => {
 
   it('returns false when no ability has board location', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [ADD_POINT_EFFECT],
     }
@@ -807,6 +831,7 @@ describe('isAsset', () => {
 
   it('returns true when location includes board among others', () => {
     const ability: Ability = {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'any', locations: ['hand', 'board'] },
       effects: [ADD_POINT_EFFECT],
     }
