@@ -199,6 +199,11 @@ export type Effect =
   | RunEndEffect
   | RefreshDeckEffect
 
+/**
+ * The type string of an effect, used in effect triggers to specify which effect an interrupt intercepts.
+ */
+export type EffectType = Effect['type']
+
 type EffectResult = { game: GameState; event: Event | null }
 
 function handleUpdateResource(gameState: GameState, effect: UpdateResourceEffect): EffectResult {

@@ -262,8 +262,10 @@ export const saveReward: PlayableCard = {
               const cardCollectEvents = roundCardPlayEvents.some((e) => {
                 const card = playableCards[e.cardId]
                 // Check new ability format for collect-card effects
-                return card.abilities.some((ability) =>
-                  ability.effects.some((eff) => eff.type === 'collect-card'),
+                return card.abilities.some(
+                  (ability) =>
+                    ability.type === 'reactive' &&
+                    ability.effects.some((eff) => eff.type === 'collect-card'),
                 )
               })
               return cardCollectEvents ? current : current + 2

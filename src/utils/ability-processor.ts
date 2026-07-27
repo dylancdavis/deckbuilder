@@ -10,7 +10,7 @@
  * data on the game state. The UI calls resolveChoice to resume.
  */
 
-import type { Ability, EventTrigger, TriggerContext } from './ability'
+import type { ReactiveAbility, EventTrigger, TriggerContext } from './ability'
 import { type CardInstance, type RulesCard, getCardChoices } from './cards'
 import type { Event, CardEvent, CardActivateEvent } from './event'
 import { isCardEvent } from './event'
@@ -461,11 +461,12 @@ function resolveSymbolicReferences(effect: Effect, context: EffectContext): Effe
 export function findMatchingAbilities(
   run: Run,
   event: Event,
-): Array<{ card: CardInstance | RulesCard; ability: Ability }> {
-  const matches: Array<{ card: CardInstance | RulesCard; ability: Ability }> = []
+): Array<{ card: CardInstance | RulesCard; ability: ReactiveAbility }> {
+  const matches: Array<{ card: CardInstance | RulesCard; ability: ReactiveAbility }> = []
 
   const rulesCard = run.deck.rulesCard!
   for (const ability of rulesCard.abilities) {
+    if (ability.type !== 'reactive') continue
     if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run))
       matches.push({ card: rulesCard, ability })
   }
@@ -473,6 +474,7 @@ export function findMatchingAbilities(
   for (const location of locations) {
     for (const card of run.cards[location]) {
       for (const ability of card.abilities) {
+        if (ability.type !== 'reactive') continue
         if (matchesTrigger(event, card, location, ability.trigger, run)) {
           matches.push({ card: card, ability })
         }
