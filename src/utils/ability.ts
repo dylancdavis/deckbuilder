@@ -5,8 +5,11 @@ import type { Run, Location } from './run'
 import type { Resource } from './resource'
 import type { TargetSpec } from './card-matchers'
 
-export type Ability = {
-  trigger: Trigger
+export type Ability = ReactiveAbility
+
+/** Reacts to events, produces an effect list */
+export type ReactiveAbility = {
+  trigger: EventTrigger
   effects: Effect[] | ((context: TriggerContext) => Effect[])
   /** Where this ability resolves relative to card abilities answering the same event. */
   order?: RulesOrder
@@ -15,7 +18,7 @@ export type Ability = {
 export type RulesOrder = 'before-cards' | 'after-cards'
 
 /** Describes the event that triggers this ability, plus additional conditionals. */
-export type Trigger = {
+export type EventTrigger = {
   on: EventType
   target?: TargetSpec
   /** List of locations for which the card containing the ability can trigger it from. If omitted, implies all locations */
