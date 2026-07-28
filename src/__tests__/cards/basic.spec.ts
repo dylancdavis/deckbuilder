@@ -18,11 +18,7 @@ import {
 import { createTestGameState } from '../utils/effects/shared'
 
 function playCard(gameState: GameState, instanceId: string): GameState {
-  return handleEffect(
-    gameState,
-    { type: 'play-card', params: { instanceId } },
-    { kind: 'player' },
-  )
+  return handleEffect(gameState, { type: 'play-card', params: { instanceId } }, { kind: 'player' })
 }
 
 it('score gains 1 point', () => {

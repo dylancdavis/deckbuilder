@@ -370,7 +370,8 @@ function handleDestroyCard(gameState: GameState, effect: DestroyCardEffect): Eff
  */
 function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): EffectResult {
   if ('matching' in effect.params) throw new Error('Card matcher removal must be decomposed first')
-  if (effect.params.instanceId === 'self') throw new Error('Self reference must be decomposed first')
+  if (effect.params.instanceId === 'self')
+    throw new Error('Self reference must be decomposed first')
 
   const run = gameState.game.run!
   const round = run.stats.rounds

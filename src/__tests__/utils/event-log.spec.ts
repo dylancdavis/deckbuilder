@@ -163,13 +163,7 @@ describe('buildLogRows', () => {
   })
 
   it('condenses consecutive identical event rows into one row with a count', () => {
-    const events: Event[] = [
-      draw(1, 1),
-      draw(1, 1),
-      draw(1, 1),
-      draw(1, 1, 'striker'),
-      draw(1, 1),
-    ]
+    const events: Event[] = [draw(1, 1), draw(1, 1), draw(1, 1), draw(1, 1, 'striker'), draw(1, 1)]
 
     expect(buildLogRows(events).map((r) => [r.text, r.count])).toEqual([
       ['Drew Score', 3],
