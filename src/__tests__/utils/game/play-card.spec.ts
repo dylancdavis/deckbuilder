@@ -175,6 +175,7 @@ describe('play-card effect', () => {
       instanceId: 'card-1',
       abilities: [
         {
+          type: 'reactive' as const,
           trigger: { on: 'card-play' as const, target: 'self' as const },
           effects: [
             { type: 'update-resource' as const, params: { resource: Resource.POINTS, delta: 1 } },

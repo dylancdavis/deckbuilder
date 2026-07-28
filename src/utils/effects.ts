@@ -199,6 +199,11 @@ export type Effect =
   | RunEndEffect
   | RefreshDeckEffect
 
+/**
+ * The type string of an effect, used in effect triggers to specify which effect an interrupt intercepts.
+ */
+export type EffectType = Effect['type']
+
 type EffectResult = { game: GameState; event: Event | null }
 
 function handleUpdateResource(gameState: GameState, effect: UpdateResourceEffect): EffectResult {
@@ -370,7 +375,8 @@ function handleDestroyCard(gameState: GameState, effect: DestroyCardEffect): Eff
  */
 function handleRemoveCard(gameState: GameState, effect: RemoveCardEffect): EffectResult {
   if ('matching' in effect.params) throw new Error('Card matcher removal must be decomposed first')
-  if (effect.params.instanceId === 'self') throw new Error('Self reference must be decomposed first')
+  if (effect.params.instanceId === 'self')
+    throw new Error('Self reference must be decomposed first')
 
   const run = gameState.game.run!
   const round = run.stats.rounds

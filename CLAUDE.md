@@ -60,6 +60,11 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 - `PlayableCard` - Cards that can be played in runs (have cost, effects, description)
 - `RulesCard` - Cards that define game rules (deck limits, turn structure, end conditions)
 
+**Ability System**: Cards hold abilities (`src/utils/ability.ts`), processed by the effect pipeline in `src/utils/ability-processor.ts` (decompose → interrupt → apply → cascade):
+
+- `ReactiveAbility` (`type: 'reactive'`) - Triggers on an event after its state change has applied, producing an effect list
+- `InterruptAbility` (`type: 'interrupt'`) - Intercepts an atomic effect before it applies and substitutes its own effects (an empty list prevents the effect), emitting an `effect-replace` event
+
 **Game Flow**:
 
 1. Player starts in collection view with access to decks and cards

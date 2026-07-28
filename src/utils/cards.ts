@@ -11,6 +11,7 @@ import type { Ability } from './ability'
 export const coreGameFlowAbilities: Ability[] = [
   // Cards reduced to 0 defense by damage are discarded.
   {
+    type: 'reactive',
     trigger: {
       on: 'card-damage',
       when: (ctx) => ctx.event.type === 'card-damage' && ctx.event.newDefense === 0,
@@ -19,11 +20,13 @@ export const coreGameFlowAbilities: Ability[] = [
   },
   // On run-start -> start first round
   {
+    type: 'reactive',
     trigger: { on: 'run-start' },
     effects: [{ type: 'round-start', params: {} }],
   },
   // On turn-end with cards in draw pile -> start new turn
   {
+    type: 'reactive',
     trigger: {
       on: 'turn-end',
       when: (ctx) => ctx.run.cards.drawPile.length > 0,
@@ -32,6 +35,7 @@ export const coreGameFlowAbilities: Ability[] = [
   },
   // On turn-end with empty draw pile -> end round
   {
+    type: 'reactive',
     trigger: {
       on: 'turn-end',
       when: (ctx) => ctx.run.cards.drawPile.length === 0,
@@ -40,16 +44,19 @@ export const coreGameFlowAbilities: Ability[] = [
   },
   // On round-end -> refresh deck (reshuffle all cards)
   {
+    type: 'reactive',
     trigger: { on: 'round-end' },
     effects: [{ type: 'refresh-deck', params: {} }],
   },
   // On round-end (after refresh) -> start new round
   {
+    type: 'reactive',
     trigger: { on: 'round-end' },
     effects: [{ type: 'round-start', params: {} }],
   },
   // On round-start -> start new turn
   {
+    type: 'reactive',
     trigger: { on: 'round-start' },
     effects: [{ type: 'turn-start', params: {} }],
   },
@@ -119,6 +126,7 @@ export const score: PlayableCard = {
   description: 'Gain 1 Point.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
@@ -138,6 +146,7 @@ export const collectBasic: PlayableCard = {
   description: 'Collect a Basic Card.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -176,6 +185,7 @@ export const starterRules: RulesCard = {
   turnStructure: { playAmount: 1 },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'run-start' },
       effects: [
         {
@@ -190,16 +200,19 @@ export const starterRules: RulesCard = {
     },
     // Before core: discard before turn transition, run-end before refresh
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
+      type: 'reactive',
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
     // After core: draw after turn-start fires
     {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
@@ -214,6 +227,7 @@ export const dualScore: PlayableCard = {
   deckLimit: 2,
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     },
@@ -233,6 +247,7 @@ export const saveReward: PlayableCard = {
   description: "If you haven't collected a card this round, gain 2 points.",
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -247,8 +262,10 @@ export const saveReward: PlayableCard = {
               const cardCollectEvents = roundCardPlayEvents.some((e) => {
                 const card = playableCards[e.cardId]
                 // Check new ability format for collect-card effects
-                return card.abilities.some((ability) =>
-                  ability.effects.some((eff) => eff.type === 'collect-card'),
+                return card.abilities.some(
+                  (ability) =>
+                    ability.type === 'reactive' &&
+                    ability.effects.some((eff) => eff.type === 'collect-card'),
                 )
               })
               return cardCollectEvents ? current : current + 2
@@ -273,6 +290,7 @@ export const zeroReward: PlayableCard = {
   description: 'If you have 0 points, gain 6 points.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -300,6 +318,7 @@ export const pointReset: PlayableCard = {
   description: 'Set your point total to 4.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -327,6 +346,7 @@ export const pointMultiply: PlayableCard = {
   description: 'If you have 4 or less points, double them.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -354,6 +374,7 @@ export const scoreSurge: PlayableCard = {
   description: 'Gain 2 points (max 8) for each "Score" played this round.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -391,6 +412,7 @@ export const scoreSynergy: PlayableCard = {
   description: 'Gain 1 point (max 6) for each "Score" in your deck.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -422,6 +444,7 @@ export const pointLoan: PlayableCard = {
   description: 'Gain 6 points. Add a "Debt" card to your draw pile.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -457,6 +480,7 @@ export const debt: PlayableCard = {
   description: 'When you draw this, lose 6 points.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-draw', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: -6 } }],
     },
@@ -476,6 +500,7 @@ export const lastResort: PlayableCard = {
   description: 'Gain 8 Points. Destroy this card.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         { type: 'update-resource', params: { resource: Resource.POINTS, delta: 8 } },
@@ -535,6 +560,7 @@ export const striker: PlayableCard = {
   defense: 3,
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-attack', target: 'self', locations: ['board'] },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
@@ -556,6 +582,7 @@ export const thornDummy: PlayableCard = {
   defense: 4,
   abilities: [
     {
+      type: 'reactive',
       trigger: {
         on: 'card-attack',
         locations: ['board'],
@@ -589,6 +616,7 @@ export const testRules: RulesCard = {
   turnStructure: { playAmount: 'any' },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'run-start' },
       effects: [
         {
@@ -612,10 +640,12 @@ export const testRules: RulesCard = {
       ],
     },
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
+      type: 'reactive',
       trigger: {
         on: 'round-end',
         when: (ctx) => ctx.event.round >= 10,
@@ -624,6 +654,7 @@ export const testRules: RulesCard = {
     },
     ...coreGameFlowAbilities,
     {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [{ type: 'draw-cards', params: { amount: 5 } }],
     },
@@ -642,6 +673,7 @@ export const discardTestRules: RulesCard = {
   turnStructure: { playAmount: 1 },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'run-start' },
       effects: [
         {
@@ -659,15 +691,18 @@ export const discardTestRules: RulesCard = {
       ],
     },
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
+      type: 'reactive',
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
     {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
@@ -686,6 +721,7 @@ export const moveTestRules: RulesCard = {
   turnStructure: { playAmount: 1 },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'run-start' },
       effects: [
         {
@@ -699,15 +735,18 @@ export const moveTestRules: RulesCard = {
       ],
     },
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
+      type: 'reactive',
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
     {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
@@ -726,6 +765,7 @@ export const choiceTestRules: RulesCard = {
   turnStructure: { playAmount: 1 },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'run-start' },
       effects: [
         {
@@ -739,15 +779,18 @@ export const choiceTestRules: RulesCard = {
       ],
     },
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
+      type: 'reactive',
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
     {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [{ type: 'draw-cards', params: { amount: 1 } }],
     },
@@ -768,15 +811,18 @@ export const attackTestRules: RulesCard = {
   turnStructure: { playAmount: 'any' },
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'turn-end' },
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
+      type: 'reactive',
       trigger: { on: 'round-end' },
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
     {
+      type: 'reactive',
       trigger: { on: 'turn-start' },
       effects: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
@@ -802,6 +848,7 @@ export const doubleChoice: PlayableCard = {
   description: 'Choose a basic card to collect, then choose another.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -843,6 +890,7 @@ export const choiceDraw: PlayableCard = {
   description: 'Choose a card to collect, then gain 2 points.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {
@@ -875,6 +923,7 @@ export const drawWatcher: PlayableCard = {
   description: 'While on board: When you draw any card, choose a basic card to collect.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
       effects: [
         {
@@ -906,6 +955,7 @@ export const drawBonus: PlayableCard = {
   description: 'While on board: When you draw any card, gain 1 point.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
@@ -926,6 +976,7 @@ export const luckyDraw: PlayableCard = {
   description: 'When you draw this, gain 1 point.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-draw', target: 'self' },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
@@ -946,6 +997,7 @@ export const pointDraw: PlayableCard = {
   description: 'While on board: When you gain points, draw a card.',
   abilities: [
     {
+      type: 'reactive',
       trigger: {
         on: 'resource-change',
         locations: ['board'],
@@ -973,6 +1025,7 @@ export const drawBonusPlus: PlayableCard = {
   description: 'While on board: When you draw any card, gain 2 points.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
       effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     },
@@ -992,6 +1045,7 @@ export const handBoardDiscard: PlayableCard = {
   description: 'Discard 1 from hand and 1 from board.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         { type: 'discard-cards', params: { from: 'hand', amount: 1 } },
@@ -1014,6 +1068,7 @@ export const handToBoard: PlayableCard = {
   description: 'Move 1 card from hand to board.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [{ type: 'move-card', params: { from: 'hand', amount: 1, to: 'board' } }],
     },
@@ -1035,6 +1090,7 @@ export const choiceAddChoice: PlayableCard = {
     'Choose a basic card to add to hand. Add a Dual Score to hand. Choose a test card to add to hand.',
   abilities: [
     {
+      type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
       effects: [
         {

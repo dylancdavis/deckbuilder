@@ -63,6 +63,15 @@ export function describeEvent(event: Event): string {
       const sign = event.delta >= 0 ? '+' : ''
       return `${capitalize(event.resource)} ${sign}${event.delta} (${event.oldValue} → ${event.newValue})`
     }
+    case 'effect-replace': {
+      const subject =
+        event.cardId !== undefined
+          ? `${event.originalEffect.type} on ${cardName(event.cardId)}`
+          : event.originalEffect.type
+      return event.newEffects.length === 0
+        ? `${cardName(event.sourceCardId)} prevented ${subject}`
+        : `${cardName(event.sourceCardId)} replaced ${subject} with ${event.newEffects.map((e) => e.type).join(', ')}`
+    }
   }
 }
 
