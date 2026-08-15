@@ -8,7 +8,11 @@ import type { TargetSpec } from './card-matchers'
 export type Ability = {
   trigger: Trigger
   effects: Effect[] | ((context: TriggerContext) => Effect[])
+  /** Where this ability resolves relative to card abilities answering the same event. */
+  order?: RulesOrder
 }
+
+export type RulesOrder = 'before-cards' | 'after-cards'
 
 /** Describes the event that triggers this ability, plus additional conditionals. */
 export type Trigger = {

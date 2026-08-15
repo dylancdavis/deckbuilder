@@ -458,34 +458,37 @@ function abilityEffects(
   return ability.effects({ event, sourceCard, targetCard, run })
 }
 
+type AbilityMatch = { card: CardInstance | RulesCard; ability: Ability }
+
 /**
  * Find all abilities that match an event, in execution order.
- * Abilities are processed in the order cards appear in their locations.
- * Locations are checked in order: board, hand, stack, discardPile, drawPile.
+ * Card abilities are ordered by location: board, hand, discardPile, drawPile.
+ * Rules card abilities are processed according to their `order` field.
  */
-export function findMatchingAbilities(
-  run: Run,
-  event: Event,
-): Array<{ card: CardInstance | RulesCard; ability: Ability }> {
-  const matches: Array<{ card: CardInstance | RulesCard; ability: Ability }> = []
+export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
+  const beforeCards: AbilityMatch[] = []
+  const cardMatches: AbilityMatch[] = []
+  const afterCards: AbilityMatch[] = []
 
   const rulesCard = run.deck.rulesCard!
   for (const ability of rulesCard.abilities) {
-    if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run))
-      matches.push({ card: rulesCard, ability })
+    if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run)) {
+      const list = ability.order === 'after-cards' ? afterCards : beforeCards
+      list.push({ card: rulesCard, ability })
+    }
   }
 
   for (const location of locations) {
     for (const card of run.cards[location]) {
       for (const ability of card.abilities) {
         if (matchesTrigger(event, card, location, ability.trigger, run)) {
-          matches.push({ card: card, ability })
+          cardMatches.push({ card: card, ability })
         }
       }
     }
   }
 
-  return matches
+  return [...beforeCards, ...cardMatches, ...afterCards]
 }
 
 /**
