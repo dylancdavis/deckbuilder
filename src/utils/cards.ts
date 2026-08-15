@@ -1,7 +1,6 @@
 import { Resource } from './resource'
 import { keys, selectRandom, values } from './utils'
 import type { Run } from './run'
-import type { CardPlayEvent } from './event'
 import type { Ability } from './ability'
 
 /**
@@ -240,18 +239,10 @@ export const saveReward: PlayableCard = {
           params: {
             resource: Resource.POINTS,
             update: (current: number, run: Run) => {
-              // Check if any collect-card events occurred this round
-              const roundCardPlayEvents = run.events.filter(
-                (e) => e.type === 'card-play' && e.round === run.stats.rounds,
-              ) as CardPlayEvent[]
-              const cardCollectEvents = roundCardPlayEvents.some((e) => {
-                const card = playableCards[e.cardId]
-                // Check new ability format for collect-card effects
-                return card.abilities.some((ability) =>
-                  ability.effects.some((eff) => eff.type === 'collect-card'),
-                )
-              })
-              return cardCollectEvents ? current : current + 2
+              const collected = run.events.some(
+                (e) => e.type === 'card-collect' && e.round === run.stats.rounds,
+              )
+              return collected ? current : current + 2
             },
           },
         },
