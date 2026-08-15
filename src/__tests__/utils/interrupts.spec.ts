@@ -78,8 +78,8 @@ describe('interrupt abilities', () => {
               effectContext.kind === 'ability' && effectContext.sourceCard.id === 'score',
           },
           effects: ({ effect }) => {
-            if (effect.type !== 'update-resource' || !('delta' in effect.params)) return [effect]
-            return [{ ...effect, params: { ...effect.params, delta: effect.params.delta + 1 } }]
+            const params = effect.params as { resource: Resource; delta: number }
+            return [{ ...effect, params: { ...params, delta: params.delta + 1 } } as Effect]
           },
         },
       ],
@@ -224,6 +224,127 @@ describe('interrupt abilities', () => {
     const run = result.game.run!
     expect(run.cards.hand.map((c) => c.instanceId)).toEqual(['e-1'])
     expect(run.cards.discardPile.map((c) => c.instanceId)).toEqual(['e-2'])
+  })
+
+  it('reduces incoming damage by substituting a smaller damage effect', () => {
+    const attacker = makeInstance(basicEntity, 'atk-1', { attack: 4 })
+    const armored = makeInstance(targetDummy, 'tgt-1', {
+      defense: 5,
+      abilities: [
+        {
+          type: 'interrupt',
+          trigger: { on: 'damage', target: 'self' },
+          effects: ({ effect }) => {
+            const params = effect.params as { instanceId: string; amount: number }
+            return [{ ...effect, params: { ...params, amount: Math.max(0, params.amount - 2) } } as Effect]
+          },
+        },
+      ],
+    })
+    const gameState = createTestGameState({
+      cards: { drawPile: [], hand: [], board: [attacker, armored], discardPile: [] },
+    })
+
+    const result = handleEffect(
+      gameState,
+      { type: 'attack', params: { instanceId: 'atk-1', targetInstanceId: 'tgt-1' } },
+      { kind: 'player' },
+    )
+
+    const run = result.game.run!
+    // 4 attack - 2 armor = 2 actual damage, so 5 - 2 = 3
+    expect(run.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(3)
+  })
+
+  it('blocks lethal damage entirely, preventing the zero-defense discard', () => {
+    const attacker = makeInstance(basicEntity, 'atk-1', { attack: 5 })
+    const shielded = makeInstance(targetDummy, 'tgt-1', {
+      defense: 3,
+      abilities: [
+        { type: 'interrupt', trigger: { on: 'damage', target: 'self' }, effects: [] },
+      ],
+    })
+    const gameState = createTestGameState({
+      cards: { drawPile: [], hand: [], board: [attacker, shielded], discardPile: [] },
+    })
+
+    const result = handleEffect(
+      gameState,
+      { type: 'attack', params: { instanceId: 'atk-1', targetInstanceId: 'tgt-1' } },
+      { kind: 'player' },
+    )
+
+    const run = result.game.run!
+    expect(run.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(3)
+    expect(run.cards.discardPile).toEqual([])
+    // Attack event fires, then the damage is replaced (never applied)
+    expect(run.events.map((e) => e.type)).toEqual(['card-attack', 'effect-replace'])
+  })
+
+  it('only intercepts damage to self, letting other cards take full damage', () => {
+    const attacker = makeInstance(basicEntity, 'atk-1', { attack: 3 })
+    const armored = makeInstance(basicEntity, 'arm-1', {
+      defense: 5,
+      abilities: [
+        { type: 'interrupt', trigger: { on: 'damage', target: 'self' }, effects: [] },
+      ],
+    })
+    const bystander = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
+    const gameState = createTestGameState({
+      cards: { drawPile: [], hand: [], board: [attacker, armored, bystander], discardPile: [] },
+    })
+
+    const result = handleEffect(
+      gameState,
+      { type: 'damage', params: { instanceId: 'tgt-1', amount: 3 } },
+      { kind: 'player' },
+    )
+
+    const run = result.game.run!
+    // Bystander takes full damage, armored card untouched
+    expect(run.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(2)
+    expect(run.cards.board.find((c) => c.instanceId === 'arm-1')!.defense).toBe(5)
+    expect(run.events.map((e) => e.type)).toEqual(['card-damage'])
+  })
+
+  it('intercepts only attack-sourced damage when the trigger checks effectContext', () => {
+    const attacker = makeInstance(basicEntity, 'atk-1', { attack: 2 })
+    // Only blocks damage that was produced by the core card-attack → damage ability
+    const antiAttack = makeInstance(targetDummy, 'tgt-1', {
+      defense: 5,
+      abilities: [
+        {
+          type: 'interrupt',
+          trigger: {
+            on: 'damage',
+            target: 'self',
+            when: ({ effectContext }) =>
+              effectContext.kind === 'ability' &&
+              effectContext.event.type === 'card-attack',
+          },
+          effects: [],
+        },
+      ],
+    })
+    const gameState = createTestGameState({
+      cards: { drawPile: [], hand: [], board: [attacker, antiAttack], discardPile: [] },
+    })
+
+    // Attack-sourced damage is blocked
+    const attacked = handleEffect(
+      gameState,
+      { type: 'attack', params: { instanceId: 'atk-1', targetInstanceId: 'tgt-1' } },
+      { kind: 'player' },
+    )
+    expect(attacked.game.run!.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(5)
+
+    // Direct damage goes through
+    const directDamage = handleEffect(
+      gameState,
+      { type: 'damage', params: { instanceId: 'tgt-1', amount: 2 } },
+      { kind: 'player' },
+    )
+    expect(directDamage.game.run!.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(3)
   })
 
   it('respects the locations gate on the effect trigger', () => {
