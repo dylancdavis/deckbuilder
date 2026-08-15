@@ -8,6 +8,16 @@ import type { Ability } from './ability'
  * These can be added to any rules card to implement standard game flow.
  */
 export const coreGameFlowAbilities: Ability[] = [
+  // Attack events cause damage equal to attacking card's attack
+  {
+    trigger: { on: 'card-attack' },
+    effects: ({ event }) => {
+      if (event.type !== 'card-attack') throw new Error('Expected a card-attack event')
+      return [
+        { type: 'damage', params: { instanceId: event.targetInstanceId, amount: event.amount } },
+      ]
+    },
+  },
   // Cards reduced to 0 defense by damage are discarded.
   {
     trigger: {

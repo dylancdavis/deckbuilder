@@ -166,21 +166,10 @@ function decomposeEffect(
   run: Run,
 ): { atomic: Effect; remaining: Effect | null } | null {
   switch (effect.type) {
-    // --- Attack: declare the attack, then deal the damage ---
-
     case 'attack': {
       const attacker = findCard(effect.params.instanceId, run)
       if (!attacker || attacker.attack === undefined) return null // Cannot attack
-
-      // The attack declaration resolves (and cascades) before the damage lands,
-      // so "when this card attacks" abilities are pre-damage triggers.
-      return {
-        atomic: effect,
-        remaining: {
-          type: 'damage',
-          params: { instanceId: effect.params.targetInstanceId, amount: attacker.attack },
-        },
-      }
+      return { atomic: effect, remaining: null }
     }
     // --- Amount-based: resolve one card at a time ---
 
