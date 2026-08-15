@@ -11,6 +11,7 @@ export const coreGameFlowAbilities: Ability[] = [
   // Attack events cause damage equal to attacking card's attack
   {
     trigger: { on: 'card-attack' },
+    order: 'after-cards',
     effects: ({ event }) => {
       if (event.type !== 'card-attack') throw new Error('Expected a card-attack event')
       return [
@@ -24,11 +25,13 @@ export const coreGameFlowAbilities: Ability[] = [
       on: 'card-damage',
       when: (ctx) => ctx.event.type === 'card-damage' && ctx.event.newDefense === 0,
     },
+    order: 'after-cards',
     effects: [{ type: 'discard-cards', params: { instanceIds: ['target'] } }],
   },
   // On run-start -> start first round
   {
     trigger: { on: 'run-start' },
+    order: 'after-cards',
     effects: [{ type: 'round-start', params: {} }],
   },
   // On turn-end with cards in draw pile -> start new turn
@@ -37,6 +40,7 @@ export const coreGameFlowAbilities: Ability[] = [
       on: 'turn-end',
       when: (ctx) => ctx.run.cards.drawPile.length > 0,
     },
+    order: 'after-cards',
     effects: [{ type: 'turn-start', params: {} }],
   },
   // On turn-end with empty draw pile -> end round
@@ -45,21 +49,25 @@ export const coreGameFlowAbilities: Ability[] = [
       on: 'turn-end',
       when: (ctx) => ctx.run.cards.drawPile.length === 0,
     },
+    order: 'after-cards',
     effects: [{ type: 'round-end', params: {} }],
   },
   // On round-end -> refresh deck (reshuffle all cards)
   {
     trigger: { on: 'round-end' },
+    order: 'after-cards',
     effects: [{ type: 'refresh-deck', params: {} }],
   },
   // On round-end (after refresh) -> start new round
   {
     trigger: { on: 'round-end' },
+    order: 'after-cards',
     effects: [{ type: 'round-start', params: {} }],
   },
   // On round-start -> start new turn
   {
     trigger: { on: 'round-start' },
+    order: 'after-cards',
     effects: [{ type: 'turn-start', params: {} }],
   },
 ]
@@ -197,21 +205,22 @@ export const starterRules: RulesCard = {
         },
       ],
     },
-    // Before core: discard before turn transition, run-end before refresh
+    {
+      trigger: { on: 'turn-start' },
+      order: 'before-cards',
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
     {
       trigger: { on: 'turn-end' },
+      order: 'after-cards',
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       trigger: { on: 'round-end' },
+      order: 'after-cards',
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
-    // After core: draw after turn-start fires
-    {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
-    },
   ],
 }
 
@@ -613,7 +622,13 @@ export const testRules: RulesCard = {
       ],
     },
     {
+      trigger: { on: 'turn-start' },
+      order: 'before-cards',
+      effects: [{ type: 'draw-cards', params: { amount: 5 } }],
+    },
+    {
       trigger: { on: 'turn-end' },
+      order: 'after-cards',
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
@@ -621,13 +636,10 @@ export const testRules: RulesCard = {
         on: 'round-end',
         when: (ctx) => ctx.event.round >= 10,
       },
+      order: 'after-cards',
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
-    {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 5 } }],
-    },
   ],
 }
 
@@ -660,18 +672,21 @@ export const discardTestRules: RulesCard = {
       ],
     },
     {
+      trigger: { on: 'turn-start' },
+      order: 'before-cards',
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+    {
       trigger: { on: 'turn-end' },
+      order: 'after-cards',
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       trigger: { on: 'round-end' },
+      order: 'after-cards',
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
-    {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
-    },
   ],
 }
 
@@ -700,18 +715,21 @@ export const moveTestRules: RulesCard = {
       ],
     },
     {
+      trigger: { on: 'turn-start' },
+      order: 'before-cards',
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+    {
       trigger: { on: 'turn-end' },
+      order: 'after-cards',
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       trigger: { on: 'round-end' },
+      order: 'after-cards',
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
-    {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
-    },
   ],
 }
 
@@ -740,18 +758,21 @@ export const choiceTestRules: RulesCard = {
       ],
     },
     {
+      trigger: { on: 'turn-start' },
+      order: 'before-cards',
+      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+    },
+    {
       trigger: { on: 'turn-end' },
+      order: 'after-cards',
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       trigger: { on: 'round-end' },
+      order: 'after-cards',
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
-    {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
-    },
   ],
 }
 
@@ -769,18 +790,21 @@ export const attackTestRules: RulesCard = {
   turnStructure: { playAmount: 'any' },
   abilities: [
     {
+      trigger: { on: 'turn-start' },
+      order: 'before-cards',
+      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+    },
+    {
       trigger: { on: 'turn-end' },
+      order: 'after-cards',
       effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       trigger: { on: 'round-end' },
+      order: 'after-cards',
       effects: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
-    {
-      trigger: { on: 'turn-start' },
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
-    },
   ],
 }
 
