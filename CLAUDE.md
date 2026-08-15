@@ -60,6 +60,17 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 - `PlayableCard` - Cards that can be played in runs (have cost, effects, description)
 - `RulesCard` - Cards that define game rules (deck limits, turn structure, end conditions)
 
+**Ability Resolution**: Every event is answered by matching abilities in three phases
+(`findMatchingAbilities` in `src/utils/ability-processor.ts`):
+
+1. Rules abilities tagged `order: 'before-cards'` — setup, such as the start-of-turn draw
+2. Card abilities, ordered by location (board, hand, discardPile, drawPile)
+3. Rules abilities tagged `order: 'after-cards'` — settlement, such as end-of-turn discarding
+
+`coreGameFlowAbilities` is entirely `after-cards`: the game only advances the turn, ends the
+round, or applies attack damage once every card has reacted. Effects resolve depth-first, so
+an ability's whole cascade completes before the next matching ability runs.
+
 **Game Flow**:
 
 1. Player starts in collection view with access to decks and cards
