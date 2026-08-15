@@ -135,12 +135,13 @@ function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
     if (event) {
       currentState = logEvent(currentState, event)
       const abilities = findMatchingAbilities(currentState.game.run!, event)
-      const cascaded = abilities.flatMap((match) =>
-        match.ability.effects.map((e) => ({
+      const cascaded = abilities.flatMap((match) => {
+        const effects = abilityEffects(match.ability, match.card, event, currentState.game.run!)
+        return effects.map((e) => ({
           context: { kind: 'ability' as const, sourceCard: match.card, event },
           effect: e,
-        })),
-      )
+        }))
+      })
       triggeredItems.push(...cascaded)
     }
 
@@ -451,6 +452,21 @@ function resolveSymbolicReferences(effect: Effect, context: EffectContext): Effe
 
   if (Object.keys(updates).length === 0) return effect
   return { ...effect, params: { ...effect.params, ...updates } } as Effect
+}
+
+/**
+ * The effects an ability produces for an event, evaluating the function form
+ * against the trigger context.
+ */
+function abilityEffects(
+  ability: Ability,
+  sourceCard: CardInstance | RulesCard,
+  event: Event,
+  run: Run,
+): Effect[] {
+  if (typeof ability.effects !== 'function') return ability.effects
+  const targetCard = isCardEvent(event) ? findCard(event.instanceId, run) : undefined
+  return ability.effects({ event, sourceCard, targetCard, run })
 }
 
 /**

@@ -7,7 +7,7 @@ import type { TargetSpec } from './card-matchers'
 
 export type Ability = {
   trigger: Trigger
-  effects: Effect[]
+  effects: Effect[] | ((context: TriggerContext) => Effect[])
 }
 
 /** Describes the event that triggers this ability, plus additional conditionals. */
