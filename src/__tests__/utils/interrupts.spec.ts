@@ -124,6 +124,27 @@ describe('interrupt abilities', () => {
     expect(run.events[0]).toMatchObject({ type: 'effect-replace', newEffects: [] })
   })
 
+  it('prevents the damage when an empty substitute list intercepts an attack', () => {
+    const attacker = makeInstance(basicEntity, 'atk-1', { attack: 3 })
+    const shielded = makeInstance(targetDummy, 'tgt-1', {
+      defense: 5,
+      abilities: [{ type: 'interrupt', trigger: { on: 'attack', target: 'self' }, effects: [] }],
+    })
+    const gameState = createTestGameState({
+      cards: { drawPile: [], hand: [], board: [attacker, shielded], discardPile: [] },
+    })
+
+    const result = handleEffect(
+      gameState,
+      { type: 'attack', params: { instanceId: 'atk-1', targetInstanceId: 'tgt-1' } },
+      { kind: 'player' },
+    )
+
+    const run = result.game.run!
+    expect(run.events.map((e) => e.type)).toEqual(['effect-replace'])
+    expect(run.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(5)
+  })
+
   it('does not re-apply an interrupt to its own substitute effects', () => {
     // Substitutes another discard of itself: without once-per-ability
     // protection this would recurse forever.
