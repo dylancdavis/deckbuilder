@@ -236,7 +236,12 @@ describe('interrupt abilities', () => {
           trigger: { on: 'damage', target: 'self' },
           effects: ({ effect }) => {
             const params = effect.params as { instanceId: string; amount: number }
-            return [{ ...effect, params: { ...params, amount: Math.max(0, params.amount - 2) } } as Effect]
+            return [
+              {
+                ...effect,
+                params: { ...params, amount: Math.max(0, params.amount - 2) },
+              } as Effect,
+            ]
           },
         },
       ],
@@ -260,9 +265,7 @@ describe('interrupt abilities', () => {
     const attacker = makeInstance(basicEntity, 'atk-1', { attack: 5 })
     const shielded = makeInstance(targetDummy, 'tgt-1', {
       defense: 3,
-      abilities: [
-        { type: 'interrupt', trigger: { on: 'damage', target: 'self' }, effects: [] },
-      ],
+      abilities: [{ type: 'interrupt', trigger: { on: 'damage', target: 'self' }, effects: [] }],
     })
     const gameState = createTestGameState({
       cards: { drawPile: [], hand: [], board: [attacker, shielded], discardPile: [] },
@@ -285,9 +288,7 @@ describe('interrupt abilities', () => {
     const attacker = makeInstance(basicEntity, 'atk-1', { attack: 3 })
     const armored = makeInstance(basicEntity, 'arm-1', {
       defense: 5,
-      abilities: [
-        { type: 'interrupt', trigger: { on: 'damage', target: 'self' }, effects: [] },
-      ],
+      abilities: [{ type: 'interrupt', trigger: { on: 'damage', target: 'self' }, effects: [] }],
     })
     const bystander = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
     const gameState = createTestGameState({
@@ -319,8 +320,7 @@ describe('interrupt abilities', () => {
             on: 'damage',
             target: 'self',
             when: ({ effectContext }) =>
-              effectContext.kind === 'ability' &&
-              effectContext.event.type === 'card-attack',
+              effectContext.kind === 'ability' && effectContext.event.type === 'card-attack',
           },
           effects: [],
         },
@@ -344,7 +344,9 @@ describe('interrupt abilities', () => {
       { type: 'damage', params: { instanceId: 'tgt-1', amount: 2 } },
       { kind: 'player' },
     )
-    expect(directDamage.game.run!.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(3)
+    expect(directDamage.game.run!.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(
+      3,
+    )
   })
 
   it('respects the locations gate on the effect trigger', () => {
