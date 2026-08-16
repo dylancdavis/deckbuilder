@@ -248,6 +248,7 @@ function decomposeEffect(
     // --- Amount-based: resolve one card at a time ---
 
     case 'draw-cards': {
+      if (effect.params.amount < 1 || run.cards.drawPile.length === 0) return null
       const remaining: Effect | null =
         effect.params.amount > 1
           ? { type: 'draw-cards', params: { amount: effect.params.amount - 1 } }
@@ -263,6 +264,7 @@ function decomposeEffect(
 
     case 'add-cards': {
       const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
       const { location, mode } = effect.params
 
@@ -287,6 +289,7 @@ function decomposeEffect(
 
     case 'collect-card': {
       const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
 
       const atomic: Effect = {
@@ -309,6 +312,7 @@ function decomposeEffect(
 
     case 'destroy-card': {
       const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
 
       const atomic: Effect = {
@@ -334,6 +338,7 @@ function decomposeEffect(
     case 'discard-cards': {
       if ('instanceIds' in effect.params) {
         const ids = effect.params.instanceIds
+        if (ids.length === 0) return null
         const remaining: Effect | null =
           ids.length > 1 ? { type: 'discard-cards', params: { instanceIds: ids.slice(1) } } : null
         return {
@@ -373,6 +378,7 @@ function decomposeEffect(
 
       if ('instanceIds' in effect.params) {
         const ids = effect.params.instanceIds
+        if (ids.length === 0) return null
         const remaining: Effect | null =
           ids.length > 1
             ? { type: 'move-card', params: { instanceIds: ids.slice(1), to, position } }

@@ -3,7 +3,7 @@ import { handleEffect } from '../../utils/ability-processor'
 import type { Effect } from '../../utils/effects'
 import { basicEntity, targetDummy, score } from '../../utils/cards'
 import type { CardInstance, PlayableCard } from '../../utils/cards'
-import type { InterruptAbility } from '../../utils/ability'
+import type { EffectTrigger, InterruptAbility } from '../../utils/ability'
 import { Resource } from '../../utils/resource'
 import { createTestGameState } from './effects/shared'
 
@@ -368,5 +368,114 @@ describe('interrupt abilities', () => {
     const run = result.game.run!
     expect(run.cards.discardPile.map((c) => c.instanceId)).toEqual(['e-1'])
     expect(run.events.map((e) => e.type)).toEqual(['card-discard'])
+  })
+})
+
+describe('interrupts and effects with no work to do', () => {
+  /** An untargeted interrupt on `on`, observable through the point it grants. */
+  function watchEffect(on: EffectTrigger['on']): InterruptAbility {
+    return { type: 'interrupt', trigger: { on }, effects: [ADD_POINT_EFFECT] }
+  }
+
+  function watcherOnBoard(on: EffectTrigger['on']) {
+    const watcher = makeInstance(basicEntity, 'w-1', { abilities: [watchEffect(on)] })
+    return createTestGameState({
+      cards: { drawPile: [], hand: [], board: [watcher], discardPile: [] },
+    })
+  }
+
+  function expectNothingHappened(result: ReturnType<typeof handleEffect>) {
+    const run = result.game.run!
+    expect(run.events).toEqual([])
+    expect(run.resources.points).toBe(0)
+  }
+
+  it('does not interrupt a discard from an empty pile', () => {
+    const gameState = watcherOnBoard('discard-cards')
+
+    expectNothingHappened(
+      handleEffect(
+        gameState,
+        { type: 'discard-cards', params: { from: 'hand', amount: 'all' } },
+        { kind: 'player' },
+      ),
+    )
+  })
+
+  it('does not interrupt a discard whose matcher selects no cards', () => {
+    const gameState = watcherOnBoard('discard-cards')
+
+    expectNothingHappened(
+      handleEffect(
+        gameState,
+        { type: 'discard-cards', params: { from: 'board', matching: { tags: ['nonexistent'] } } },
+        { kind: 'player' },
+      ),
+    )
+  })
+
+  it('does not interrupt a move from an empty pile', () => {
+    const gameState = watcherOnBoard('move-card')
+
+    expectNothingHappened(
+      handleEffect(
+        gameState,
+        { type: 'move-card', params: { from: 'hand', amount: 'all', to: 'board' } },
+        { kind: 'player' },
+      ),
+    )
+  })
+
+  it('does not interrupt a draw from an empty draw pile', () => {
+    const gameState = watcherOnBoard('draw-cards')
+
+    expectNothingHappened(
+      handleEffect(gameState, { type: 'draw-cards', params: { amount: 1 } }, { kind: 'player' }),
+    )
+  })
+
+  it('does not draw or interrupt when the requested draw amount is zero', () => {
+    const drawn = makeInstance(score, 'score-1')
+    const watcher = makeInstance(basicEntity, 'w-1', { abilities: [watchEffect('draw-cards')] })
+    const gameState = createTestGameState({
+      cards: { drawPile: [drawn], hand: [], board: [watcher], discardPile: [] },
+    })
+
+    const result = handleEffect(
+      gameState,
+      { type: 'draw-cards', params: { amount: 0 } },
+      { kind: 'player' },
+    )
+
+    expect(result.game.run!.cards.hand).toEqual([])
+    expectNothingHappened(result)
+  })
+
+  it('does not interrupt an add-cards effect with an empty card counter', () => {
+    const gameState = watcherOnBoard('add-cards')
+
+    expectNothingHappened(
+      handleEffect(
+        gameState,
+        { type: 'add-cards', params: { location: 'hand', cards: {}, mode: 'top' } },
+        { kind: 'player' },
+      ),
+    )
+  })
+
+  it('does not interrupt a collect-card effect with an empty card counter', () => {
+    const gameState = watcherOnBoard('collect-card')
+
+    expectNothingHappened(
+      handleEffect(gameState, { type: 'collect-card', params: { cards: {} } }, { kind: 'player' }),
+    )
+  })
+
+  it('does not interrupt a destroy-card effect with an empty card counter', () => {
+    const gameState = watcherOnBoard('destroy-card')
+
+    expectNothingHappened(
+      handleEffect(gameState, { type: 'destroy-card', params: { cards: {} } }, { kind: 'player' }),
+    )
   })
 })
