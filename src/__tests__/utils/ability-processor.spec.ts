@@ -874,6 +874,8 @@ describe('double choice card', () => {
   })
 
   it('completes after the second choice is made', () => {
+    // Note: choices will be non-deterministic until randomization
+    // is properly modularized
     const afterFirstModal = playDoubleChoice()
     const firstChoice = afterFirstModal.viewData.cardOptions[0]
     const afterFirstChoice = resolveChoice(afterFirstModal, firstChoice)
@@ -882,9 +884,10 @@ describe('double choice card', () => {
 
     expect(afterSecondChoice.viewData.modalView).toBeNull()
     expect(afterSecondChoice.viewData.pendingChoice).toBeNull()
-    expect(afterSecondChoice.game.collection.cards[firstChoice]).toBe(1)
-    expect(afterSecondChoice.game.collection.cards[secondChoice]).toBe(
-      firstChoice === secondChoice ? 2 : 1,
+    expect(afterSecondChoice.game.collection.cards).toEqual(
+      firstChoice === secondChoice
+        ? { [firstChoice]: 2 } // both choices can be the same
+        : { [firstChoice]: 1, [secondChoice]: 1 }, // but are usually different
     )
   })
 })
