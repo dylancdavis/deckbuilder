@@ -1,18 +1,27 @@
 /**
  * Effect processing pipeline.
  *
- * The pipeline follows a decompose → apply → cascade loop:
+ * The pipeline follows a decompose → interrupt → apply → cascade loop:
  * 1. DECOMPOSE: Break compound effects into atomic, single-card effects (just-in-time)
- * 2. APPLY: Execute atomic effect → state change + 0 or 1 event
- * 3. CASCADE: Event → find matching abilities → their effects enter step 1
+ * 2. INTERRUPT: A matching interrupt ability substitutes its effects for the
+ *    atomic one (emitting an effect-replace event) instead of applying it
+ * 3. APPLY: Execute atomic effect → state change + 0 or 1 event
+ * 4. CASCADE: Event → find matching abilities → their effects enter step 1
  *
  * Card-choice effects pause the pipeline by storing pending work as inspectable
  * data on the game state. The UI calls resolveChoice to resume.
  */
 
-import type { Ability, Trigger, TriggerContext } from './ability'
+import type {
+  ReactiveAbility,
+  InterruptAbility,
+  EventTrigger,
+  EffectTrigger,
+  TriggerContext,
+  InterruptContext,
+} from './ability'
 import { type CardInstance, type RulesCard, getCardChoices } from './cards'
-import type { Event, CardEvent, CardActivateEvent } from './event'
+import type { Event, CardEvent, CardActivateEvent, EffectReplaceEvent } from './event'
 import { isCardEvent } from './event'
 import { type Run, type Location, locations } from './run'
 import type { GameState, PendingChoice } from './game'
@@ -42,6 +51,11 @@ export type EffectContext =
 export type EffectStackItem = {
   context: EffectContext
   effect: Effect
+  /**
+   * Keys of interrupt abilities already applied along this substitution chain.
+   * An interrupt applies at most once per chain, preventing infinite loops.
+   */
+  interrupted?: string[]
 }
 
 /**
@@ -109,7 +123,7 @@ function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
   let currentState = gameState
 
   while (stack.length > 0) {
-    const { context, effect } = stack.shift()!
+    const { context, effect, interrupted } = stack.shift()!
 
     // Card-choice: pause processing. After the shift, `stack` is exactly the
     // remaining work, so it can be stored as-is.
@@ -125,6 +139,66 @@ function drainStack(gameState: GameState, stack: EffectStackItem[]): GameState {
     if (!decomposed) continue // Nothing to do (pile empty, no matches, etc.)
 
     const { atomic, remaining } = decomposed
+
+    // Interrupt: a matching interrupt ability substitutes its effects for the
+    // atomic one, which never applies. The substitutes re-enter the stack under
+    // the original context so stacked interrupts still see the true producer.
+    const match = findMatchingInterrupt(currentState.game.run!, atomic, context, interrupted ?? [])
+    if (match) {
+      const run = currentState.game.run!
+      const { card, ability } = match
+      const targetInstanceId = effectTargetInstanceId(atomic)
+      const targetCard = targetInstanceId ? findCard(targetInstanceId, run) : undefined
+      const interruptContext: InterruptContext = {
+        effect: atomic,
+        effectContext: context,
+        sourceCard: card,
+        targetCard,
+        run,
+      }
+      const rawEffects =
+        typeof ability.effects === 'function' ? ability.effects(interruptContext) : ability.effects
+
+      const replaceEvent: EffectReplaceEvent = {
+        type: 'effect-replace',
+        sourceCardId: card.id,
+        ...(targetCard ? { cardId: targetCard.id, instanceId: targetCard.instanceId } : {}),
+        originalEffect: atomic,
+        newEffects: [],
+        round: run.stats.rounds,
+        turn: run.stats.turns,
+      }
+      // Resolve the substitutes' symbolic references eagerly against the
+      // interrupting card ('self') and the affected card ('target'), so they
+      // can carry the original context without losing those references.
+      replaceEvent.newEffects = rawEffects.map((e) =>
+        resolveSymbolicReferences(e, { kind: 'ability', sourceCard: card, event: replaceEvent }),
+      )
+      currentState = logEvent(currentState, replaceEvent)
+
+      const triggeredItems: EffectStackItem[] = findMatchingAbilities(
+        currentState.game.run!,
+        replaceEvent,
+      ).flatMap((m) => {
+        const effects = abilityEffects(m.ability, m.card, replaceEvent, currentState.game.run!)
+        return effects.map((e) => ({
+          context: { kind: 'ability' as const, sourceCard: m.card, event: replaceEvent },
+          effect: e,
+        }))
+      })
+      const substituteItems: EffectStackItem[] = replaceEvent.newEffects.map((e) => ({
+        context,
+        effect: e,
+        interrupted: [...(interrupted ?? []), interruptKey(card, ability)],
+      }))
+      const next = [
+        ...triggeredItems,
+        ...substituteItems,
+        ...(remaining ? [{ context, effect: remaining, interrupted }] : []),
+      ]
+      if (next.length > 0) stack.unshift(...next)
+      continue
+    }
 
     // Apply the atomic effect
     const { game, event } = applyEffect(currentState, atomic)
@@ -174,6 +248,7 @@ function decomposeEffect(
     // --- Amount-based: resolve one card at a time ---
 
     case 'draw-cards': {
+      if (effect.params.amount < 1 || run.cards.drawPile.length === 0) return null
       const remaining: Effect | null =
         effect.params.amount > 1
           ? { type: 'draw-cards', params: { amount: effect.params.amount - 1 } }
@@ -189,6 +264,7 @@ function decomposeEffect(
 
     case 'add-cards': {
       const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
       const { location, mode } = effect.params
 
@@ -213,6 +289,7 @@ function decomposeEffect(
 
     case 'collect-card': {
       const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
 
       const atomic: Effect = {
@@ -235,6 +312,7 @@ function decomposeEffect(
 
     case 'destroy-card': {
       const cardIds = toArray(effect.params.cards)
+      if (cardIds.length === 0) return null
       const firstId = cardIds[0]
 
       const atomic: Effect = {
@@ -260,6 +338,7 @@ function decomposeEffect(
     case 'discard-cards': {
       if ('instanceIds' in effect.params) {
         const ids = effect.params.instanceIds
+        if (ids.length === 0) return null
         const remaining: Effect | null =
           ids.length > 1 ? { type: 'discard-cards', params: { instanceIds: ids.slice(1) } } : null
         return {
@@ -299,6 +378,7 @@ function decomposeEffect(
 
       if ('instanceIds' in effect.params) {
         const ids = effect.params.instanceIds
+        if (ids.length === 0) return null
         const remaining: Effect | null =
           ids.length > 1
             ? { type: 'move-card', params: { instanceIds: ids.slice(1), to, position } }
@@ -448,7 +528,7 @@ function resolveSymbolicReferences(effect: Effect, context: EffectContext): Effe
  * against the trigger context.
  */
 function abilityEffects(
-  ability: Ability,
+  ability: ReactiveAbility,
   sourceCard: CardInstance | RulesCard,
   event: Event,
   run: Run,
@@ -458,12 +538,14 @@ function abilityEffects(
   return ability.effects({ event, sourceCard, targetCard, run })
 }
 
-type AbilityMatch = { card: CardInstance | RulesCard; ability: Ability }
+type AbilityMatch = { card: CardInstance | RulesCard; ability: ReactiveAbility }
 
 /**
- * Find all abilities that match an event, in execution order.
- * Card abilities are ordered by location: board, hand, discardPile, drawPile.
- * Rules card abilities are processed according to their `order` field.
+ * Find all reactive abilities that match an event, in execution order: rules
+ * abilities ordered `before-cards`, then card abilities, then rules abilities
+ * ordered `after-cards`. Card abilities are ordered by location — board, hand,
+ * discardPile, drawPile — and by position within each. Rules abilities keep
+ * their declared order within a group.
  */
 export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
   const beforeCards: AbilityMatch[] = []
@@ -472,6 +554,7 @@ export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
 
   const rulesCard = run.deck.rulesCard!
   for (const ability of rulesCard.abilities) {
+    if (ability.type !== 'reactive') continue
     if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run)) {
       const list = ability.order === 'after-cards' ? afterCards : beforeCards
       list.push({ card: rulesCard, ability })
@@ -481,6 +564,7 @@ export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
   for (const location of locations) {
     for (const card of run.cards[location]) {
       for (const ability of card.abilities) {
+        if (ability.type !== 'reactive') continue
         if (matchesTrigger(event, card, location, ability.trigger, run)) {
           cardMatches.push({ card: card, ability })
         }
@@ -492,13 +576,133 @@ export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
 }
 
 /**
+ * Find the first interrupt ability matching an atomic effect, in the same
+ * order as findMatchingAbilities: rules card first, then cards by location.
+ * Abilities whose key is in `applied` already fired on this substitution
+ * chain and are skipped.
+ */
+function findMatchingInterrupt(
+  run: Run,
+  effect: Effect,
+  effectContext: EffectContext,
+  applied: string[],
+): { card: CardInstance | RulesCard; ability: InterruptAbility } | null {
+  const rulesCard = run.deck.rulesCard!
+  for (const ability of rulesCard.abilities) {
+    if (ability.type !== 'interrupt' || applied.includes(interruptKey(rulesCard, ability))) continue
+    if (matchesEffectTrigger(effect, rulesCard, 'board', ability.trigger, effectContext, run))
+      return { card: rulesCard, ability }
+  }
+
+  for (const location of locations) {
+    for (const card of run.cards[location]) {
+      for (const ability of card.abilities) {
+        if (ability.type !== 'interrupt' || applied.includes(interruptKey(card, ability))) continue
+        if (matchesEffectTrigger(effect, card, location, ability.trigger, effectContext, run)) {
+          return { card, ability }
+        }
+      }
+    }
+  }
+
+  return null
+}
+
+/**
+ * Identity key for an interrupt ability on a specific card, used for
+ * once-per-chain tracking. Ability objects can be shared across instances of
+ * the same card definition, so the key includes the owning instance.
+ */
+function interruptKey(card: CardInstance | RulesCard, ability: InterruptAbility): string {
+  const cardKey = card.type === 'playable' ? card.instanceId : card.id
+  return `${cardKey}#${card.abilities.indexOf(ability)}`
+}
+
+/**
+ * Check if an effect trigger on a card should intercept an atomic effect.
+ */
+function matchesEffectTrigger(
+  effect: Effect,
+  sourceCard: CardInstance | RulesCard,
+  cardLocation: Location,
+  trigger: EffectTrigger,
+  effectContext: EffectContext,
+  run: Run,
+): boolean {
+  // 1. Effect type must match
+  if (effect.type !== trigger.on) return false
+
+  // 2. If specified, must be in the right location
+  if (trigger.locations && !trigger.locations.includes(cardLocation)) return false
+
+  const targetInstanceId = effectTargetInstanceId(effect)
+
+  // 3. Target matching, against the card the effect is about to act on
+  if (trigger.target && sourceCard.type === 'playable') {
+    if (!matchesEffectTarget(targetInstanceId, sourceCard, trigger.target, run)) return false
+  }
+
+  // 4. Custom condition check
+  if (trigger.when) {
+    const targetCard = targetInstanceId ? findCard(targetInstanceId, run) : undefined
+    const context: InterruptContext = { effect, effectContext, sourceCard, targetCard, run }
+    if (!trigger.when(context)) return false
+  }
+
+  return true
+}
+
+/**
+ * Check if the target specification matches the card an effect acts on.
+ */
+function matchesEffectTarget(
+  targetInstanceId: string | undefined,
+  sourceCard: CardInstance,
+  target: TargetSpec,
+  run: Run,
+): boolean {
+  switch (target) {
+    case 'self':
+      return targetInstanceId === sourceCard.instanceId
+    case 'other':
+      return targetInstanceId !== undefined && targetInstanceId !== sourceCard.instanceId
+    case 'any':
+      return true
+  }
+
+  // Only other option is CardMatcher
+  if (!targetInstanceId) return false
+  const targetCard = findCard(targetInstanceId, run)
+  if (!targetCard) return false
+  return matchesCard(targetCard, target)
+}
+
+/**
+ * The instanceId of the card an atomic effect acts on, if it targets one.
+ * Assumes symbolic references were already resolved and compound variants
+ * decomposed to a single instance.
+ */
+function effectTargetInstanceId(effect: Effect): string | undefined {
+  const params = effect.params as Record<string, unknown>
+  // An attack acts on its target, not the attacker
+  if (effect.type === 'attack') {
+    return typeof params.targetInstanceId === 'string' ? params.targetInstanceId : undefined
+  }
+  if (Array.isArray(params.instanceIds) && typeof params.instanceIds[0] === 'string') {
+    return params.instanceIds[0]
+  }
+  if (typeof params.instanceId === 'string') return params.instanceId
+  return undefined
+}
+
+/**
  * Check if a trigger on a card should resolve for an event.
  */
 export function matchesTrigger(
   event: Event,
   sourceCard: CardInstance | RulesCard,
   cardLocation: Location,
-  trigger: Trigger,
+  trigger: EventTrigger,
   run: Run,
 ): boolean {
   // 1. Event type must match
@@ -565,7 +769,7 @@ function matchesTarget(
 /**
  * Check if an activated ability can be used (costs and limits).
  */
-export function canActivate(trigger: Trigger, sourceCard: CardInstance, run: Run): boolean {
+export function canActivate(trigger: EventTrigger, sourceCard: CardInstance, run: Run): boolean {
   // Check resource costs
   if (trigger.costs) {
     for (const [resource, cost] of Object.entries(trigger.costs)) {

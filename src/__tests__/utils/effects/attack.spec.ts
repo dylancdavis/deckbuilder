@@ -86,6 +86,7 @@ describe('AttackEffect', () => {
       attack: 3,
       abilities: [
         {
+          type: 'reactive',
           trigger: { on: 'card-attack', target: 'self' },
           effects: [ADD_POINT_EFFECT],
         },
@@ -110,6 +111,7 @@ describe('AttackEffect', () => {
       defense: 5,
       abilities: [
         {
+          type: 'reactive',
           trigger: {
             on: 'card-attack',
             when: (ctx) =>
@@ -144,6 +146,7 @@ describe('AttackEffect', () => {
       defense: 5,
       abilities: [
         {
+          type: 'reactive',
           trigger: {
             on: 'card-attack',
             when: (ctx) =>
@@ -169,6 +172,7 @@ describe('AttackEffect', () => {
       attack: 2,
       abilities: [
         {
+          type: 'reactive',
           trigger: { on: 'turn-start' },
           effects: [{ type: 'attack', params: { instanceId: 'self', targetInstanceId: 'tgt-1' } }],
         },
