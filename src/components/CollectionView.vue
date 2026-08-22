@@ -257,7 +257,6 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           <CardItem ref="cardRefs" :card="card" :tilt="TILT_PRESETS.collection" />
           <div class="card-interaction-row">
             <CardCount :count="amountInCollection" />
-            <div v-if="selectedDeck" class="add-card">+</div>
           </div>
         </div>
       </div>
