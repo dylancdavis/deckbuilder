@@ -43,8 +43,11 @@ async function clickNextTurn() {
 }
 
 // Display value helpers
-const getDrawPileCount = () => screen.getByTestId('draw-pile-count').textContent?.trim() ?? ''
-const getDiscardPileCount = () => screen.getByTestId('discard-pile-count').textContent?.trim() ?? ''
+// Pile counters render as "x N" — strip the multiplier prefix for comparisons
+const pileCount = (testId: string) =>
+  screen.getByTestId(testId).textContent?.replace(/^x\s*/, '').trim() ?? ''
+const getDrawPileCount = () => pileCount('draw-pile-count')
+const getDiscardPileCount = () => pileCount('discard-pile-count')
 const getPoints = () => screen.getByTestId('points-display').textContent?.trim() ?? ''
 const getRound = () => screen.getByTestId('round-display').textContent?.trim() ?? ''
 const getTurn = () => screen.getByTestId('turn-display').textContent?.trim() ?? ''

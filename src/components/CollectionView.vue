@@ -2,6 +2,7 @@
 import { computed, useTemplateRef } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
+import CardCount from './CardCount.vue'
 import {
   cards,
   cardType,
@@ -255,7 +256,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
         >
           <CardItem ref="cardRefs" :card="card" :tilt="TILT_PRESETS.collection" />
           <div class="card-interaction-row">
-            <div class="amount">x {{ amountInCollection }}</div>
+            <CardCount :count="amountInCollection" />
             <div v-if="selectedDeck" class="add-card">+</div>
           </div>
         </div>

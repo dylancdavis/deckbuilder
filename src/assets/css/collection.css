@@ -209,15 +209,9 @@ button.run-deck.disabled {
   padding-left: 1em;
 }
 
-.card-interaction-row .amount {
-  color: white;
-  background-color: #111;
-  padding: 0.5em;
-  padding-top: 1em;
+.card-interaction-row .card-count {
   position: relative;
   bottom: 0.75em;
-  border: 2px solid black;
-  border-radius: 8px;
   z-index: 0;
 }
 

@@ -3,6 +3,7 @@
   --card-border-color: rgb(20, 20, 20);
   --collection-card-width: 250px;
   --card-border: calc(var(--card-width) * 4 / 250) solid var(--card-border-color);
+  --card-corner-radius: calc(var(--card-width, var(--collection-card-width)) * 16 / 250);
 }
 
 .card-container {
@@ -12,7 +13,7 @@
   width: var(--card-width);
   aspect-ratio: 5/7;
   border: var(--card-border);
-  border-radius: calc(var(--card-width) * 16 / 250);
+  border-radius: var(--card-corner-radius);
   /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
   background-color: var(--card-border-color);
   position: relative;

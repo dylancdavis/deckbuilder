@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import CardBack from './CardBack.vue'
+import CardCount from './CardCount.vue'
 import FlashValue from './FlashValue.vue'
 import type { CardInstance } from '@/utils/cards'
 import { TILT_PRESETS } from '@/composables/useTilt'
@@ -119,9 +120,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
           :data-flip-id="card.instanceId"
           :tilt="TILT_PRESETS.minimal"
         />
-        <span class="pile-badge" data-testid="draw-pile-count">
-          <FlashValue :value="drawPileData.pileSize" base-color="white" />
-        </span>
+        <CardCount :count="drawPileData.pileSize" data-testid="draw-pile-count" />
       </div>
     </div>
 
@@ -181,9 +180,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
         >
           <CardItem :card="card" :tilt="TILT_PRESETS.minimal" />
         </div>
-        <span class="pile-badge" data-testid="discard-pile-count">
-          <FlashValue :value="discardPileData.pileSize" base-color="white" />
-        </span>
+        <CardCount :count="discardPileData.pileSize" data-testid="discard-pile-count" />
       </div>
 
       <!-- Round Info Panel -->

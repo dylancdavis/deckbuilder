@@ -86,25 +86,29 @@
   z-index: 10;
 }
 
-.pile-badge {
+/* Pile counters park behind the stack and slide out from under it on hover */
+.draw-pile .card-count,
+.discard-pile .card-count {
   position: absolute;
-  bottom: -0.75em;
-  left: 50%;
-  transform: translateX(-50%);
-  background: radial-gradient(circle at 30% 30%, #aaa, #555);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: bold;
-  display: grid;
-  place-items: center;
-  min-width: 2em;
-  aspect-ratio: 1;
-  border: 2px solid var(--card-border-color);
-  border-radius: 50%;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  z-index: 11;
+  top: 100%;
+  z-index: 0;
   pointer-events: none;
+  transform: translateY(-100%);
+  transition: 0.15s transform ease;
+}
+
+/* Inset by the card's corner radius so the counter clears the rounded corner */
+.draw-pile .card-count {
+  left: var(--card-corner-radius);
+}
+
+.discard-pile .card-count {
+  right: var(--card-corner-radius);
+}
+
+.draw-pile:hover .card-count,
+.discard-pile:hover .card-count {
+  transform: translateY(-0.75em);
 }
 
 .discard-pile {
