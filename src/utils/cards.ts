@@ -614,7 +614,7 @@ export const thornDummy: PlayableCard = {
   tags: ['test', 'entity'],
   art: {
     gradient: ['#c8d4dc', '#ffffff'],
-    image: 'scarab',
+    image: 'spikes',
     fillGradient: ['#7ba05b', '#355c3a'],
     borderColor: '#2e3c28',
     borderWidth: 2.5,
