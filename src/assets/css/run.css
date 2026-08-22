@@ -91,24 +91,16 @@
 .discard-pile .card-count {
   position: absolute;
   top: 100%;
+  left: 50%;
   z-index: 0;
   pointer-events: none;
-  transform: translateY(-100%);
+  transform: translate(-50%, -100%);
   transition: 0.15s transform ease;
-}
-
-/* Inset by the card's corner radius so the counter clears the rounded corner */
-.draw-pile .card-count {
-  left: var(--card-corner-radius);
-}
-
-.discard-pile .card-count {
-  right: var(--card-corner-radius);
 }
 
 .draw-pile:hover .card-count,
 .discard-pile:hover .card-count {
-  transform: translateY(-0.75em);
+  transform: translate(-50%, -0.75em);
 }
 
 .discard-pile {
