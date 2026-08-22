@@ -109,7 +109,10 @@
   gap: calc(var(--card-width) * 8 / 250);
   text-align: center;
   flex: 1;
-  padding: 0 calc(var(--card-width) * 4 / 250);
+  /* Inset equally on the sides and bottom, so the content sits a step inside the
+     card name above it and the stat badges stay centred on its edges. */
+  --card-content-inset: calc(var(--card-width) * 4 / 250);
+  padding: 0 var(--card-content-inset) var(--card-content-inset);
 }
 
 .card-image {
