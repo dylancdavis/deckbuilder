@@ -120,17 +120,31 @@
   border: calc(var(--card-width) * 1 / 250) solid var(--inner-border-color);
   border-radius: calc(var(--card-width) * 16 / 250);
   background: #093153ff;
+  /* Rays running bottom-left to top-right: stops advance along the 135deg axis,
+     so the bands they form sit perpendicular to it and span the whole face.
+     First layer is the bright pair across the top-left and bottom-right corners,
+     second is three subtler dark rays filling the middle, parallel to the pair. */
   background:
-    conic-gradient(
-      from 90deg at 50% -40%,
-      rgba(255, 255, 255, 0) 45deg,
-      rgba(255, 255, 255, 0.14) 60deg,
-      rgba(255, 255, 255, 0) 75deg,
-      rgba(255, 255, 255, 0.12) 90deg,
-      rgba(255, 255, 255, 0) 105deg,
-      rgba(255, 255, 255, 0.14) 120deg,
-      rgba(255, 255, 255, 0) 135deg,
-      rgba(255, 255, 255, 0) 360deg
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0) 6%,
+      rgba(255, 255, 255, 0.14) 16%,
+      rgba(255, 255, 255, 0) 26%,
+      rgba(255, 255, 255, 0) 74%,
+      rgba(255, 255, 255, 0.12) 84%,
+      rgba(255, 255, 255, 0) 94%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0.06) 36%,
+      rgba(0, 0, 0, 0) 42%,
+      rgba(0, 0, 0, 0) 44%,
+      rgba(0, 0, 0, 0.055) 50%,
+      rgba(0, 0, 0, 0) 56%,
+      rgba(0, 0, 0, 0) 58%,
+      rgba(0, 0, 0, 0.05) 64%,
+      rgba(0, 0, 0, 0) 70%
     ),
     linear-gradient(
       135deg,
