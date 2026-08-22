@@ -63,7 +63,12 @@ const svgProps = computed(() => ({
 </script>
 
 <template>
-  <div ref="cardRef" class="card-container" :style="cardStyle">
+  <div
+    ref="cardRef"
+    class="card-container"
+    :class="{ 'has-attack': card.attack !== undefined, 'has-defense': card.defense !== undefined }"
+    :style="cardStyle"
+  >
     <div class="card-background">
       <div class="card-name">{{ card.name }}</div>
       <div class="card-content">

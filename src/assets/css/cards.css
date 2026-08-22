@@ -10,6 +10,18 @@
   --card-width: var(--collection-card-width);
   --card-gradient-start: #093153ff;
   --card-gradient-end: #1077d2;
+  /* Geometry the card's pieces derive from. It lives here, not on the pieces
+     themselves, because custom properties only inherit downwards: the notch
+     radius below is read by .card-description, a cousin of .card-stat. */
+  --card-stat-size: 40;
+  --card-stat-offset: -8;
+  --card-stat-font-size: 22;
+  --card-content-inset: calc(var(--card-width) * 4 / 250);
+  /* Badge outer radius (border-box, so its border is inside the size) plus a
+     moat as wide as the content inset. */
+  --card-notch-radius: calc(
+    var(--card-width) * var(--card-stat-size) / 2 / 250 + var(--card-content-inset)
+  );
   width: var(--card-width);
   aspect-ratio: 5/7;
   border: var(--card-border);
@@ -17,12 +29,21 @@
   /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
   background-color: var(--card-border-color);
   position: relative;
+  /* Radius of the bite the description takes out of each bottom corner, so it
+     curves around the attack/defense badges. 0 when the badge is absent. */
+  --notch-left: 0px;
+  --notch-right: 0px;
+}
+
+.card-container.has-attack {
+  --notch-left: var(--card-notch-radius);
+}
+
+.card-container.has-defense {
+  --notch-right: var(--card-notch-radius);
 }
 
 .card-stat {
-  --card-stat-size: 40;
-  --card-stat-offset: -8;
-  --card-stat-font-size: 22;
   position: absolute;
   bottom: calc(var(--card-width) * var(--card-stat-offset) / 250);
   width: calc(var(--card-width) * var(--card-stat-size) / 250);
@@ -111,7 +132,6 @@
   flex: 1;
   /* Inset equally on the sides and bottom, so the content sits a step inside the
      card name above it and the stat badges stay centred on its edges. */
-  --card-content-inset: calc(var(--card-width) * 4 / 250);
   padding: 0 var(--card-content-inset) var(--card-content-inset);
 }
 
@@ -169,18 +189,69 @@
   display: grid;
   place-items: center;
   padding: calc(var(--card-width) * 8 / 250);
+  /* Matches the element's own border width, so the arc's rings read as its
+     continuation. */
+  --notch-stroke: calc(var(--card-width) * 1 / 250);
+  /* Gradient stops are rasterised per pixel with no supersampling, so a hard stop
+     along a curve stair-steps. Every ring boundary below instead ramps over this
+     distance, capped at the stroke width so no stop can resolve negative. */
+  --notch-aa: min(0.5px, var(--notch-stroke));
+  /* One layer per notch, each a pair of rings just outside the hole the mask cuts:
+     the border along the arc (which the element's own border can't follow) and,
+     inside it, the same dark line the inset box-shadow draws down the sides — so
+     the arc reads as part of the pressed-in panel rather than an outer edge.
+     Without a badge the rings collapse to within a stroke or two of the corner
+     point, which the border-radius clips away entirely, so nothing shows. */
   background:
+    radial-gradient(
+      circle calc(var(--notch-left) + var(--notch-stroke) * 2) at 0 100%,
+      var(--inner-border-color) calc(var(--notch-left) + var(--notch-stroke) - var(--notch-aa)),
+      rgba(0, 0, 0, 0.25) calc(var(--notch-left) + var(--notch-stroke)),
+      rgba(0, 0, 0, 0.25) calc(var(--notch-left) + var(--notch-stroke) * 2 - var(--notch-aa)),
+      transparent 100%
+    ),
+    radial-gradient(
+      circle calc(var(--notch-right) + var(--notch-stroke) * 2) at 100% 100%,
+      var(--inner-border-color) calc(var(--notch-right) + var(--notch-stroke) - var(--notch-aa)),
+      rgba(0, 0, 0, 0.25) calc(var(--notch-right) + var(--notch-stroke)),
+      rgba(0, 0, 0, 0.25) calc(var(--notch-right) + var(--notch-stroke) * 2 - var(--notch-aa)),
+      transparent 100%
+    ),
     conic-gradient(from 90deg at 2px 2px, transparent 90deg, rgba(0, 0, 0, 0.02) 0),
     conic-gradient(from 90deg at 1px 1px, transparent 90deg, rgba(0, 0, 0, 0.012) 0),
     linear-gradient(#e6e6e6, #fff);
   background-size:
+    100% 100%,
+    100% 100%,
     80% 80%,
     16% 16%,
     100% 100%;
   background-position:
+    0 0,
+    0 0,
     50% 50%,
     50% 50%,
     0 0;
+  /* Match the mask's border-box origin, so the discs stay concentric with the holes. */
+  background-origin: border-box;
+  /* The hole's own edge, ramped over --notch-aa just outside the notch radius so
+     the cut is antialiased too. */
+  mask:
+    radial-gradient(
+      circle calc(var(--notch-left) + var(--notch-aa)) at 0 100%,
+      transparent calc(100% - var(--notch-aa)),
+      #000 100%
+    ),
+    radial-gradient(
+      circle calc(var(--notch-right) + var(--notch-aa)) at 100% 100%,
+      transparent calc(100% - var(--notch-aa)),
+      #000 100%
+    );
+  /* Each layer composites against the layers below it, so only the upper one
+     intersects; the bottom layer has nothing beneath it and must `add`, or it
+     would intersect with transparent black and mask out the whole element.
+     Must follow the `mask` shorthand, which resets this. */
+  mask-composite: intersect, add;
   font-size: calc(var(--card-width) * 20 / 250);
   position: relative;
 }
