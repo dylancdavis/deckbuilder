@@ -581,6 +581,10 @@ export const striker: PlayableCard = {
     gradient: ['#c8d4dc', '#ffffff'],
     image: 'lightning',
     fillGradient: ['#ff8c00', '#8b0000'],
+    borderColor: '#56270c',
+    // 3.3 rather than Thorn Dummy's 2.5: the lightning viewBox packs 177.8 user
+    // units into the same box the scarab fills with 134, so its unit renders smaller.
+    borderWidth: 3.3,
   },
 }
 
@@ -612,6 +616,8 @@ export const thornDummy: PlayableCard = {
     gradient: ['#c8d4dc', '#ffffff'],
     image: 'scarab',
     fillGradient: ['#7ba05b', '#355c3a'],
+    borderColor: '#2e3c28',
+    borderWidth: 2.5,
   },
 }
 
