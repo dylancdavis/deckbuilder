@@ -4,14 +4,12 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     cardId: string
-    fillColor?: string
     fillGradient?: [string, string]
     borderColor?: string
     borderWidth?: number
     shadow?: boolean
   }>(),
   {
-    fillColor: '#fff',
     borderColor: '#000',
     borderWidth: 2,
     shadow: true,
@@ -22,8 +20,6 @@ const gradientId = `lightning-gradient-${props.cardId}`
 const defaultGradient: [string, string] = ['#ffffff', '#c8d4dc']
 const effectiveGradient = computed<[string, string]>(() => props.fillGradient ?? defaultGradient)
 
-const fillValue = computed(() => `url(#${gradientId})`)
-
 const pathStyle = computed(() => ({
   stroke: props.borderColor,
   strokeWidth: props.borderWidth,
@@ -32,7 +28,7 @@ const pathStyle = computed(() => ({
   strokeDashoffset: 0,
   strokeLinejoin: 'miter' as const,
   strokeMiterlimit: 4,
-  fill: fillValue.value,
+  fill: `url(#${gradientId})`,
   fillRule: 'nonzero' as const,
   opacity: 1,
 }))
