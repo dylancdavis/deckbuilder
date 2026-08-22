@@ -80,7 +80,7 @@ export const coreGameFlowAbilities: Ability[] = [
   },
 ]
 
-export type CardArtId = 'lightning' | 'scarab'
+export type CardArtId = 'lightning' | 'scarab' | 'spikes'
 
 export interface CardArt {
   /** Card background gradient, ordered [top-left, bottom-right]. */

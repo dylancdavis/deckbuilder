@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import type { Component } from 'vue'
 import LightningSvg from './LightningSvg.vue'
 import ScarabSvg from './ScarabSvg.vue'
+import SpikesSvg from './SpikesSvg.vue'
 import type { Card, CardArtId, PlayableCard, RulesCard } from '@/utils/cards'
 import { useTilt, type TiltOptions } from '@/composables/useTilt'
 
@@ -37,6 +38,7 @@ const defaultImage: CardArtId = 'scarab'
 const cardImages: Record<CardArtId, Component> = {
   lightning: LightningSvg,
   scarab: ScarabSvg,
+  spikes: SpikesSvg,
 }
 
 const cardStyle = computed(() => {
