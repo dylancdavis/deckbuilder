@@ -576,8 +576,9 @@ export const striker: PlayableCard = {
   cost: 2,
   tags: ['test', 'entity'],
   art: {
-    gradient: ['#8b0000', '#ff8c00'],
+    gradient: ['#ffffff', '#c8d4dc'],
     image: 'lightning',
+    fillGradient: ['#ff8c00', '#8b0000'],
   },
 }
 
@@ -606,8 +607,9 @@ export const thornDummy: PlayableCard = {
   cost: 1,
   tags: ['test', 'entity'],
   art: {
-    gradient: ['#355c3a', '#7ba05b'],
+    gradient: ['#ffffff', '#c8d4dc'],
     image: 'scarab',
+    fillGradient: ['#7ba05b', '#355c3a'],
   },
 }
 
