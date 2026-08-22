@@ -8,8 +8,8 @@
 
 .card-container {
   --card-width: var(--collection-card-width);
-  --card-gradient-start: #093153ff;
-  --card-gradient-end: #1077d2;
+  --card-gradient-start: #1077d2;
+  --card-gradient-end: #093153ff;
   width: var(--card-width);
   aspect-ratio: 5/7;
   border: var(--card-border);
@@ -122,7 +122,6 @@
   height: 100%;
   border: calc(var(--card-width) * 1 / 250) solid var(--inner-border-color);
   border-radius: calc(var(--card-width) * 16 / 250);
-  background: #093153ff;
   /* Rays running bottom-left to top-right: stops advance along the 135deg axis,
      so the bands they form sit perpendicular to it and span the whole face.
      First layer is the bright pair across the top-left and bottom-right corners,
@@ -149,11 +148,7 @@
       rgba(0, 0, 0, 0.05) 64%,
       rgba(0, 0, 0, 0) 70%
     ),
-    linear-gradient(
-      135deg,
-      var(--card-gradient-end, #1077d2) 0%,
-      var(--card-gradient-start, #093153ff) 100%
-    );
+    linear-gradient(135deg, var(--card-gradient-start) 0%, var(--card-gradient-end) 100%);
 }
 
 .card-description {

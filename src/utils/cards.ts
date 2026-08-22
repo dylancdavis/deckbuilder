@@ -83,8 +83,10 @@ export const coreGameFlowAbilities: Ability[] = [
 export type CardArtId = 'lightning' | 'scarab'
 
 export interface CardArt {
+  /** Card background gradient, ordered [top-left, bottom-right]. */
   gradient: [string, string]
   image: CardArtId
+  /** Icon fill gradient, ordered [top, bottom]. */
   fillGradient?: [string, string]
   borderColor?: string
   borderWidth?: number
@@ -151,7 +153,7 @@ export const score: PlayableCard = {
   cost: 0,
   tags: ['basic'],
   art: {
-    gradient: ['#093153ff', '#1077d2'],
+    gradient: ['#1077d2', '#093153ff'],
     image: 'scarab',
   },
 }
@@ -185,7 +187,7 @@ export const collectBasic: PlayableCard = {
   cost: 2,
   tags: ['basic'],
   art: {
-    gradient: ['#3d1472', '#ff6ec7'],
+    gradient: ['#ff6ec7', '#3d1472'],
     image: 'scarab',
   },
 }
@@ -195,7 +197,7 @@ export const starterRules: RulesCard = {
   id: 'starter-rules',
   name: 'Starter Rules',
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
@@ -253,7 +255,7 @@ export const dualScore: PlayableCard = {
   cost: 4,
   tags: ['basic'],
   art: {
-    gradient: ['#1e3c72', '#2a5298'],
+    gradient: ['#2a5298', '#1e3c72'],
     image: 'lightning',
   },
 }
@@ -286,7 +288,7 @@ export const saveReward: PlayableCard = {
   cost: 4,
   tags: ['basic'],
   art: {
-    gradient: ['#355c7d', '#6c5b7b'],
+    gradient: ['#6c5b7b', '#355c7d'],
     image: 'scarab',
   },
 }
@@ -314,7 +316,7 @@ export const zeroReward: PlayableCard = {
   cost: 4,
   tags: ['basic'],
   art: {
-    gradient: ['#42275a', '#734b6d'],
+    gradient: ['#734b6d', '#42275a'],
     image: 'scarab',
   },
 }
@@ -342,7 +344,7 @@ export const pointReset: PlayableCard = {
   cost: 6,
   tags: ['basic'],
   art: {
-    gradient: ['#134e5e', '#71b280'],
+    gradient: ['#71b280', '#134e5e'],
     image: 'scarab',
   },
 }
@@ -370,7 +372,7 @@ export const pointMultiply: PlayableCard = {
   cost: 0,
   tags: ['basic'],
   art: {
-    gradient: ['#de6262', '#ffb88c'],
+    gradient: ['#ffb88c', '#de6262'],
     image: 'lightning',
   },
 }
@@ -408,7 +410,7 @@ export const scoreSurge: PlayableCard = {
   cost: 10,
   tags: ['basic'],
   art: {
-    gradient: ['#4568dc', '#b06ab3'],
+    gradient: ['#b06ab3', '#4568dc'],
     image: 'lightning',
   },
 }
@@ -440,7 +442,7 @@ export const scoreSynergy: PlayableCard = {
   cost: 10,
   tags: ['basic'],
   art: {
-    gradient: ['#a83279', '#d38312'],
+    gradient: ['#d38312', '#a83279'],
     image: 'scarab',
   },
 }
@@ -476,7 +478,7 @@ export const pointLoan: PlayableCard = {
   cost: 10,
   tags: ['basic'],
   art: {
-    gradient: ['#f7b733', '#fc4a1a'],
+    gradient: ['#fc4a1a', '#f7b733'],
     image: 'scarab',
   },
 }
@@ -496,7 +498,7 @@ export const debt: PlayableCard = {
   cost: 0,
   tags: [],
   art: {
-    gradient: ['#757f9a', '#d7dde8'],
+    gradient: ['#d7dde8', '#757f9a'],
     image: 'scarab',
   },
 }
@@ -520,7 +522,7 @@ export const lastResort: PlayableCard = {
   cost: 12,
   tags: ['basic'],
   art: {
-    gradient: ['#141e30', '#243b55'],
+    gradient: ['#243b55', '#141e30'],
     image: 'lightning',
   },
 }
@@ -536,7 +538,7 @@ export const basicEntity: PlayableCard = {
   cost: 2,
   tags: ['basic', 'entity'],
   art: {
-    gradient: ['#2c5364', '#0f2027'],
+    gradient: ['#0f2027', '#2c5364'],
     image: 'scarab',
   },
 }
@@ -552,7 +554,7 @@ export const targetDummy: PlayableCard = {
   cost: 1,
   tags: ['test', 'entity'],
   art: {
-    gradient: ['#bdc3c7', '#2c3e50'],
+    gradient: ['#2c3e50', '#bdc3c7'],
     image: 'scarab',
   },
 }
@@ -576,7 +578,7 @@ export const striker: PlayableCard = {
   cost: 2,
   tags: ['test', 'entity'],
   art: {
-    gradient: ['#ffffff', '#c8d4dc'],
+    gradient: ['#c8d4dc', '#ffffff'],
     image: 'lightning',
     fillGradient: ['#ff8c00', '#8b0000'],
   },
@@ -607,7 +609,7 @@ export const thornDummy: PlayableCard = {
   cost: 1,
   tags: ['test', 'entity'],
   art: {
-    gradient: ['#ffffff', '#c8d4dc'],
+    gradient: ['#c8d4dc', '#ffffff'],
     image: 'scarab',
     fillGradient: ['#7ba05b', '#355c3a'],
   },
@@ -619,7 +621,7 @@ export const testRules: RulesCard = {
   id: 'test-rules',
   name: 'Test Rules',
   art: {
-    gradient: ['#ff0000', '#00ff00'],
+    gradient: ['#00ff00', '#ff0000'],
     image: 'lightning',
   },
   deckLimits: { size: [0, 100] },
@@ -679,7 +681,7 @@ export const discardTestRules: RulesCard = {
   id: 'discard-test-rules',
   name: 'Discard Test Rules',
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
@@ -730,7 +732,7 @@ export const moveTestRules: RulesCard = {
   id: 'move-test-rules',
   name: 'Move Test Rules',
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'scarab',
   },
   deckLimits: { size: [0, 4] },
@@ -777,7 +779,7 @@ export const choiceTestRules: RulesCard = {
   id: 'choice-test-rules',
   name: 'Choice Test Rules',
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'lightning',
   },
   deckLimits: { size: [0, 4] },
@@ -826,7 +828,7 @@ export const attackTestRules: RulesCard = {
   id: 'attack-test-rules',
   name: 'Attack Test Rules',
   art: {
-    gradient: ['#8b0000', '#2c3e50'],
+    gradient: ['#2c3e50', '#8b0000'],
     image: 'lightning',
   },
   deckLimits: { size: [0, 10] },
@@ -902,7 +904,7 @@ export const doubleChoice: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#ff6b6b', '#feca57'],
+    gradient: ['#feca57', '#ff6b6b'],
     image: 'lightning',
   },
 }
@@ -935,7 +937,7 @@ export const choiceDraw: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#48dbfb', '#0abde3'],
+    gradient: ['#0abde3', '#48dbfb'],
     image: 'scarab',
   },
 }
@@ -967,7 +969,7 @@ export const drawWatcher: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#5f27cd', '#341f97'],
+    gradient: ['#341f97', '#5f27cd'],
     image: 'scarab',
   },
 }
@@ -988,7 +990,7 @@ export const drawBonus: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#10ac84', '#1dd1a1'],
+    gradient: ['#1dd1a1', '#10ac84'],
     image: 'scarab',
   },
 }
@@ -1009,7 +1011,7 @@ export const luckyDraw: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#f5af19', '#f12711'],
+    gradient: ['#f12711', '#f5af19'],
     image: 'lightning',
   },
 }
@@ -1037,7 +1039,7 @@ export const pointDraw: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#667eea', '#764ba2'],
+    gradient: ['#764ba2', '#667eea'],
     image: 'lightning',
   },
 }
@@ -1058,7 +1060,7 @@ export const drawBonusPlus: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#11998e', '#38ef7d'],
+    gradient: ['#38ef7d', '#11998e'],
     image: 'scarab',
   },
 }
@@ -1081,7 +1083,7 @@ export const handBoardDiscard: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'scarab',
   },
 }
@@ -1101,7 +1103,7 @@ export const handToBoard: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'scarab',
   },
 }
@@ -1162,7 +1164,7 @@ export const choiceAddChoice: PlayableCard = {
   cost: 0,
   tags: ['test'],
   art: {
-    gradient: ['#4b4b4b', '#9e9e9e'],
+    gradient: ['#9e9e9e', '#4b4b4b'],
     image: 'lightning',
   },
 }

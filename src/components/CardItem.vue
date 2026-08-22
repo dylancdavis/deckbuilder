@@ -31,7 +31,7 @@ function isPlayableCard(card: Card): card is PlayableCard {
   return card.type === 'playable'
 }
 
-const defaultGradient: [string, string] = ['#093153ff', '#1077d2']
+const defaultGradient: [string, string] = ['#1077d2', '#093153ff']
 const defaultImage: CardArtId = 'scarab'
 
 const cardImages: Record<CardArtId, Component> = {
