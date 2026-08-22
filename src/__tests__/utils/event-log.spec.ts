@@ -13,7 +13,7 @@ describe('describeEvent', () => {
 
   it('describes card-play', () => {
     const event: Event = { ...base, type: 'card-play', cardId: 'striker', instanceId: 'i1' }
-    expect(describeEvent(event)).toBe('Played Striker')
+    expect(describeEvent(event)).toBe('Played Score Striker')
   })
 
   it('describes card-discard with a readable location', () => {
@@ -49,7 +49,7 @@ describe('describeEvent', () => {
       targetInstanceId: 'i2',
       amount: 2,
     }
-    expect(describeEvent(event)).toBe('Striker attacked Target Dummy for 2')
+    expect(describeEvent(event)).toBe('Score Striker attacked Target Dummy for 2')
   })
 
   it('describes card-damage with old and new defense', () => {
@@ -130,7 +130,7 @@ describe('describeEvent', () => {
         instanceId: 'i1',
         abilityIndex: 0,
       }),
-    ).toBe('Activated Striker')
+    ).toBe('Activated Score Striker')
   })
 })
 
@@ -167,7 +167,7 @@ describe('buildLogRows', () => {
 
     expect(buildLogRows(events).map((r) => [r.text, r.count])).toEqual([
       ['Drew Score', 3],
-      ['Drew Striker', 1],
+      ['Drew Score Striker', 1],
       ['Drew Score', 1],
     ])
   })

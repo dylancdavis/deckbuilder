@@ -564,7 +564,7 @@ export const targetDummy: PlayableCard = {
 export const striker: PlayableCard = {
   type: 'playable',
   id: 'striker',
-  name: 'Striker',
+  name: 'Score Striker',
   description: 'When this card attacks, gain 1 point.',
   attack: 2,
   defense: 3,
