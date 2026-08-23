@@ -80,7 +80,13 @@ export const coreGameFlowAbilities: Ability[] = [
   },
 ]
 
-export type CardArtId = 'crossed-swords' | 'lightning' | 'scarab' | 'spikes' | 'split-arrows'
+export type CardArtId =
+  | 'card-draw'
+  | 'crossed-swords'
+  | 'lightning'
+  | 'scarab'
+  | 'spikes'
+  | 'split-arrows'
 
 export interface CardArt {
   /** Card background gradient, ordered [top-left, bottom-right]. */

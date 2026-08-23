@@ -46,3 +46,4 @@ Card icons from [game-icons.net](https://game-icons.net/), licensed under
 - [Spikes](https://game-icons.net/1x1/sbed/spikes.html) by sbed
 - [Crossed swords](https://game-icons.net/1x1/lorc/crossed-swords.html) by Lorc
 - [Split arrows](https://game-icons.net/1x1/delapouite/split-arrows.html) by Delapouite
+- [Card draw](https://game-icons.net/1x1/faithtoken/card-draw.html) by Faithtoken
