@@ -80,7 +80,7 @@ export const coreGameFlowAbilities: Ability[] = [
   },
 ]
 
-export type CardArtId = 'lightning' | 'scarab' | 'spikes'
+export type CardArtId = 'crossed-swords' | 'lightning' | 'scarab' | 'spikes'
 
 export interface CardArt {
   /** Card background gradient, ordered [top-left, bottom-right]. */
@@ -585,6 +585,25 @@ export const striker: PlayableCard = {
     // 3.3 rather than Thorn Dummy's 2.5: the lightning viewBox packs 177.8 user
     // units into the same box the scarab fills with 134, so its unit renders smaller.
     borderWidth: 3.3,
+  },
+}
+
+export const basicStriker: PlayableCard = {
+  type: 'playable',
+  id: 'basic-striker',
+  name: 'Basic Striker',
+  description: 'A plain attacker.',
+  attack: 1,
+  defense: 3,
+  abilities: [],
+  cost: 1,
+  tags: ['basic', 'entity'],
+  art: {
+    gradient: ['#c8d4dc', '#ffffff'],
+    image: 'crossed-swords',
+    fillGradient: ['#e8eef2', '#8fa3b0'],
+    borderColor: '#556671',
+    borderWidth: 2.5,
   },
 }
 
@@ -1203,6 +1222,7 @@ export const playableCards = {
   'target-dummy': targetDummy,
   striker: striker,
   'thorn-dummy': thornDummy,
+  'basic-striker': basicStriker,
 } as const
 
 export const cards = { ...rulesCards, ...playableCards }

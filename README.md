@@ -44,3 +44,4 @@ Card icons from [game-icons.net](https://game-icons.net/), licensed under
 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 
 - [Spikes](https://game-icons.net/1x1/sbed/spikes.html) by sbed
+- [Crossed swords](https://game-icons.net/1x1/lorc/crossed-swords.html) by Lorc

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { Component } from 'vue'
+import CrossedSwordsSvg from './CrossedSwordsSvg.vue'
 import LightningSvg from './LightningSvg.vue'
 import ScarabSvg from './ScarabSvg.vue'
 import SpikesSvg from './SpikesSvg.vue'
@@ -36,6 +37,7 @@ const defaultGradient: [string, string] = ['#1077d2', '#093153ff']
 const defaultImage: CardArtId = 'scarab'
 
 const cardImages: Record<CardArtId, Component> = {
+  'crossed-swords': CrossedSwordsSvg,
   lightning: LightningSvg,
   scarab: ScarabSvg,
   spikes: SpikesSvg,
