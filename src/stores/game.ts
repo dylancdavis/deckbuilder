@@ -45,6 +45,7 @@ const initialCollectionCards: Counter<CardID> = {
   'attack-test-rules': 1,
   striker: 4,
   'thorn-dummy': 4,
+  'basic-striker': 4,
 }
 
 export const useGameStore = defineStore('game', () => {
