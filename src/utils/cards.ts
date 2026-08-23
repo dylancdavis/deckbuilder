@@ -599,7 +599,7 @@ export const basicStriker: PlayableCard = {
   cost: 1,
   tags: ['basic', 'entity'],
   art: {
-    gradient: ['#c8d4dc', '#ffffff'],
+    gradient: ['#ba211c', '#e95c20'],
     image: 'crossed-swords',
     fillGradient: ['#e8eef2', '#8fa3b0'],
     borderColor: '#556671',
