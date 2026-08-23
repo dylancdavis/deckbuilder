@@ -602,8 +602,6 @@ export const basicStriker: PlayableCard = {
     gradient: ['#ba211c', '#e95c20'],
     image: 'crossed-swords',
     fillGradient: ['#e8eef2', '#8fa3b0'],
-    borderColor: '#556671',
-    borderWidth: 2.5,
   },
 }
 
