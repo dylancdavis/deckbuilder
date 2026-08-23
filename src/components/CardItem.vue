@@ -4,6 +4,7 @@ import type { Component } from 'vue'
 import CrossedSwordsSvg from './CrossedSwordsSvg.vue'
 import LightningSvg from './LightningSvg.vue'
 import ScarabSvg from './ScarabSvg.vue'
+import SplitArrowsSvg from './SplitArrowsSvg.vue'
 import SpikesSvg from './SpikesSvg.vue'
 import type { Card, CardArtId, PlayableCard, RulesCard } from '@/utils/cards'
 import { useTilt, type TiltOptions } from '@/composables/useTilt'
@@ -40,6 +41,7 @@ const cardImages: Record<CardArtId, Component> = {
   'crossed-swords': CrossedSwordsSvg,
   lightning: LightningSvg,
   scarab: ScarabSvg,
+  'split-arrows': SplitArrowsSvg,
   spikes: SpikesSvg,
 }
 

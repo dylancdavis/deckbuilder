@@ -80,7 +80,7 @@ export const coreGameFlowAbilities: Ability[] = [
   },
 ]
 
-export type CardArtId = 'crossed-swords' | 'lightning' | 'scarab' | 'spikes'
+export type CardArtId = 'crossed-swords' | 'lightning' | 'scarab' | 'spikes' | 'split-arrows'
 
 export interface CardArt {
   /** Card background gradient, ordered [top-left, bottom-right]. */
@@ -928,7 +928,7 @@ export const doubleChoice: PlayableCard = {
   tags: ['test'],
   art: {
     gradient: ['#feca57', '#ff6b6b'],
-    image: 'lightning',
+    image: 'split-arrows',
   },
 }
 
@@ -961,7 +961,7 @@ export const choiceDraw: PlayableCard = {
   tags: ['test'],
   art: {
     gradient: ['#0abde3', '#48dbfb'],
-    image: 'scarab',
+    image: 'split-arrows',
   },
 }
 
@@ -1188,7 +1188,7 @@ export const choiceAddChoice: PlayableCard = {
   tags: ['test'],
   art: {
     gradient: ['#9e9e9e', '#4b4b4b'],
-    image: 'lightning',
+    image: 'split-arrows',
   },
 }
 
