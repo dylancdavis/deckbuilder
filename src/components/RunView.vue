@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import CardBack from './CardBack.vue'
 import CardCount from './CardCount.vue'
 import FlashValue from './FlashValue.vue'
+import AttackArrow, { type Point } from './AttackArrow.vue'
 import type { CardInstance } from '@/utils/cards'
 import { TILT_PRESETS } from '@/composables/useTilt'
 import { useCardFlip } from '@/composables/useCardFlip'
@@ -121,6 +122,91 @@ function onKeydown(event: KeyboardEvent) {
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
+/**
+ * Endpoints for the targeting arrow, in viewport pixels. Read imperatively from
+ * the DOM rather than derived in a computed: they depend on layout, which Vue
+ * has no way to track, so a computed would happily serve a stale rect.
+ */
+const arrowOrigin = ref<Point | null>(null)
+const arrowTarget = ref<Point | null>(null)
+const arrowRadius = ref(0)
+const hoveredTargetId = ref<string | null>(null)
+
+/** The targeting circle's diameter, as a fraction of the card's width. */
+const CIRCLE_DIAMETER_RATIO = 0.6
+
+/**
+ * Centre of a card's content area, found by the flip id every card carries.
+ * Deliberately measures `.card-content` rather than the whole card: the title
+ * sits above it, so centring on the full box reads as sitting too low.
+ */
+function cardCenter(instanceId: string): Point | null {
+  const card = document.querySelector(`[data-flip-id="${instanceId}"]`)
+  if (!card) return null
+  const rect = (card.querySelector('.card-content') ?? card).getBoundingClientRect()
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+}
+
+/** Circle radius for a card, scaled to its on-screen width. */
+function cardRadius(instanceId: string): number {
+  const card = document.querySelector(`[data-flip-id="${instanceId}"]`)
+  if (!card) return 0
+  return (card.getBoundingClientRect().width * CIRCLE_DIAMETER_RATIO) / 2
+}
+
+function clearArrowTarget() {
+  hoveredTargetId.value = null
+  arrowTarget.value = null
+}
+
+/**
+ * The arrow latches onto the last target pointed at, rather than following
+ * hover exactly. Cards are separated by a gap, so an exact reading would drop
+ * the target every time the cursor crossed between two of them and flash the
+ * arrow off and on. Entering a different target moves it; leaving the board
+ * clears it.
+ *
+ * Pointing at the attacker is the exception, and retracts the arrow: the circle
+ * sits on that card, so a latched target would draw the arrow back out of the
+ * very card being pointed at.
+ */
+function onTargetEnter(card: CardInstance) {
+  if (card.instanceId === selectedAttackerId.value) {
+    clearArrowTarget()
+    return
+  }
+  if (!isAttackTarget(card, selectedAttackerId.value)) return
+  hoveredTargetId.value = card.instanceId
+  arrowTarget.value = cardCenter(card.instanceId)
+}
+
+/** Re-reads both endpoints; the boxes move when the window resizes. */
+function refreshArrowPoints() {
+  const attackerId = selectedAttackerId.value
+  arrowOrigin.value = attackerId ? cardCenter(attackerId) : null
+  arrowRadius.value = attackerId ? cardRadius(attackerId) : 0
+  arrowTarget.value = hoveredTargetId.value ? cardCenter(hoveredTargetId.value) : null
+}
+
+watch(selectedAttackerId, async (attackerId) => {
+  hoveredTargetId.value = null
+  arrowTarget.value = null
+
+  if (!attackerId) {
+    arrowOrigin.value = null
+    arrowRadius.value = 0
+    return
+  }
+
+  // Wait for the targeting classes to land so the measured box is the final one
+  await nextTick()
+  arrowOrigin.value = cardCenter(attackerId)
+  arrowRadius.value = cardRadius(attackerId)
+})
+
+onMounted(() => window.addEventListener('resize', refreshArrowPoints))
+onBeforeUnmount(() => window.removeEventListener('resize', refreshArrowPoints))
+
 async function playCard(instanceId: string) {
   // Plays a card from hand: asset→board or non-asset→discard, plus any
   // board→discard moves triggered by its abilities.
@@ -155,7 +241,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
     <div class="panel board-hand">
       <!-- Board Display -->
       <div class="hand-group">
-        <div class="empty-pile">
+        <div class="empty-pile" @mouseleave="clearArrowTarget">
           <div
             v-for="card in run.cards.board"
             :key="card.instanceId || card.name"
@@ -168,6 +254,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             }"
             data-testid="board-card"
             @click.stop="onBoardCardClick(card)"
+            @mouseenter="onTargetEnter(card)"
           >
             <CardItem :card="card" :tilt="TILT_PRESETS.minimal" />
           </div>
@@ -266,6 +353,8 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
         </div>
       </div>
     </div>
+
+    <AttackArrow :origin="arrowOrigin" :target="arrowTarget" :radius="arrowRadius" />
   </div>
 </template>
 
