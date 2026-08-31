@@ -102,7 +102,6 @@ export function resolveChoice(gameState: GameState, chosenCard: CardID): GameSta
       modalView: null,
       cardOptions: [],
       pendingChoice: null,
-      pendingAttack: null,
     },
   }
 

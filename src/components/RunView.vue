@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import CardBack from './CardBack.vue'
@@ -89,10 +89,37 @@ function canAttackWith(card: CardInstance): boolean {
   )
 }
 
-function onBoardCardClick(card: CardInstance) {
-  if (!canAttackWith(card)) return
-  gameStore.startAttack(card.instanceId)
+const selectedAttackerId = ref<string | null>(null)
+
+/** Determines whether the given `attackerId` can attack the given `card`. */
+function isAttackTarget(card: CardInstance, attackerId: string | null): boolean {
+  if (!attackerId) return false
+  return card.defense !== undefined && card.instanceId !== attackerId
 }
+
+async function onBoardCardClick(card: CardInstance) {
+  const attackerInstanceId = selectedAttackerId.value
+
+  // Set clicked card to selected attacker
+  if (!attackerInstanceId) {
+    if (canAttackWith(card)) selectedAttackerId.value = card.instanceId
+    return
+  }
+
+  // Otherwise, try to attack with current selected attacker
+  // Clear regardless of whether it's a valid target
+  selectedAttackerId.value = null
+  if (isAttackTarget(card, attackerInstanceId)) {
+    await animateCardMove(() => gameStore.resolveAttack(attackerInstanceId, card.instanceId))
+  }
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') selectedAttackerId.value = null
+}
+
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 async function playCard(instanceId: string) {
   // Plays a card from hand: asset→board or non-asset→discard, plus any
@@ -106,7 +133,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 </script>
 
 <template>
-  <div v-if="run" class="run-view">
+  <div v-if="run" class="run-view" @click="selectedAttackerId = null">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
       <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" :tilt="TILT_PRESETS.minimal" />
@@ -134,9 +161,13 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             :key="card.instanceId || card.name"
             :data-flip-id="card.instanceId"
             class="board-card-wrapper"
-            :class="{ 'board-card-attacker': canAttackWith(card) }"
+            :class="{
+              'board-card-attacker': !selectedAttackerId && canAttackWith(card),
+              'board-card-selected': card.instanceId === selectedAttackerId,
+              'board-card-target': isAttackTarget(card, selectedAttackerId),
+            }"
             data-testid="board-card"
-            @click="onBoardCardClick(card)"
+            @click.stop="onBoardCardClick(card)"
           >
             <CardItem :card="card" :tilt="TILT_PRESETS.minimal" />
           </div>
@@ -405,5 +436,39 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 .board-card-attacker:hover {
   transform: translateY(-4px);
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+/*
+ * Targeting feedback: red on the armed attacker, blue on each card it may
+ * legally hit. A doubled glow — a tight bright core plus a wider halo — so it
+ * reads clearly stronger than the plain hand-card hover in run.css.
+ *
+ * Glow only, no transform: vanilla-tilt owns the transform on these cards.
+ *
+ * The board lives inside a .hand-group wrapper, so `.hand-group
+ * .card-container:hover` applies here too and ties these on specificity. The
+ * extra .board-card-wrapper class in each compound is what keeps a targeting
+ * state visible while the card is hovered.
+ */
+.board-card-wrapper .card-container {
+  transition: 0.15s box-shadow ease;
+}
+
+.board-card-wrapper.board-card-selected .card-container {
+  box-shadow:
+    0 0 12px rgba(255, 107, 107, 0.95),
+    0 0 30px rgba(255, 107, 107, 0.75),
+    0px 0px 8px rgba(0, 0, 0, 0.7);
+}
+
+.board-card-target {
+  cursor: pointer;
+}
+
+.board-card-wrapper.board-card-target .card-container {
+  box-shadow:
+    0 0 12px rgba(135, 206, 250, 0.95),
+    0 0 30px rgba(135, 206, 250, 0.75),
+    0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 </style>

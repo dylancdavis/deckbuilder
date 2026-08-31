@@ -4,7 +4,6 @@ import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
 import CardChoiceModal from './components/CardChoiceModal.vue'
-import AttackTargetModal from './components/AttackTargetModal.vue'
 import EventLogModal from './components/EventLogModal.vue'
 import type { CardID } from './utils/cards'
 import { resolveChoice } from './utils/ability-processor'
@@ -33,11 +32,6 @@ async function handleSelect(cardId: CardID) {
     gameStore.gameState = resolveChoice(gameStore.gameState, cardId)
   })
 }
-
-async function handleAttackTarget(targetInstanceId: string) {
-  // Resolving an attack can move board cards to the discard pile
-  await animateCardMove(() => gameStore.resolveAttack(targetInstanceId))
-}
 </script>
 
 <template>
@@ -58,12 +52,6 @@ async function handleAttackTarget(targetInstanceId: string) {
     v-if="modalView === 'card-choice'"
     :card-options="gameStore.cardOptions"
     :handle-select="handleSelect"
-  />
-  <AttackTargetModal
-    v-if="modalView === 'attack-target'"
-    :targets="gameStore.attackTargets"
-    :handle-select="handleAttackTarget"
-    :handle-cancel="gameStore.cancelAttack"
   />
   <EventLogModal
     v-if="modalView === 'event-log'"

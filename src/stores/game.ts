@@ -71,7 +71,6 @@ export const useGameStore = defineStore('game', () => {
       modalView: null,
       cardOptions: [],
       pendingChoice: null,
-      pendingAttack: null,
     },
   })
 
@@ -89,12 +88,6 @@ export const useGameStore = defineStore('game', () => {
   })
   const modalView = computed(() => gameState.value.viewData.modalView)
   const cardOptions = computed(() => gameState.value.viewData.cardOptions)
-  const pendingAttack = computed(() => gameState.value.viewData.pendingAttack)
-  const attackTargets = computed(() => {
-    const board = gameState.value.game.run?.cards.board ?? []
-    const attackerId = gameState.value.viewData.pendingAttack?.attackerInstanceId
-    return board.filter((c) => c.defense !== undefined && c.instanceId !== attackerId)
-  })
 
   // Actions
   function selectDeck(key: string | null) {
@@ -170,21 +163,6 @@ export const useGameStore = defineStore('game', () => {
     return newDeckKey
   }
 
-  function startAttack(attackerInstanceId: string) {
-    const run = gameState.value.game.run
-    if (!run) return
-    const attacker = run.cards.board.find((c) => c.instanceId === attackerInstanceId)
-    if (!attacker || attacker.attack === undefined || attacker.attack <= 0) return
-
-    const hasTarget = run.cards.board.some(
-      (c) => c.defense !== undefined && c.instanceId !== attackerInstanceId,
-    )
-    if (!hasTarget) return
-
-    gameState.value.viewData.modalView = 'attack-target'
-    gameState.value.viewData.pendingAttack = { attackerInstanceId }
-  }
-
   function openEventLog() {
     if (!gameState.value.game.run) return
     gameState.value.viewData.modalView = 'event-log'
@@ -194,30 +172,18 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.viewData.modalView = null
   }
 
-  function cancelAttack() {
-    gameState.value.viewData.modalView = null
-    gameState.value.viewData.pendingAttack = null
-  }
-
-  function resolveAttack(targetInstanceId: string) {
-    const run = gameState.value.game.run
-    const pending = gameState.value.viewData.pendingAttack
-    if (!run || !pending) return
-
-    const clearedState: GameState = {
-      ...gameState.value,
-      viewData: {
-        ...gameState.value.viewData,
-        modalView: null,
-        pendingAttack: null,
-      },
-    }
+  /**
+   * Declares an attack from one board card against another. Target legality is
+   * enforced by the view; this only turns the interaction into an attack effect.
+   */
+  function resolveAttack(attackerInstanceId: string, targetInstanceId: string) {
+    if (!gameState.value.game.run) return
 
     gameState.value = handleEffect(
-      clearedState,
+      gameState.value,
       {
         type: 'attack',
-        params: { instanceId: pending.attackerInstanceId, targetInstanceId },
+        params: { instanceId: attackerInstanceId, targetInstanceId },
       },
       { kind: 'player' },
     )
@@ -259,8 +225,6 @@ export const useGameStore = defineStore('game', () => {
     selectedDeckKey,
     modalView,
     cardOptions,
-    pendingAttack,
-    attackTargets,
     selectDeck,
     startRun,
     tryPlayCard,
@@ -271,8 +235,6 @@ export const useGameStore = defineStore('game', () => {
     removeCardFromDeck,
     setDeckRulesCard,
     clearDeckRulesCard,
-    startAttack,
-    cancelAttack,
     resolveAttack,
     openEventLog,
     closeEventLog,

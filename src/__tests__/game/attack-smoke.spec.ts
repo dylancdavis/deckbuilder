@@ -31,9 +31,7 @@ describe('attack test deck smoke test', () => {
   }
 
   function attack(store: ReturnType<typeof useGameStore>, attackerId: string, targetId: string) {
-    store.startAttack(attackerId)
-    expect(store.modalView).toBe('attack-target')
-    store.resolveAttack(targetId)
+    store.resolveAttack(attackerId, targetId)
   }
 
   it('resolves an attack with on-attack and retaliation triggers', () => {

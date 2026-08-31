@@ -19,10 +19,6 @@ export type PendingChoice = {
   remainingStack: EffectStackItem[]
 }
 
-export type PendingAttack = {
-  attackerInstanceId: string
-}
-
 export type GameState = {
   game: {
     collection: Collection
@@ -35,10 +31,9 @@ export type GameState = {
     }
   }
   viewData: {
-    modalView: 'card-choice' | 'attack-target' | 'event-log' | null
+    modalView: 'card-choice' | 'event-log' | null
     cardOptions: CardID[]
     pendingChoice: PendingChoice | null
-    pendingAttack: PendingAttack | null
   }
 }
 
