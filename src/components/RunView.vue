@@ -430,11 +430,10 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 
 .board-card-attacker {
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: filter 0.15s ease;
 }
 
 .board-card-attacker:hover {
-  transform: translateY(-4px);
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
 }
 
