@@ -1,17 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { handleEffect } from '../../../utils/ability-processor'
+import { handleCommand } from '../../../utils/ability-processor'
 import { score, dualScore } from '../../../utils/cards'
-import { createTestGameState } from '../effects/shared'
+import { createTestGameState } from '../commands/shared'
 import { Resource } from '../../../utils/resource'
 import type { GameState } from '../../../utils/game'
-import type { PlayCardEffect } from '../../../utils/effects'
+import type { PlayCardCommand } from '../../../utils/commands'
 
 function playCard(gameState: GameState, instanceId: string): GameState {
-  const effect: PlayCardEffect = { type: 'play-card', params: { instanceId } }
-  return handleEffect(gameState, effect, { kind: 'player' })
+  const command: PlayCardCommand = { type: 'play-card', params: { instanceId } }
+  return handleCommand(gameState, command, { kind: 'player' })
 }
 
-describe('play-card effect', () => {
+describe('play-card command', () => {
   it('plays a card by instance ID', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const card2 = { ...score, instanceId: 'card-2' }
@@ -48,7 +48,7 @@ describe('play-card effect', () => {
     )
   })
 
-  it('applies card effects after moving to discard', () => {
+  it('applies card commands after moving to discard', () => {
     const card1 = { ...score, instanceId: 'card-1' }
     const gameState = createTestGameState({
       cards: {
@@ -95,7 +95,7 @@ describe('play-card effect', () => {
       cardId: 'score',
       instanceId: 'card-1',
     })
-    // The score card's effect triggers a resource-change event
+    // The score card's command triggers a resource-change event
     expect(result.game.run!.events[1]).toEqual({
       type: 'resource-change',
       round: 2,
@@ -169,7 +169,7 @@ describe('play-card effect', () => {
     expect(result.game.run!.cards.discardPile[1].instanceId).toBe('card-1')
   })
 
-  it("transforms 'self' in remove-card effect to card's instanceId", () => {
+  it("transforms 'self' in remove-card command to card's instanceId", () => {
     const cardWithSelfRemoval = {
       ...score,
       instanceId: 'card-1',
@@ -177,7 +177,7 @@ describe('play-card effect', () => {
         {
           type: 'reactive' as const,
           trigger: { on: 'card-play' as const, target: 'self' as const },
-          effects: [
+          commands: [
             { type: 'update-resource' as const, params: { resource: Resource.POINTS, delta: 1 } },
             { type: 'remove-card' as const, params: { instanceId: 'self' as const } },
           ],
@@ -198,7 +198,7 @@ describe('play-card effect', () => {
 
     const result = playCard(gameState, 'card-1')
 
-    // Effect should have been applied
+    // Command should have been applied
     expect(result.game.run!.resources.points).toBe(1)
     // Card should not be in discard pile (removed instead)
     expect(result.game.run!.cards.discardPile).toHaveLength(0)

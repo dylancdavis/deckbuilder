@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { MoveCardEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { MoveCardCommand } from '../../../utils/commands'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-describe('MoveCardEffect', () => {
+describe('MoveCardCommand', () => {
   describe('single instanceId variant', () => {
     it('moves a specific card by instanceId to target location', () => {
       const gameState = createTestGameState({
@@ -15,12 +15,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['a'], to: 'discardPile' },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.hand).toHaveLength(0)
       expect(result.game.game.run!.cards.board).toHaveLength(1)
@@ -36,12 +36,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['a'], to: 'board' },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.event).toMatchObject({
         type: 'card-move',
@@ -60,12 +60,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['nonexistent'], to: 'board' },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.board).toHaveLength(0)
       expect(result.event).toBeNull()
@@ -82,12 +82,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { from: 'drawPile', amount: 2, to: 'hand' },
-      } as MoveCardEffect
+      } as MoveCardCommand
 
-      expect(() => applyEffect(gameState, effect)).toThrow('must be decomposed')
+      expect(() => applyCommand(gameState, command)).toThrow('must be decomposed')
     })
 
     it('throws for non-decomposed multi-instanceId variant', () => {
@@ -102,12 +102,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['a', 'b'], to: 'board' },
       }
 
-      expect(() => applyEffect(gameState, effect)).toThrow('must be decomposed')
+      expect(() => applyCommand(gameState, command)).toThrow('must be decomposed')
     })
   })
 
@@ -121,12 +121,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['new'], to: 'board' },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.board).toHaveLength(2)
       expect(result.game.game.run!.cards.board[0].instanceId).toBe('existing')
@@ -142,12 +142,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['new'], to: 'board', position: 'top' },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.board).toHaveLength(2)
       expect(result.game.game.run!.cards.board[0].instanceId).toBe('new')
@@ -163,12 +163,12 @@ describe('MoveCardEffect', () => {
           discardPile: [],
         },
       })
-      const effect: MoveCardEffect = {
+      const command: MoveCardCommand = {
         type: 'move-card',
         params: { instanceIds: ['new'], to: 'board', position: 'shuffle' },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.board).toHaveLength(2)
       const ids = result.game.game.run!.cards.board.map((c) => c.instanceId)
@@ -186,12 +186,12 @@ describe('MoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: MoveCardEffect = {
+    const command: MoveCardCommand = {
       type: 'move-card',
       params: { instanceIds: ['a'], to: 'board' },
     }
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.run!.cards.hand).toHaveLength(1)
     expect(gameState.game.run!.cards.board).toHaveLength(0)

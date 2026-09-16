@@ -3,7 +3,7 @@ import type { GameState } from '../../../utils/game'
 import { starterRules } from '../../../utils/cards'
 
 /**
- * Helper to create a minimal run for testing effects
+ * Helper to create a minimal run for testing commands
  */
 export const createTestRun = (overrides: Partial<Run> = {}): Run => ({
   deck: {
@@ -30,7 +30,7 @@ export const createTestRun = (overrides: Partial<Run> = {}): Run => ({
 })
 
 /**
- * Helper to create a minimal game state for testing effects
+ * Helper to create a minimal game state for testing commands
  */
 export const createTestGameState = (runOverrides: Partial<Run> = {}): GameState => ({
   game: {

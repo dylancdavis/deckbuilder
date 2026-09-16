@@ -1,30 +1,30 @@
-import type { Effect, EffectType } from './effects'
+import type { Command, CommandType } from './commands'
 import type { Event, EventType } from './event'
 import type { CardInstance, RulesCard } from './cards'
 import type { Run, Location } from './run'
 import type { Resource } from './resource'
 import type { TargetSpec } from './card-matchers'
-import type { EffectContext } from './ability-processor'
+import type { CommandContext } from './ability-processor'
 
 export type Ability = ReactiveAbility | InterruptAbility
 
-/** Reacts to events, produces an effect list */
+/** Reacts to events, produces a command list */
 export type ReactiveAbility = {
   type: 'reactive'
   trigger: EventTrigger
-  effects: Effect[] | ((context: TriggerContext) => Effect[])
+  commands: Command[] | ((context: TriggerContext) => Command[])
   /** Where this ability resolves relative to card abilities answering the same event. */
   order?: RulesOrder
 }
 
 export type RulesOrder = 'before-cards' | 'after-cards'
 
-/** Intercepts an effect before it applies, producing substitute effects */
+/** Intercepts a command before it applies, producing substitute commands */
 export type InterruptAbility = {
   type: 'interrupt'
-  trigger: EffectTrigger
-  /** Substitutes for the intercepted effect. An empty list prevents it entirely. */
-  effects: Effect[] | ((context: InterruptContext) => Effect[])
+  trigger: CommandTrigger
+  /** Substitutes for the intercepted command. An empty list prevents it entirely. */
+  commands: Command[] | ((context: InterruptContext) => Command[])
 }
 
 /** Describes the event that triggers this ability, plus additional conditionals. */
@@ -43,10 +43,10 @@ export type EventTrigger = {
   }
 }
 
-/** Describes the atomic effect that triggers this ability, plus additional conditionals. */
-export type EffectTrigger = {
-  on: EffectType
-  /** Matched against the card the effect is about to act on, when it targets one */
+/** Describes the atomic command that triggers this ability, plus additional conditionals. */
+export type CommandTrigger = {
+  on: CommandType
+  /** Matched against the card the command is about to act on, when it targets one */
   target?: TargetSpec
   /** List of locations for which the card containing the ability can trigger it from. If omitted, implies all locations */
   locations?: Location[]
@@ -64,13 +64,13 @@ export type TriggerContext = {
 }
 
 export type InterruptContext = {
-  /** The atomic effect about to resolve */
-  effect: Effect
-  /** Who produced the effect — a player action, or an ability and its source card */
-  effectContext: EffectContext
+  /** The atomic command about to resolve */
+  command: Command
+  /** Who produced the command — a player action, or an ability and its source card */
+  commandContext: CommandContext
   /** Card with the interrupt ability */
   sourceCard: CardInstance | RulesCard
-  /** If applicable, the card the effect is about to act on */
+  /** If applicable, the card the command is about to act on */
   targetCard?: CardInstance
   run: Run
 }

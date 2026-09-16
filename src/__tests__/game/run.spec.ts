@@ -9,7 +9,7 @@ import {
   type PlayableCardID,
 } from '../../utils/cards.ts'
 import type { GameState } from '../../utils/game.ts'
-import { handleEffect } from '../../utils/ability-processor.ts'
+import { handleCommand } from '../../utils/ability-processor.ts'
 
 const wrapInGameState = (run: Run): GameState => ({
   game: {
@@ -35,19 +35,19 @@ const baseRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 1 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -67,7 +67,7 @@ const rulesWithAddedCards: RulesCard = {
     {
       type: 'reactive',
       trigger: { on: 'run-start' },
-      effects: [
+      commands: [
         {
           type: 'add-cards',
           params: { location: 'drawPile', cards: { score: 3 }, mode: 'shuffle' },
@@ -78,19 +78,19 @@ const rulesWithAddedCards: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 1 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -218,7 +218,7 @@ const populatedHandRunNoAdded: Run = {
 describe('run-start event', () => {
   it("doesn't modify cards in draw-pile when no run-start add-cards ability", () => {
     const gameState = wrapInGameState(populatedHandRunNoAdded)
-    const result = handleEffect(gameState, { type: 'run-start', params: {} }, { kind: 'player' })
+    const result = handleCommand(gameState, { type: 'run-start', params: {} }, { kind: 'player' })
     const allCards = [
       ...result.game.run!.cards.drawPile,
       ...result.game.run!.cards.hand,
@@ -230,7 +230,7 @@ describe('run-start event', () => {
 
   it('adds cards to draw-pile from rules card run-start ability', () => {
     const gameState = wrapInGameState(populatedHandRun)
-    const result = handleEffect(gameState, { type: 'run-start', params: {} }, { kind: 'player' })
+    const result = handleCommand(gameState, { type: 'run-start', params: {} }, { kind: 'player' })
     const allCards = [
       ...result.game.run!.cards.drawPile,
       ...result.game.run!.cards.hand,

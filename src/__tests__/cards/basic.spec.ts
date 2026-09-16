@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest'
 import type { GameState } from '../../utils/game'
-import { handleEffect } from '../../utils/ability-processor'
+import { handleCommand } from '../../utils/ability-processor'
 import {
   score,
   dualScore,
@@ -15,10 +15,10 @@ import {
   zeroReward,
   pointMultiply,
 } from '../../utils/cards'
-import { createTestGameState } from '../utils/effects/shared'
+import { createTestGameState } from '../utils/commands/shared'
 
 function playCard(gameState: GameState, instanceId: string): GameState {
-  return handleEffect(gameState, { type: 'play-card', params: { instanceId } }, { kind: 'player' })
+  return handleCommand(gameState, { type: 'play-card', params: { instanceId } }, { kind: 'player' })
 }
 
 it('score gains 1 point', () => {
@@ -211,7 +211,7 @@ it('debt loses 6 points when drawn', () => {
     resources: { points: 10 },
   })
 
-  const result = handleEffect(
+  const result = handleCommand(
     gameState,
     { type: 'draw-cards', params: { amount: 1 } },
     { kind: 'player' },

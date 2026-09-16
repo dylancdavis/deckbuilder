@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { RefreshDeckEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { RefreshDeckCommand } from '../../../utils/commands'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-const effect: RefreshDeckEffect = {
+const command: RefreshDeckCommand = {
   type: 'refresh-deck',
   params: {},
 }
 
-describe('RefreshDeckEffect', () => {
+describe('RefreshDeckCommand', () => {
   it('moves hand, board, and discardPile into drawPile', () => {
     const gameState = createTestGameState({
       cards: {
@@ -20,7 +20,7 @@ describe('RefreshDeckEffect', () => {
       },
     })
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(3)
     expect(result.game.game.run!.cards.hand).toHaveLength(0)
@@ -38,7 +38,7 @@ describe('RefreshDeckEffect', () => {
       },
     })
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
     const ids = result.game.game.run!.cards.drawPile.map((c) => c.instanceId)
@@ -56,7 +56,7 @@ describe('RefreshDeckEffect', () => {
       },
     })
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.event).not.toBeNull()
     expect(result.event).toMatchObject({ type: 'deck-refresh' })
@@ -72,7 +72,7 @@ describe('RefreshDeckEffect', () => {
       },
     })
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.run!.cards.hand).toHaveLength(1)
     expect(gameState.game.run!.cards.board).toHaveLength(1)

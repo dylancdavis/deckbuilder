@@ -311,7 +311,7 @@ describe('starter deck run', () => {
     })
   })
 
-  describe('discard effects', () => {
+  describe('discard commands', () => {
     async function startDiscardTestRun() {
       renderApp()
       await fireEvent.click(screen.getByText('Discard Test Deck'))
@@ -338,7 +338,7 @@ describe('starter deck run', () => {
     })
   })
 
-  describe('move effects', () => {
+  describe('move commands', () => {
     async function startMoveTestRun() {
       renderApp()
       await fireEvent.click(screen.getByText('Move Test Deck'))

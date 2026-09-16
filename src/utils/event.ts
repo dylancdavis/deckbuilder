@@ -1,7 +1,7 @@
 import type { PlayableCardID, CardID } from './cards'
 import type { Location } from './run'
 import type { Resource } from './resource'
-import type { Effect } from './effects'
+import type { Command } from './commands'
 
 type BaseEvent = {
   round: number
@@ -128,19 +128,19 @@ export type CardAttackEvent = BaseEvent & {
   amount: number
 }
 
-// An interrupt substituting new effects for an atomic effect, emitted before the
-// substitutes resolve. `instanceId`/`cardId` describe the card the original effect
+// An interrupt substituting new commands for an atomic command, emitted before the
+// substitutes resolve. `instanceId`/`cardId` describe the card the original command
 // was about to act on, when it targets one, so `target: 'self'` in a trigger means
-// "when an effect on this card is replaced".
-export type EffectReplaceEvent = BaseEvent & {
-  type: 'effect-replace'
+// "when a command on this card is replaced".
+export type CommandReplaceEvent = BaseEvent & {
+  type: 'command-replace'
   /** Card whose interrupt ability fired */
   sourceCardId: CardID
   cardId?: PlayableCardID
   instanceId?: string
-  originalEffect: Effect
-  /** The substitute effects. Empty means the original effect was prevented. */
-  newEffects: Effect[]
+  originalCommand: Command
+  /** The substitute commands. Empty means the original command was prevented. */
+  newCommands: Command[]
 }
 
 // Union Type
@@ -164,7 +164,7 @@ export type Event =
   | RunEndEvent
   | DeckRefreshEvent
   | ResourceChangeEvent
-  | EffectReplaceEvent
+  | CommandReplaceEvent
 
 /**
  * The type string of an event, used in triggers to specify which event activates an ability.

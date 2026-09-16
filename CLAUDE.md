@@ -57,13 +57,13 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 
 **Card System**: Two main card types defined in `src/utils/cards.ts`:
 
-- `PlayableCard` - Cards that can be played in runs (have cost, effects, description)
+- `PlayableCard` - Cards that can be played in runs (have cost, commands, description)
 - `RulesCard` - Cards that define game rules (deck limits, turn structure, end conditions)
 
-**Ability System**: Cards hold abilities (`src/utils/ability.ts`), processed by the effect pipeline in `src/utils/ability-processor.ts` (decompose → interrupt → apply → cascade):
+**Ability System**: Cards hold abilities (`src/utils/ability.ts`), processed by the command pipeline in `src/utils/ability-processor.ts` (decompose → interrupt → apply → cascade):
 
-- `ReactiveAbility` (`type: 'reactive'`) - Triggers on an event after its state change has applied, producing an effect list
-- `InterruptAbility` (`type: 'interrupt'`) - Intercepts an atomic effect before it applies and substitutes its own effects (an empty list prevents the effect), emitting an `effect-replace` event
+- `ReactiveAbility` (`type: 'reactive'`) - Triggers on an event after its state change has applied, producing a command list
+- `InterruptAbility` (`type: 'interrupt'`) - Intercepts an atomic command before it applies and substitutes its own commands (an empty list prevents the command), emitting an `command-replace` event
 
 **Ability Resolution**: Every event is answered by matching reactive abilities in three phases
 (`findMatchingAbilities`):
@@ -73,7 +73,7 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 3. Rules abilities tagged `order: 'after-cards'` — settlement, such as end-of-turn discarding
 
 `coreGameFlowAbilities` is entirely `after-cards`: the game only advances the turn, ends the
-round, or applies attack damage once every card has reacted. Effects resolve depth-first, so
+round, or applies attack damage once every card has reacted. Commands resolve depth-first, so
 an ability's whole cascade completes before the next matching ability runs. Interrupts are not
 phased — `findMatchingInterrupt` returns the first match by precedence, not a sequence.
 

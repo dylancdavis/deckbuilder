@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { AddCardsEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { AddCardsCommand } from '../../../utils/commands'
 import { dualScore } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-describe('AddCardsEffect', () => {
+describe('AddCardsCommand', () => {
   it('adds single card to drawPile', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'drawPile',
@@ -16,7 +16,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(1)
     expect(result.game.game.run!.cards.drawPile[0].id).toBe('score')
@@ -25,7 +25,7 @@ describe('AddCardsEffect', () => {
 
   it('adds card to hand location', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'hand',
@@ -34,7 +34,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.game.run!.cards.hand[0].id).toBe('dual-score')
@@ -42,7 +42,7 @@ describe('AddCardsEffect', () => {
 
   it('adds card to board location', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'board',
@@ -51,14 +51,14 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.board).toHaveLength(1)
   })
 
   it('adds card to discardPile location', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'discardPile',
@@ -67,7 +67,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.discardPile).toHaveLength(1)
   })
@@ -81,7 +81,7 @@ describe('AddCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'drawPile',
@@ -90,7 +90,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
     expect(result.game.game.run!.cards.drawPile[0].instanceId).toBe('foobar')
@@ -106,7 +106,7 @@ describe('AddCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'drawPile',
@@ -115,7 +115,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
     expect(result.game.game.run!.cards.drawPile[0].id).toBe('score')
@@ -124,7 +124,7 @@ describe('AddCardsEffect', () => {
 
   it('assigns unique instanceId to added card', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'drawPile',
@@ -133,7 +133,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     const instanceId = result.game.game.run!.cards.drawPile[0].instanceId
     expect(instanceId).toBeDefined()
@@ -143,7 +143,7 @@ describe('AddCardsEffect', () => {
 
   it('emits card-add event', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'drawPile',
@@ -152,7 +152,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.event).toMatchObject({
       type: 'card-add',
@@ -163,7 +163,7 @@ describe('AddCardsEffect', () => {
 
   it('does not mutate original game state', () => {
     const gameState = createTestGameState()
-    const effect: AddCardsEffect = {
+    const command: AddCardsCommand = {
       type: 'add-cards',
       params: {
         location: 'drawPile',
@@ -172,7 +172,7 @@ describe('AddCardsEffect', () => {
       },
     }
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.run!.cards.drawPile).toHaveLength(0) // Original unchanged
   })

@@ -3,7 +3,7 @@ import {
   matchesTrigger,
   findMatchingAbilities,
   canActivate,
-  handleEffect,
+  handleCommand,
   resolveChoice,
 } from '../../utils/ability-processor'
 import type { Ability, EventTrigger } from '../../utils/ability'
@@ -15,9 +15,9 @@ import type {
   CardActivateEvent,
 } from '../../utils/event'
 import { Resource } from '../../utils/resource'
-import { createTestRun, createTestGameState } from './effects/shared'
+import { createTestRun, createTestGameState } from './commands/shared'
 
-const ADD_POINT_EFFECT = {
+const ADD_POINT_COMMAND = {
   type: 'update-resource' as const,
   params: { resource: Resource.POINTS, delta: 1 },
 }
@@ -507,7 +507,7 @@ describe('findMatchingAbilities', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
     const event = createCardPlayEvent('card-1')
@@ -526,12 +526,12 @@ describe('findMatchingAbilities', () => {
     const ability1: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const ability2: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability1, ability2] })
     const event = createCardPlayEvent('card-1')
@@ -548,12 +548,12 @@ describe('findMatchingAbilities', () => {
     const ability1: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const ability2: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
     const card1 = createCard({ instanceId: 'card-1', abilities: [ability1] })
     const card2 = createCard({ instanceId: 'card-2', abilities: [ability2] })
@@ -571,7 +571,7 @@ describe('findMatchingAbilities', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const handCard = createCard({ instanceId: 'hand-card', abilities: [ability] })
     const boardCard = createCard({ instanceId: 'board-card', abilities: [ability] })
@@ -589,7 +589,7 @@ describe('findMatchingAbilities', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'turn-start', locations: ['board'] }, // Only triggers when on board
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const handCard = createCard({ instanceId: 'hand-card', abilities: [ability] })
     const run = createTestRun({
@@ -606,7 +606,7 @@ describe('findMatchingAbilities', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const handCard = createCard({ instanceId: 'hand-card', abilities: [ability] })
     const boardCard = createCard({ instanceId: 'board-card', abilities: [ability] })
@@ -624,7 +624,7 @@ describe('findMatchingAbilities', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-draw', target: 'self' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
     const event = createCardPlayEvent('card-1')
@@ -638,8 +638,8 @@ describe('findMatchingAbilities', () => {
   })
 })
 
-describe('handleEffect ability cascade', () => {
-  const PLAY_CARD_1: import('../../utils/effects').PlayCardEffect = {
+describe('handleCommand ability cascade', () => {
+  const PLAY_CARD_1: import('../../utils/commands').PlayCardCommand = {
     type: 'play-card',
     params: { instanceId: 'card-1' },
   }
@@ -648,16 +648,16 @@ describe('handleEffect ability cascade', () => {
     const gameState = createTestGameState()
     gameState.game.run = null
 
-    expect(() => handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })).toThrow(
-      'Cannot handle effect with no run',
+    expect(() => handleCommand(gameState, PLAY_CARD_1, { kind: 'player' })).toThrow(
+      'Cannot handle command with no run',
     )
   })
 
-  it('applies update-resource effects from card-play abilities', () => {
+  it('applies update-resource commands from card-play abilities', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 5 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 5 } }],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
     const gameState = createTestGameState({
@@ -665,16 +665,16 @@ describe('handleEffect ability cascade', () => {
       resources: { points: 10 },
     })
 
-    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
+    const result = handleCommand(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(15)
   })
 
-  it('applies multiple effects in order', () => {
+  it('applies multiple commands in order', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         { type: 'update-resource', params: { resource: Resource.POINTS, delta: 5 } },
         { type: 'update-resource', params: { resource: Resource.POINTS, delta: 3 } },
       ],
@@ -685,7 +685,7 @@ describe('handleEffect ability cascade', () => {
       resources: { points: 0 },
     })
 
-    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
+    const result = handleCommand(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(8)
   })
@@ -694,12 +694,12 @@ describe('handleEffect ability cascade', () => {
     const ability1: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const ability2: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'any' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
     const card1 = createCard({ instanceId: 'card-1', abilities: [ability1] })
     const card2 = createCard({ instanceId: 'card-2', abilities: [ability2] })
@@ -708,7 +708,7 @@ describe('handleEffect ability cascade', () => {
       resources: { points: 0 },
     })
 
-    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
+    const result = handleCommand(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(3)
   })
@@ -717,7 +717,7 @@ describe('handleEffect ability cascade', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'card-choice',
           params: {
@@ -735,24 +735,24 @@ describe('handleEffect ability cascade', () => {
       cards: { ...EMPTY_PILES, hand: [card] },
     })
 
-    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
+    const result = handleCommand(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.viewData.modalView).toBe('card-choice')
     expect(result.viewData.pendingChoice).not.toBeNull()
   })
 
-  it('resolves self references in remove-card effects', () => {
+  it('resolves self references in remove-card commands', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [{ type: 'remove-card', params: { instanceId: 'self' } }],
+      commands: [{ type: 'remove-card', params: { instanceId: 'self' } }],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
     const gameState = createTestGameState({
       cards: { ...EMPTY_PILES, hand: [card] },
     })
 
-    const result = handleEffect(gameState, PLAY_CARD_1, { kind: 'player' })
+    const result = handleCommand(gameState, PLAY_CARD_1, { kind: 'player' })
 
     expect(result.game.run!.cards.hand).toHaveLength(0)
     expect(result.game.run!.cards.discardPile).toHaveLength(0)
@@ -764,7 +764,7 @@ describe('handleEffect ability cascade', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'other' },
-      effects: [{ type: 'remove-card', params: { instanceId: 'target' } }],
+      commands: [{ type: 'remove-card', params: { instanceId: 'target' } }],
     }
     const watcher = createCard({ instanceId: 'watcher', abilities: [ability] })
     const played = createCard({ instanceId: 'played', abilities: [] })
@@ -772,7 +772,7 @@ describe('handleEffect ability cascade', () => {
       cards: { ...EMPTY_PILES, hand: [played], board: [watcher] },
     })
 
-    const result = handleEffect(
+    const result = handleCommand(
       gameState,
       { type: 'play-card', params: { instanceId: 'played' } },
       { kind: 'player' },
@@ -789,7 +789,7 @@ describe('isAsset', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'turn-start', locations: ['board'] },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
 
@@ -800,12 +800,12 @@ describe('isAsset', () => {
     const ability1: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const ability2: Ability = {
       type: 'reactive',
       trigger: { on: 'turn-start', locations: ['board'] },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability1, ability2] })
 
@@ -816,7 +816,7 @@ describe('isAsset', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
 
@@ -833,7 +833,7 @@ describe('isAsset', () => {
     const ability: Ability = {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'any', locations: ['hand', 'board'] },
-      effects: [ADD_POINT_EFFECT],
+      commands: [ADD_POINT_COMMAND],
     }
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
 
@@ -847,7 +847,7 @@ describe('double choice card', () => {
     const gameState = createTestGameState({
       cards: { ...EMPTY_PILES, hand: [cardInstance] },
     })
-    return handleEffect(
+    return handleCommand(
       gameState,
       { type: 'play-card', params: { instanceId: 'test-instance-1' } },
       { kind: 'player' },

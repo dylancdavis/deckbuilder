@@ -9,7 +9,7 @@ import type { GameState } from './game.ts'
 import type { Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
 import type { Event } from './event.ts'
-import { handleEffect } from './ability-processor.ts'
+import { handleCommand } from './ability-processor.ts'
 
 export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
@@ -128,5 +128,5 @@ export function initializeRun(gameState: GameState): GameState {
     game: { ...gameState.game, run },
   }
 
-  return handleEffect(stateWithRun, { type: 'run-start', params: {} }, { kind: 'player' })
+  return handleCommand(stateWithRun, { type: 'run-start', params: {} }, { kind: 'player' })
 }

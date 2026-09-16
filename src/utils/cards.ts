@@ -13,7 +13,7 @@ export const coreGameFlowAbilities: Ability[] = [
     type: 'reactive',
     trigger: { on: 'card-attack' },
     order: 'after-cards',
-    effects: ({ event }) => {
+    commands: ({ event }) => {
       if (event.type !== 'card-attack') throw new Error('Expected a card-attack event')
       return [
         { type: 'damage', params: { instanceId: event.targetInstanceId, amount: event.amount } },
@@ -28,14 +28,14 @@ export const coreGameFlowAbilities: Ability[] = [
       when: (ctx) => ctx.event.type === 'card-damage' && ctx.event.newDefense === 0,
     },
     order: 'after-cards',
-    effects: [{ type: 'discard-cards', params: { instanceIds: ['target'] } }],
+    commands: [{ type: 'discard-cards', params: { instanceIds: ['target'] } }],
   },
   // On run-start -> start first round
   {
     type: 'reactive',
     trigger: { on: 'run-start' },
     order: 'after-cards',
-    effects: [{ type: 'round-start', params: {} }],
+    commands: [{ type: 'round-start', params: {} }],
   },
   // On turn-end with cards in draw pile -> start new turn
   {
@@ -45,7 +45,7 @@ export const coreGameFlowAbilities: Ability[] = [
       when: (ctx) => ctx.run.cards.drawPile.length > 0,
     },
     order: 'after-cards',
-    effects: [{ type: 'turn-start', params: {} }],
+    commands: [{ type: 'turn-start', params: {} }],
   },
   // On turn-end with empty draw pile -> end round
   {
@@ -55,28 +55,28 @@ export const coreGameFlowAbilities: Ability[] = [
       when: (ctx) => ctx.run.cards.drawPile.length === 0,
     },
     order: 'after-cards',
-    effects: [{ type: 'round-end', params: {} }],
+    commands: [{ type: 'round-end', params: {} }],
   },
   // On round-end -> refresh deck (reshuffle all cards)
   {
     type: 'reactive',
     trigger: { on: 'round-end' },
     order: 'after-cards',
-    effects: [{ type: 'refresh-deck', params: {} }],
+    commands: [{ type: 'refresh-deck', params: {} }],
   },
   // On round-end (after refresh) -> start new round
   {
     type: 'reactive',
     trigger: { on: 'round-end' },
     order: 'after-cards',
-    effects: [{ type: 'round-start', params: {} }],
+    commands: [{ type: 'round-start', params: {} }],
   },
   // On round-start -> start new turn
   {
     type: 'reactive',
     trigger: { on: 'round-start' },
     order: 'after-cards',
-    effects: [{ type: 'turn-start', params: {} }],
+    commands: [{ type: 'turn-start', params: {} }],
   },
 ]
 
@@ -153,7 +153,7 @@ export const score: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
   ],
   cost: 0,
@@ -173,7 +173,7 @@ export const collectBasic: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'card-choice',
           params: {
@@ -212,7 +212,7 @@ export const starterRules: RulesCard = {
     {
       type: 'reactive',
       trigger: { on: 'run-start' },
-      effects: [
+      commands: [
         {
           type: 'add-cards',
           params: {
@@ -227,19 +227,19 @@ export const starterRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -255,7 +255,7 @@ export const dualScore: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     },
   ],
   cost: 4,
@@ -275,7 +275,7 @@ export const saveReward: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -308,7 +308,7 @@ export const zeroReward: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -336,7 +336,7 @@ export const pointReset: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -364,7 +364,7 @@ export const pointMultiply: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -392,7 +392,7 @@ export const scoreSurge: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -430,7 +430,7 @@ export const scoreSynergy: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -462,7 +462,7 @@ export const pointLoan: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'update-resource',
           params: {
@@ -498,7 +498,7 @@ export const debt: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-draw', target: 'self' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: -6 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: -6 } }],
     },
   ],
   cost: 0,
@@ -518,7 +518,7 @@ export const lastResort: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         { type: 'update-resource', params: { resource: Resource.POINTS, delta: 8 } },
         { type: 'remove-card', params: { instanceId: 'self' } },
         { type: 'destroy-card', params: { cards: { 'last-resort': 1 } } },
@@ -578,7 +578,7 @@ export const striker: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-attack', target: 'self', locations: ['board'] },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
   ],
   cost: 2,
@@ -630,7 +630,7 @@ export const thornDummy: PlayableCard = {
           ctx.event.targetInstanceId === ctx.sourceCard.instanceId,
       },
       // 'target' is the card the event is about — for card-attack, the attacker
-      effects: [{ type: 'damage', params: { instanceId: 'target', amount: 1 } }],
+      commands: [{ type: 'damage', params: { instanceId: 'target', amount: 1 } }],
     },
   ],
   cost: 1,
@@ -659,7 +659,7 @@ export const testRules: RulesCard = {
     {
       type: 'reactive',
       trigger: { on: 'run-start' },
-      effects: [
+      commands: [
         {
           type: 'add-cards',
           params: {
@@ -684,13 +684,13 @@ export const testRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 5 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 5 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
@@ -699,7 +699,7 @@ export const testRules: RulesCard = {
         when: (ctx) => ctx.event.round >= 10,
       },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -719,7 +719,7 @@ export const discardTestRules: RulesCard = {
     {
       type: 'reactive',
       trigger: { on: 'run-start' },
-      effects: [
+      commands: [
         {
           type: 'add-cards',
           params: {
@@ -738,19 +738,19 @@ export const discardTestRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -770,7 +770,7 @@ export const moveTestRules: RulesCard = {
     {
       type: 'reactive',
       trigger: { on: 'run-start' },
-      effects: [
+      commands: [
         {
           type: 'add-cards',
           params: {
@@ -785,19 +785,19 @@ export const moveTestRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -817,7 +817,7 @@ export const choiceTestRules: RulesCard = {
     {
       type: 'reactive',
       trigger: { on: 'run-start' },
-      effects: [
+      commands: [
         {
           type: 'add-cards',
           params: {
@@ -832,19 +832,19 @@ export const choiceTestRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 1 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -867,19 +867,19 @@ export const attackTestRules: RulesCard = {
       type: 'reactive',
       trigger: { on: 'turn-start' },
       order: 'before-cards',
-      effects: [{ type: 'draw-cards', params: { amount: 2 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 2 } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'turn-end' },
       order: 'after-cards',
-      effects: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
+      commands: [{ type: 'discard-cards', params: { from: 'hand', amount: 'all' } }],
     },
     {
       type: 'reactive',
       trigger: { on: 'round-end' },
       order: 'after-cards',
-      effects: [{ type: 'run-end', params: {} }],
+      commands: [{ type: 'run-end', params: {} }],
     },
     ...coreGameFlowAbilities,
   ],
@@ -906,7 +906,7 @@ export const doubleChoice: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'card-choice',
           params: {
@@ -938,7 +938,7 @@ export const doubleChoice: PlayableCard = {
   },
 }
 
-// Test: Card-choice where the effect gains points (simple effect after choice)
+// Test: Card-choice where the command gains points (simple command after choice)
 export const choiceDraw: PlayableCard = {
   type: 'playable',
   id: 'choice-draw',
@@ -948,7 +948,7 @@ export const choiceDraw: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'card-choice',
           params: {
@@ -981,7 +981,7 @@ export const drawWatcher: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
-      effects: [
+      commands: [
         {
           type: 'card-choice',
           params: {
@@ -1013,7 +1013,7 @@ export const drawBonus: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
   ],
   cost: 0,
@@ -1034,7 +1034,7 @@ export const luckyDraw: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-draw', target: 'self' },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 1 } }],
     },
   ],
   cost: 0,
@@ -1062,7 +1062,7 @@ export const pointDraw: PlayableCard = {
           return event.resource === Resource.POINTS && event.delta > 0
         },
       },
-      effects: [{ type: 'draw-cards', params: { amount: 1 } }],
+      commands: [{ type: 'draw-cards', params: { amount: 1 } }],
     },
   ],
   cost: 0,
@@ -1083,7 +1083,7 @@ export const drawBonusPlus: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-draw', target: 'any', locations: ['board'] },
-      effects: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
+      commands: [{ type: 'update-resource', params: { resource: Resource.POINTS, delta: 2 } }],
     },
   ],
   cost: 0,
@@ -1103,7 +1103,7 @@ export const handBoardDiscard: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         { type: 'discard-cards', params: { from: 'hand', amount: 1 } },
         { type: 'discard-cards', params: { from: 'board', amount: 1 } },
       ],
@@ -1126,7 +1126,7 @@ export const handToBoard: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [{ type: 'move-card', params: { from: 'hand', amount: 1, to: 'board' } }],
+      commands: [{ type: 'move-card', params: { from: 'hand', amount: 1, to: 'board' } }],
     },
   ],
   cost: 0,
@@ -1148,7 +1148,7 @@ export const choiceAddChoice: PlayableCard = {
     {
       type: 'reactive',
       trigger: { on: 'card-play', target: 'self' },
-      effects: [
+      commands: [
         {
           type: 'card-choice',
           params: {

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { DrawCardsEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { DrawCardsCommand } from '../../../utils/commands'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-describe('DrawCardsEffect', () => {
+describe('DrawCardsCommand', () => {
   it('draws a card from drawPile into hand', () => {
     const gameState = createTestGameState({
       cards: {
@@ -18,12 +18,12 @@ describe('DrawCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DrawCardsEffect = {
+    const command: DrawCardsCommand = {
       type: 'draw-cards',
       params: { amount: 1 },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
@@ -40,12 +40,12 @@ describe('DrawCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DrawCardsEffect = {
+    const command: DrawCardsCommand = {
       type: 'draw-cards',
       params: { amount: 1 },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.hand).toHaveLength(2)
     expect(result.game.game.run!.cards.hand[0].instanceId).toBe('a')
@@ -54,12 +54,12 @@ describe('DrawCardsEffect', () => {
 
   it('draws nothing when drawPile is empty', () => {
     const gameState = createTestGameState()
-    const effect: DrawCardsEffect = {
+    const command: DrawCardsCommand = {
       type: 'draw-cards',
       params: { amount: 1 },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.hand).toHaveLength(0)
     expect(result.game.game.run!.cards.drawPile).toHaveLength(0)
@@ -75,12 +75,12 @@ describe('DrawCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DrawCardsEffect = {
+    const command: DrawCardsCommand = {
       type: 'draw-cards',
       params: { amount: 1 },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.event).toMatchObject({
       type: 'card-draw',
@@ -98,12 +98,12 @@ describe('DrawCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DrawCardsEffect = {
+    const command: DrawCardsCommand = {
       type: 'draw-cards',
       params: { amount: 1 },
     }
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.run!.cards.drawPile).toHaveLength(1)
     expect(gameState.game.run!.cards.hand).toHaveLength(0)

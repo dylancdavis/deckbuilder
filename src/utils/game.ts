@@ -2,21 +2,21 @@ import type { Collection } from './collection.ts'
 import type { Run } from './run.ts'
 import type { CardID } from './cards.ts'
 import type { Event } from './event.ts'
-import type { CardChoiceEffect } from './effects.ts'
-import type { EffectContext, EffectStackItem } from './ability-processor.ts'
+import type { CardChoiceCommand } from './commands.ts'
+import type { CommandContext, CommandStackItem } from './ability-processor.ts'
 
 /**
- * A paused card-choice interaction: the remaining stack, the choice effect that
- * paused it, and the context to resume under. The choice effect carries the
+ * A paused card-choice interaction: the remaining stack, the choice command that
+ * paused it, and the context to resume under. The choice command carries the
  * `choiceHandler` closure, so this isn't fully serializable, but the stack and
  * control state are plain data instead of a stored resolver.
  */
 export type PendingChoice = {
   cardOptions: CardID[]
   tags: string[]
-  choiceEffect: CardChoiceEffect
-  context: EffectContext
-  remainingStack: EffectStackItem[]
+  choiceCommand: CardChoiceCommand
+  context: CommandContext
+  remainingStack: CommandStackItem[]
 }
 
 export type GameState = {

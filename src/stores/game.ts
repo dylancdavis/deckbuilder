@@ -13,7 +13,7 @@ import { cards } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import type { GameState } from '@/utils/game.ts'
-import { handleEffect } from '@/utils/ability-processor.ts'
+import { handleCommand } from '@/utils/ability-processor.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -174,12 +174,12 @@ export const useGameStore = defineStore('game', () => {
 
   /**
    * Declares an attack from one board card against another. Target legality is
-   * enforced by the view; this only turns the interaction into an attack effect.
+   * enforced by the view; this only turns the interaction into an attack command.
    */
   function resolveAttack(attackerInstanceId: string, targetInstanceId: string) {
     if (!gameState.value.game.run) return
 
-    gameState.value = handleEffect(
+    gameState.value = handleCommand(
       gameState.value,
       {
         type: 'attack',
@@ -190,7 +190,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function tryPlayCard(instanceId: string) {
-    gameState.value = handleEffect(
+    gameState.value = handleCommand(
       gameState.value,
       { type: 'play-card', params: { instanceId } },
       { kind: 'player' },
@@ -200,7 +200,7 @@ export const useGameStore = defineStore('game', () => {
   function nextTurn() {
     if (!gameState.value.game.run?.deck.rulesCard) return
 
-    gameState.value = handleEffect(
+    gameState.value = handleCommand(
       gameState.value,
       { type: 'turn-end', params: {} },
       { kind: 'player' },

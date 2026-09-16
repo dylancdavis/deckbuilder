@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { handleEffect } from '../../../utils/ability-processor'
-import type { AttackEffect } from '../../../utils/effects'
+import { handleCommand } from '../../../utils/ability-processor'
+import type { AttackCommand } from '../../../utils/commands'
 import { basicEntity, targetDummy } from '../../../utils/cards'
 import type { CardInstance, PlayableCard } from '../../../utils/cards'
 import { Resource } from '../../../utils/resource'
@@ -20,22 +20,22 @@ function stateWithBoard(board: CardInstance[]) {
   })
 }
 
-function attackEffect(instanceId: string, targetInstanceId: string): AttackEffect {
+function attackCommand(instanceId: string, targetInstanceId: string): AttackCommand {
   return { type: 'attack', params: { instanceId, targetInstanceId } }
 }
 
-const ADD_POINT_EFFECT = {
+const ADD_POINT_COMMAND = {
   type: 'update-resource' as const,
   params: { resource: Resource.POINTS, delta: 1 },
 }
 
-describe('AttackEffect', () => {
+describe('AttackCommand', () => {
   it('reduces target defense by the attacker attack stat', () => {
     const attacker = makeInstance(basicEntity, 'atk-1', { attack: 3 })
     const target = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, attackEffect('atk-1', 'tgt-1'), { kind: 'player' })
+    const result = handleCommand(gameState, attackCommand('atk-1', 'tgt-1'), { kind: 'player' })
 
     const board = result.game.run!.cards.board
     expect(board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(2)
@@ -46,7 +46,7 @@ describe('AttackEffect', () => {
     const target = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, attackEffect('atk-1', 'tgt-1'), { kind: 'player' })
+    const result = handleCommand(gameState, attackCommand('atk-1', 'tgt-1'), { kind: 'player' })
 
     const events = result.game.run!.events
     expect(events.map((e) => e.type)).toEqual(['card-attack', 'card-damage'])
@@ -65,7 +65,7 @@ describe('AttackEffect', () => {
     const target = makeInstance(basicEntity, 'tgt-1', { defense: undefined })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, attackEffect('atk-1', 'tgt-1'), { kind: 'player' })
+    const result = handleCommand(gameState, attackCommand('atk-1', 'tgt-1'), { kind: 'player' })
 
     expect(result.game.run!.events.map((e) => e.type)).toEqual(['card-attack'])
   })
@@ -75,7 +75,7 @@ describe('AttackEffect', () => {
     const target = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, attackEffect('atk-1', 'tgt-1'), { kind: 'player' })
+    const result = handleCommand(gameState, attackCommand('atk-1', 'tgt-1'), { kind: 'player' })
 
     expect(result.game.run!.events).toEqual([])
     expect(result.game.run!.cards.board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(5)
@@ -88,14 +88,14 @@ describe('AttackEffect', () => {
         {
           type: 'reactive',
           trigger: { on: 'card-attack', target: 'self' },
-          effects: [ADD_POINT_EFFECT],
+          commands: [ADD_POINT_COMMAND],
         },
       ],
     })
     const target = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, attackEffect('atk-1', 'tgt-1'), { kind: 'player' })
+    const result = handleCommand(gameState, attackCommand('atk-1', 'tgt-1'), { kind: 'player' })
 
     expect(result.game.run!.resources.points).toBe(1)
     expect(result.game.run!.events.map((e) => e.type)).toEqual([
@@ -119,20 +119,20 @@ describe('AttackEffect', () => {
               ctx.sourceCard.type === 'playable' &&
               ctx.event.targetInstanceId === ctx.sourceCard.instanceId,
           },
-          effects: [ADD_POINT_EFFECT],
+          commands: [ADD_POINT_COMMAND],
         },
       ],
     })
 
-    const attacked = handleEffect(
+    const attacked = handleCommand(
       stateWithBoard([attacker, target]),
-      attackEffect('atk-1', 'tgt-1'),
+      attackCommand('atk-1', 'tgt-1'),
       { kind: 'player' },
     )
     expect(attacked.game.run!.resources.points).toBe(1)
 
     // Plain damage is not an attack: the ability must not fire
-    const damaged = handleEffect(
+    const damaged = handleCommand(
       stateWithBoard([attacker, target]),
       { type: 'damage', params: { instanceId: 'tgt-1', amount: 1 } },
       { kind: 'player' },
@@ -154,13 +154,13 @@ describe('AttackEffect', () => {
               ctx.sourceCard.type === 'playable' &&
               ctx.event.targetInstanceId === ctx.sourceCard.instanceId,
           },
-          effects: [{ type: 'damage', params: { instanceId: 'target', amount: 1 } }],
+          commands: [{ type: 'damage', params: { instanceId: 'target', amount: 1 } }],
         },
       ],
     })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, attackEffect('atk-1', 'tgt-1'), { kind: 'player' })
+    const result = handleCommand(gameState, attackCommand('atk-1', 'tgt-1'), { kind: 'player' })
 
     const board = result.game.run!.cards.board
     expect(board.find((c) => c.instanceId === 'atk-1')!.defense).toBe(4)
@@ -174,14 +174,14 @@ describe('AttackEffect', () => {
         {
           type: 'reactive',
           trigger: { on: 'turn-start' },
-          effects: [{ type: 'attack', params: { instanceId: 'self', targetInstanceId: 'tgt-1' } }],
+          commands: [{ type: 'attack', params: { instanceId: 'self', targetInstanceId: 'tgt-1' } }],
         },
       ],
     })
     const target = makeInstance(targetDummy, 'tgt-1', { defense: 5 })
     const gameState = stateWithBoard([attacker, target])
 
-    const result = handleEffect(gameState, { type: 'turn-start', params: {} }, { kind: 'player' })
+    const result = handleCommand(gameState, { type: 'turn-start', params: {} }, { kind: 'player' })
 
     const board = result.game.run!.cards.board
     expect(board.find((c) => c.instanceId === 'tgt-1')!.defense).toBe(3)

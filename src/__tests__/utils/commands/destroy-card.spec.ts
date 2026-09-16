@@ -1,21 +1,21 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { DestroyCardEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { DestroyCardCommand } from '../../../utils/commands'
 import { createTestGameState } from './shared'
 
-describe('DestroyCardEffect', () => {
+describe('DestroyCardCommand', () => {
   it('removes single card from collection', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { score: 3, 'dual-score': 2 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { score: 1 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.collection.cards).toEqual({ score: 2, 'dual-score': 2 })
   })
@@ -24,14 +24,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { score: 3, 'dual-score': 2 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { score: 3 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.collection.cards).toEqual({ 'dual-score': 2 })
   })
@@ -40,14 +40,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { score: 2, 'dual-score': 1 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { score: 5 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.collection.cards).toEqual({ 'dual-score': 1 })
   })
@@ -56,14 +56,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { score: 3 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { 'dual-score': 2 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.collection.cards).toEqual({ score: 3 })
   })
@@ -72,14 +72,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { 'starter-rules': 2, score: 1 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { 'starter-rules': 1 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.collection.cards).toEqual({ 'starter-rules': 1, score: 1 })
   })
@@ -88,14 +88,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { score: 2 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { score: 2 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.collection.cards).toEqual({})
   })
@@ -104,14 +104,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState()
     gameState.game.collection.cards = { score: 5, 'dual-score': 2 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { score: 2 },
       },
     }
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.collection.cards).toEqual({ score: 5, 'dual-score': 2 }) // Original unchanged
   })
@@ -120,14 +120,14 @@ describe('DestroyCardEffect', () => {
     const gameState = createTestGameState({ resources: { points: 10 } })
     gameState.game.collection.cards = { score: 5 }
 
-    const effect: DestroyCardEffect = {
+    const command: DestroyCardCommand = {
       type: 'destroy-card',
       params: {
         cards: { score: 2 },
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     // Run state should be unchanged
     expect(result.game.game.run!.resources.points).toBe(10)

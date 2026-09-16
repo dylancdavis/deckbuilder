@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { RemoveCardEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { RemoveCardCommand } from '../../../utils/commands'
 import { score } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-describe('RemoveCardEffect', () => {
+describe('RemoveCardCommand', () => {
   it('removes card from drawPile by instanceId', () => {
     const gameState = createTestGameState({
       cards: {
@@ -18,14 +18,14 @@ describe('RemoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'card-2',
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(2)
     expect(result.game.game.run!.cards.drawPile[0].instanceId).toBe('card-1')
@@ -44,14 +44,14 @@ describe('RemoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'card-1',
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
     expect(result.game.game.run!.cards.hand[0].instanceId).toBe('card-2')
@@ -66,14 +66,14 @@ describe('RemoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'card-1',
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.board).toHaveLength(0)
   })
@@ -90,14 +90,14 @@ describe('RemoveCardEffect', () => {
         ],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'card-2',
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.discardPile).toHaveLength(1)
     expect(result.game.game.run!.cards.discardPile[0].instanceId).toBe('card-1')
@@ -112,14 +112,14 @@ describe('RemoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'card-1',
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(0)
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
@@ -135,14 +135,14 @@ describe('RemoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'non-existent',
       },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.drawPile).toHaveLength(1)
     expect(result.game.game.run!.cards.hand).toHaveLength(1)
@@ -157,14 +157,14 @@ describe('RemoveCardEffect', () => {
         discardPile: [],
       },
     })
-    const effect: RemoveCardEffect = {
+    const command: RemoveCardCommand = {
       type: 'remove-card',
       params: {
         instanceId: 'card-1',
       },
     }
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.run!.cards.drawPile).toHaveLength(1) // Original unchanged
   })

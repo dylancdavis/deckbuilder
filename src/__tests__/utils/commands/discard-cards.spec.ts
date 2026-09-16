@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { DiscardCardsEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { DiscardCardsCommand } from '../../../utils/commands'
 import { score, dualScore } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-describe('DiscardCardsEffect', () => {
+describe('DiscardCardsCommand', () => {
   describe('single instanceId variant', () => {
     it('discards a specific card by instanceId', () => {
       const gameState = createTestGameState({
@@ -15,12 +15,12 @@ describe('DiscardCardsEffect', () => {
           discardPile: [],
         },
       })
-      const effect: DiscardCardsEffect = {
+      const command: DiscardCardsCommand = {
         type: 'discard-cards',
         params: { instanceIds: ['a'] },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.hand).toHaveLength(0)
       expect(result.game.game.run!.cards.board).toHaveLength(1)
@@ -36,12 +36,12 @@ describe('DiscardCardsEffect', () => {
           discardPile: [],
         },
       })
-      const effect: DiscardCardsEffect = {
+      const command: DiscardCardsCommand = {
         type: 'discard-cards',
         params: { instanceIds: ['a'] },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.event).toMatchObject({
         type: 'card-discard',
@@ -59,12 +59,12 @@ describe('DiscardCardsEffect', () => {
           discardPile: [],
         },
       })
-      const effect: DiscardCardsEffect = {
+      const command: DiscardCardsCommand = {
         type: 'discard-cards',
         params: { instanceIds: ['nonexistent'] },
       }
 
-      const result = applyEffect(gameState, effect)
+      const result = applyCommand(gameState, command)
 
       expect(result.game.game.run!.cards.discardPile).toHaveLength(0)
       expect(result.event).toBeNull()
@@ -81,12 +81,12 @@ describe('DiscardCardsEffect', () => {
           discardPile: [],
         },
       })
-      const effect: DiscardCardsEffect = {
+      const command: DiscardCardsCommand = {
         type: 'discard-cards',
         params: { from: 'hand', amount: 2 },
-      } as DiscardCardsEffect
+      } as DiscardCardsCommand
 
-      expect(() => applyEffect(gameState, effect)).toThrow('must be decomposed')
+      expect(() => applyCommand(gameState, command)).toThrow('must be decomposed')
     })
 
     it('throws for non-decomposed multi-instanceId variant', () => {
@@ -101,12 +101,12 @@ describe('DiscardCardsEffect', () => {
           discardPile: [],
         },
       })
-      const effect: DiscardCardsEffect = {
+      const command: DiscardCardsCommand = {
         type: 'discard-cards',
         params: { instanceIds: ['a', 'b'] },
       }
 
-      expect(() => applyEffect(gameState, effect)).toThrow('must be decomposed')
+      expect(() => applyCommand(gameState, command)).toThrow('must be decomposed')
     })
   })
 
@@ -119,12 +119,12 @@ describe('DiscardCardsEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DiscardCardsEffect = {
+    const command: DiscardCardsCommand = {
       type: 'discard-cards',
       params: { instanceIds: ['a'] },
     }
 
-    applyEffect(gameState, effect)
+    applyCommand(gameState, command)
 
     expect(gameState.game.run!.cards.hand).toHaveLength(1)
     expect(gameState.game.run!.cards.discardPile).toHaveLength(0)

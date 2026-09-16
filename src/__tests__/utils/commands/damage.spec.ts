@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { applyEffect } from '../../../utils/effects'
-import type { DamageEffect } from '../../../utils/effects'
+import { applyCommand } from '../../../utils/commands'
+import type { DamageCommand } from '../../../utils/commands'
 import { score } from '../../../utils/cards'
 import { createTestGameState } from './shared'
 
-describe('DamageEffect', () => {
+describe('DamageCommand', () => {
   it('subtracts damage from card defense', () => {
     const gameState = createTestGameState({
       cards: {
@@ -14,12 +14,12 @@ describe('DamageEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DamageEffect = {
+    const command: DamageCommand = {
       type: 'damage',
       params: { instanceId: 'card-1', amount: 3 },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.board[0].defense).toBe(2)
   })
@@ -33,12 +33,12 @@ describe('DamageEffect', () => {
         discardPile: [],
       },
     })
-    const effect: DamageEffect = {
+    const command: DamageCommand = {
       type: 'damage',
       params: { instanceId: 'card-1', amount: 10 },
     }
 
-    const result = applyEffect(gameState, effect)
+    const result = applyCommand(gameState, command)
 
     expect(result.game.game.run!.cards.board[0].defense).toBe(0)
   })
