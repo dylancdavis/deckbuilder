@@ -43,7 +43,7 @@
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 250px);
+  grid-template-columns: repeat(auto-fill, var(--collection-card-width));
   padding: 1em;
   gap: 1em;
   align-content: start;
