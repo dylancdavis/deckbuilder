@@ -361,6 +361,8 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
 <style scoped>
 .panel.board-hand {
   flex: 1;
+  padding: 0.5em;
+  gap: 0.5em;
 }
 
 /* Round info panel styling - match empty pile background */
