@@ -2,16 +2,18 @@
   --card-grey: #dfdfdf;
   --card-border-color: rgb(20, 20, 20);
   --collection-card-width: 200px;
+  --collection-card-height: calc(var(--collection-card-width) * 7 / 5);
   --card-border: calc(var(--card-width) * 4 / 250) solid var(--card-border-color);
   --card-corner-radius: calc(var(--card-width, var(--collection-card-width)) * 16 / 250);
 }
 
 .card-container {
   --card-width: var(--collection-card-width);
+  --card-height: var(--collection-card-height);
   --card-gradient-start: #1077d2;
   --card-gradient-end: #093153ff;
   width: var(--card-width);
-  aspect-ratio: 5/7;
+  height: var(--card-height);
   border: var(--card-border);
   border-radius: var(--card-corner-radius);
   /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
