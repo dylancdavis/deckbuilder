@@ -3,7 +3,7 @@ import { createPinia, setActivePinia, type Pinia } from 'pinia'
 import { mount } from '@vue/test-utils'
 import CollectionView from '../../components/CollectionView.vue'
 import { useGameStore } from '../../stores/game'
-import { cards, type Card } from '../../utils/cards'
+import { cardCategory, cards, type CardCategory } from '../../utils/cards'
 import { entries, keys } from '../../utils/utils'
 
 describe('CollectionView filters', () => {
@@ -36,55 +36,72 @@ describe('CollectionView filters', () => {
       .sort()
   }
 
-  function collectionNames(...types: Card['type'][]) {
+  function collectionNames(...categories: CardCategory[]) {
     return keys(useGameStore().collection.cards)
       .map((id) => cards[id])
-      .filter((card) => types.includes(card.type))
+      .filter((card) => categories.includes(cardCategory(card)))
       .map((card) => card.name)
       .sort()
   }
 
-  it('shows every card with both filters on by default', () => {
-    const wrapper = mountCollection()
-    expect(filterButton(wrapper, 'Rules').classes()).toContain('active')
-    expect(filterButton(wrapper, 'Playables').classes()).toContain('active')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'playable'))
+  function quantityOf(category: CardCategory) {
+    return entries(useGameStore().collection.cards)
+      .filter(([id]) => cardCategory(cards[id]) === category)
+      .reduce((sum, [, amount]) => sum + (amount ?? 0), 0)
+  }
+
+  it('has every category in the test collection', () => {
+    expect(collectionNames('rules')).not.toEqual([])
+    expect(collectionNames('asset')).not.toEqual([])
+    expect(collectionNames('action')).not.toEqual([])
   })
 
-  it('labels each filter with the quantity of that card type in the collection', () => {
-    const quantityOf = (type: Card['type']) =>
-      entries(useGameStore().collection.cards)
-        .filter(([id]) => cards[id].type === type)
-        .reduce((sum, [, amount]) => sum + (amount ?? 0), 0)
+  it('shows every card with all filters on by default', () => {
+    const wrapper = mountCollection()
+    for (const label of ['Rules', 'Assets', 'Actions']) {
+      expect(filterButton(wrapper, label).classes()).toContain('active')
+    }
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'asset', 'action'))
+  })
+
+  it('labels each filter with the quantity of that category in the collection', () => {
     const wrapper = mountCollection()
     expect(filterButton(wrapper, 'Rules').text()).toBe(`Rules (x${quantityOf('rules')})`)
-    expect(filterButton(wrapper, 'Playables').text()).toBe(`Playables (x${quantityOf('playable')})`)
+    expect(filterButton(wrapper, 'Assets').text()).toBe(`Assets (x${quantityOf('asset')})`)
+    expect(filterButton(wrapper, 'Actions').text()).toBe(`Actions (x${quantityOf('action')})`)
   })
 
   it('hides rules cards when the rules filter is toggled off', async () => {
     const wrapper = mountCollection()
     await filterButton(wrapper, 'Rules').trigger('click')
     expect(filterButton(wrapper, 'Rules').classes()).not.toContain('active')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('playable'))
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('asset', 'action'))
   })
 
-  it('hides playable cards when the playables filter is toggled off', async () => {
+  it('hides asset cards when the assets filter is toggled off', async () => {
     const wrapper = mountCollection()
-    await filterButton(wrapper, 'Playables').trigger('click')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules'))
+    await filterButton(wrapper, 'Assets').trigger('click')
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'action'))
   })
 
-  it('shows no cards when both filters are toggled off', async () => {
+  it('hides action cards when the actions filter is toggled off', async () => {
     const wrapper = mountCollection()
-    await filterButton(wrapper, 'Rules').trigger('click')
-    await filterButton(wrapper, 'Playables').trigger('click')
+    await filterButton(wrapper, 'Actions').trigger('click')
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'asset'))
+  })
+
+  it('shows no cards when every filter is toggled off', async () => {
+    const wrapper = mountCollection()
+    for (const label of ['Rules', 'Assets', 'Actions']) {
+      await filterButton(wrapper, label).trigger('click')
+    }
     expect(shownCardNames(wrapper)).toEqual([])
   })
 
-  it('shows a filter type again when toggled back on', async () => {
+  it('shows a category again when toggled back on', async () => {
     const wrapper = mountCollection()
-    await filterButton(wrapper, 'Rules').trigger('click')
-    await filterButton(wrapper, 'Rules').trigger('click')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'playable'))
+    await filterButton(wrapper, 'Assets').trigger('click')
+    await filterButton(wrapper, 'Assets').trigger('click')
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'asset', 'action'))
   })
 })

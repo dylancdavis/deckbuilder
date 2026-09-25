@@ -132,6 +132,13 @@ export function isAsset(card: PlayableCard): boolean {
   return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
 }
 
+export type CardCategory = 'rules' | 'asset' | 'action'
+
+export function cardCategory(card: RulesCard | PlayableCard): CardCategory {
+  if (card.type === 'rules') return 'rules'
+  return isAsset(card) ? 'asset' : 'action'
+}
+
 export interface RulesCard extends Card {
   id: RulesCardID
   type: 'rules'

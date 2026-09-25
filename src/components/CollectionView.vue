@@ -5,8 +5,10 @@ import CardItem from './CardItem.vue'
 import CardCount from './CardCount.vue'
 import {
   cards,
+  cardCategory,
   cardType,
-  type Card,
+  type RulesCard,
+  type CardCategory,
   type CardID,
   type PlayableCard,
   type PlayableCardID,
@@ -23,16 +25,19 @@ const collection = computed(() => gameStore.collection)
 const selectedDeck = computed(() => gameStore.selectedDeck as Deck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
-type CardType = Card['type']
-
-const cardFilters: { type: CardType; label: string }[] = [
-  { type: 'rules', label: 'Rules' },
-  { type: 'playable', label: 'Playables' },
+const cardFilters: { category: CardCategory; label: string }[] = [
+  { category: 'rules', label: 'Rules' },
+  { category: 'asset', label: 'Assets' },
+  { category: 'action', label: 'Actions' },
 ]
-const shownCardTypes = ref<Record<CardType, boolean>>({ rules: true, playable: true })
+const shownCategories = ref<Record<CardCategory, boolean>>({
+  rules: true,
+  asset: true,
+  action: true,
+})
 
-function onToggleCardFilter(type: CardType) {
-  shownCardTypes.value[type] = !shownCardTypes.value[type]
+function onToggleCardFilter(category: CardCategory) {
+  shownCategories.value[category] = !shownCategories.value[category]
 }
 
 const { flyElement } = useFlyAnimation()
@@ -143,15 +148,15 @@ const selectedDeckCardsEntries = computed(() => {
 const collectionCardsEntries = computed(() => {
   const collectionCards = entries(collection.value.cards)
   return collectionCards
-    .map(([id, amount]) => [cards[id], amount] as [Card, number])
-    .filter(([card]) => shownCardTypes.value[card.type])
+    .map(([id, amount]) => [cards[id], amount] as [RulesCard | PlayableCard, number])
+    .filter(([card]) => shownCategories.value[cardCategory(card)])
     .sort(([a], [b]) => Number(b.type === 'rules') - Number(a.type === 'rules'))
 })
 
-const cardTypeQuantities = computed(() => {
-  const quantities: Record<CardType, number> = { rules: 0, playable: 0 }
+const categoryQuantities = computed(() => {
+  const quantities: Record<CardCategory, number> = { rules: 0, asset: 0, action: 0 }
   for (const [id, amount] of entries(collection.value.cards)) {
-    quantities[cards[id].type] += amount ?? 0
+    quantities[cardCategory(cards[id])] += amount ?? 0
   }
   return quantities
 })
@@ -268,12 +273,12 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
       <div class="collection-filters">
         <button
           v-for="filter in cardFilters"
-          :key="filter.type"
+          :key="filter.category"
           class="collection-filter"
-          :class="{ active: shownCardTypes[filter.type] }"
-          @click="onToggleCardFilter(filter.type)"
+          :class="{ active: shownCategories[filter.category] }"
+          @click="onToggleCardFilter(filter.category)"
         >
-          {{ filter.label }} (x{{ cardTypeQuantities[filter.type] }})
+          {{ filter.label }} (x{{ categoryQuantities[filter.category] }})
         </button>
       </div>
       <div class="card-grid">
