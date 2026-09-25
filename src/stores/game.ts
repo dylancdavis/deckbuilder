@@ -94,6 +94,10 @@ export const useGameStore = defineStore('game', () => {
     gameState.value.ui.collection.selectedDeck = key
   }
 
+  function setView(view: string[]) {
+    gameState.value.ui.currentView = view
+  }
+
   function startRun() {
     gameState.value.ui.currentView = ['run']
     gameState.value = initializeRun(gameState.value)
@@ -226,6 +230,7 @@ export const useGameStore = defineStore('game', () => {
     modalView,
     cardOptions,
     selectDeck,
+    setView,
     startRun,
     tryPlayCard,
     nextTurn,

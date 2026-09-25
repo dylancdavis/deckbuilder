@@ -55,6 +55,28 @@ svg {
   gap: 0.5em;
 }
 
+.main-panel .nav button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  opacity: 0.6;
+}
+
+.main-panel .nav button:not(:disabled) {
+  cursor: pointer;
+}
+
+.main-panel .nav button:not(:disabled):hover,
+.main-panel .nav button.active {
+  opacity: 1;
+}
+
+.main-panel .nav button:disabled {
+  opacity: 0.3;
+}
+
 .main-panel .nav .nav-divider {
   border-left: 1px solid var(--standard-orange);
 }

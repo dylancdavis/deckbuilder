@@ -39,9 +39,20 @@ async function handleSelect(cardId: CardID) {
   <div class="main-content">
     <div class="main-panel">
       <div class="nav">
-        Collection
+        <button
+          :class="{ active: view[0] === 'collection' }"
+          @click="gameStore.setView(['collection'])"
+        >
+          Collection
+        </button>
         <div class="nav-divider"></div>
-        Current Run
+        <button
+          :class="{ active: view[0] === 'run' }"
+          :disabled="!gameStore.run"
+          @click="gameStore.setView(['run'])"
+        >
+          Current Run
+        </button>
       </div>
       <component :is="getView(view)" />
     </div>
