@@ -584,7 +584,7 @@ export const striker: PlayableCard = {
   type: 'playable',
   id: 'striker',
   name: 'Score Striker',
-  description: 'When this card attacks, gain 1 point.',
+  description: 'When this attacks, gain 1 point.',
   attack: 2,
   defense: 3,
   abilities: [
@@ -628,7 +628,7 @@ export const thornDummy: PlayableCard = {
   type: 'playable',
   id: 'thorn-dummy',
   name: 'Thorn Dummy',
-  description: 'When this card is attacked, deal 1 damage to the attacker.',
+  description: 'When this is attacked, deal 1 damage to the attacker.',
   attack: 0,
   defense: 4,
   abilities: [
