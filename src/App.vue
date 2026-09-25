@@ -45,14 +45,12 @@ async function handleSelect(cardId: CardID) {
         >
           Collection
         </button>
-        <div class="nav-divider"></div>
-        <button
-          :class="{ active: view[0] === 'run' }"
-          :disabled="!gameStore.run"
-          @click="gameStore.setView(['run'])"
-        >
-          Current Run
-        </button>
+        <template v-if="gameStore.run">
+          <div class="nav-divider"></div>
+          <button :class="{ active: view[0] === 'run' }" @click="gameStore.setView(['run'])">
+            Current Run
+          </button>
+        </template>
       </div>
       <component :is="getView(view)" />
     </div>

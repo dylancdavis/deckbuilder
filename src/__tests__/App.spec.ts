@@ -26,9 +26,9 @@ describe('App', () => {
     expect(mountApp().text()).toContain('Deckbuilder')
   })
 
-  it('disables the run nav button when there is no run', () => {
+  it('hides the run nav button when there is no run', () => {
     const wrapper = mountApp()
-    expect(navButton(wrapper, 'Current Run').attributes('disabled')).toBeDefined()
+    expect(wrapper.findAll('.nav button').map((b) => b.text())).toEqual(['Collection'])
   })
 
   it('switches between the collection and run views during a run', async () => {
