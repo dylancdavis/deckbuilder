@@ -611,7 +611,7 @@ export const basicStriker: PlayableCard = {
   type: 'playable',
   id: 'basic-striker',
   name: 'Basic Striker',
-  description: 'A plain attacker.',
+  description: '',
   attack: 1,
   defense: 3,
   abilities: [],
