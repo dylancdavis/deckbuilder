@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue'
+import { ref, computed, watch, type Ref } from 'vue'
 import { defineStore } from 'pinia'
 import {
   startingDeck,
@@ -13,6 +13,8 @@ import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import type { GameState } from '@/utils/game.ts'
 import { handleCommand } from '@/utils/ability-processor.ts'
+import type { Collection } from '@/utils/collection.ts'
+import { loadCollection, saveCollection } from '@/utils/persistence.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -47,19 +49,32 @@ const initialCollectionCards: Counter<CardID> = {
   'basic-striker': 4,
 }
 
+function defaultCollection(): Collection {
+  return {
+    cards: initialCollectionCards,
+    decks: {
+      startingDeck: startingDeck,
+      discardTestDeck: discardTestDeck,
+      moveTestDeck: moveTestDeck,
+      choiceTestDeck: choiceTestDeck,
+      attackTestDeck: attackTestDeck,
+    },
+  }
+}
+
+function initialCollection(): Collection {
+  try {
+    return loadCollection(localStorage) ?? defaultCollection()
+  } catch (error) {
+    console.error('Discarding invalid saved collection', error)
+    return defaultCollection()
+  }
+}
+
 export const useGameStore = defineStore('game', () => {
   const gameState: Ref<GameState> = ref({
     game: {
-      collection: {
-        cards: initialCollectionCards,
-        decks: {
-          startingDeck: startingDeck,
-          discardTestDeck: discardTestDeck,
-          moveTestDeck: moveTestDeck,
-          choiceTestDeck: choiceTestDeck,
-          attackTestDeck: attackTestDeck,
-        },
-      },
+      collection: initialCollection(),
       run: null,
     },
     ui: {
@@ -72,6 +87,12 @@ export const useGameStore = defineStore('game', () => {
       pendingChoice: null,
     },
   })
+
+  watch(
+    () => gameState.value.game.collection,
+    (collection) => saveCollection(localStorage, collection),
+    { deep: true },
+  )
 
   // Getters
   const run = computed(() => gameState.value.game.run)

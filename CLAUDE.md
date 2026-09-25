@@ -50,6 +50,10 @@ This is a Vue 3 + TypeScript deckbuilding game built with Vite. The application 
 - UI state (current view, selected deck)
 - View data (modal view, card options, resolver)
 
+**Persistence**: The collection (cards and decks) is saved to `localStorage` on every change and
+restored on load (`src/utils/persistence.ts`); runs are not saved. Decks reference their rules
+card by `rulesCardId` so they stay plain data; `makeRun` resolves it into `run.deck.rulesCard`.
+
 **View System**: The app renders different views based on `gameState.ui.currentView`:
 
 - `collection` - Shows card collection and deck management
