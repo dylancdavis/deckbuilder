@@ -155,12 +155,12 @@ const collectionCardsEntries = computed(() => {
     .sort(([a], [b]) => Number(b.type === 'rules') - Number(a.type === 'rules'))
 })
 
-const categoryQuantities = computed(() => {
-  const quantities: Record<CardCategory, number> = { rules: 0, entity: 0, aura: 0, action: 0 }
-  for (const [id, amount] of entries(collection.value.cards)) {
-    quantities[cardCategory(cards[id])] += amount ?? 0
+const uniqueCardCounts = computed(() => {
+  const counts: Record<CardCategory, number> = { rules: 0, entity: 0, aura: 0, action: 0 }
+  for (const id of keys(collection.value.cards)) {
+    counts[cardCategory(cards[id])] += 1
   }
-  return quantities
+  return counts
 })
 
 const isCollectionEmpty = computed(() => keys(collection.value.cards).length === 0)
@@ -280,7 +280,7 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           :class="{ active: shownCategories[filter.category] }"
           @click="onToggleCardFilter(filter.category)"
         >
-          {{ filter.label }} (x{{ categoryQuantities[filter.category] }})
+          {{ filter.label }} (x{{ uniqueCardCounts[filter.category] }})
         </button>
       </div>
       <div class="card-grid">

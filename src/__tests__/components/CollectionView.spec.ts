@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import CollectionView from '../../components/CollectionView.vue'
 import { useGameStore } from '../../stores/game'
 import { cardCategory, cards, type CardCategory } from '../../utils/cards'
-import { entries, keys } from '../../utils/utils'
+import { keys } from '../../utils/utils'
 
 describe('CollectionView filters', () => {
   let pinia: Pinia
@@ -44,12 +44,6 @@ describe('CollectionView filters', () => {
       .sort()
   }
 
-  function quantityOf(category: CardCategory) {
-    return entries(useGameStore().collection.cards)
-      .filter(([id]) => cardCategory(cards[id]) === category)
-      .reduce((sum, [, amount]) => sum + (amount ?? 0), 0)
-  }
-
   it('has every category in the test collection', () => {
     expect(collectionNames('rules')).not.toEqual([])
     expect(collectionNames('entity')).not.toEqual([])
@@ -65,12 +59,18 @@ describe('CollectionView filters', () => {
     expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'entity', 'aura', 'action'))
   })
 
-  it('labels each filter with the quantity of that category in the collection', () => {
+  it('labels each filter with the number of unique cards in that category', () => {
     const wrapper = mountCollection()
-    expect(filterButton(wrapper, 'Rules').text()).toBe(`Rules (x${quantityOf('rules')})`)
-    expect(filterButton(wrapper, 'Entities').text()).toBe(`Entities (x${quantityOf('entity')})`)
-    expect(filterButton(wrapper, 'Auras').text()).toBe(`Auras (x${quantityOf('aura')})`)
-    expect(filterButton(wrapper, 'Actions').text()).toBe(`Actions (x${quantityOf('action')})`)
+    expect(filterButton(wrapper, 'Rules').text()).toBe(
+      `Rules (x${collectionNames('rules').length})`,
+    )
+    expect(filterButton(wrapper, 'Entities').text()).toBe(
+      `Entities (x${collectionNames('entity').length})`,
+    )
+    expect(filterButton(wrapper, 'Auras').text()).toBe(`Auras (x${collectionNames('aura').length})`)
+    expect(filterButton(wrapper, 'Actions').text()).toBe(
+      `Actions (x${collectionNames('action').length})`,
+    )
   })
 
   it('hides rules cards when the rules filter is toggled off', async () => {
