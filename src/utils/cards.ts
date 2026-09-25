@@ -128,15 +128,21 @@ export interface CardInstance extends PlayableCard {
  * attack/defense stats (entities live on the board to be attacked/targeted).
  */
 export function isAsset(card: PlayableCard): boolean {
-  if (card.attack !== undefined || card.defense !== undefined) return true
+  if (isEntity(card)) return true
   return card.abilities.some((ability) => ability.trigger.locations?.includes('board'))
 }
 
-export type CardCategory = 'rules' | 'asset' | 'action'
+/** An entity is an asset with attack or defense stats; any other asset is an aura. */
+export function isEntity(card: PlayableCard): boolean {
+  return card.attack !== undefined || card.defense !== undefined
+}
+
+export type CardCategory = 'rules' | 'entity' | 'aura' | 'action'
 
 export function cardCategory(card: RulesCard | PlayableCard): CardCategory {
   if (card.type === 'rules') return 'rules'
-  return isAsset(card) ? 'asset' : 'action'
+  if (isEntity(card)) return 'entity'
+  return isAsset(card) ? 'aura' : 'action'
 }
 
 export interface RulesCard extends Card {

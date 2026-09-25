@@ -52,22 +52,24 @@ describe('CollectionView filters', () => {
 
   it('has every category in the test collection', () => {
     expect(collectionNames('rules')).not.toEqual([])
-    expect(collectionNames('asset')).not.toEqual([])
+    expect(collectionNames('entity')).not.toEqual([])
+    expect(collectionNames('aura')).not.toEqual([])
     expect(collectionNames('action')).not.toEqual([])
   })
 
   it('shows every card with all filters on by default', () => {
     const wrapper = mountCollection()
-    for (const label of ['Rules', 'Assets', 'Actions']) {
+    for (const label of ['Rules', 'Entities', 'Auras', 'Actions']) {
       expect(filterButton(wrapper, label).classes()).toContain('active')
     }
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'asset', 'action'))
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'entity', 'aura', 'action'))
   })
 
   it('labels each filter with the quantity of that category in the collection', () => {
     const wrapper = mountCollection()
     expect(filterButton(wrapper, 'Rules').text()).toBe(`Rules (x${quantityOf('rules')})`)
-    expect(filterButton(wrapper, 'Assets').text()).toBe(`Assets (x${quantityOf('asset')})`)
+    expect(filterButton(wrapper, 'Entities').text()).toBe(`Entities (x${quantityOf('entity')})`)
+    expect(filterButton(wrapper, 'Auras').text()).toBe(`Auras (x${quantityOf('aura')})`)
     expect(filterButton(wrapper, 'Actions').text()).toBe(`Actions (x${quantityOf('action')})`)
   })
 
@@ -75,24 +77,30 @@ describe('CollectionView filters', () => {
     const wrapper = mountCollection()
     await filterButton(wrapper, 'Rules').trigger('click')
     expect(filterButton(wrapper, 'Rules').classes()).not.toContain('active')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('asset', 'action'))
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('entity', 'aura', 'action'))
   })
 
-  it('hides asset cards when the assets filter is toggled off', async () => {
+  it('hides entity cards when the entities filter is toggled off', async () => {
     const wrapper = mountCollection()
-    await filterButton(wrapper, 'Assets').trigger('click')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'action'))
+    await filterButton(wrapper, 'Entities').trigger('click')
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'aura', 'action'))
+  })
+
+  it('hides aura cards when the auras filter is toggled off', async () => {
+    const wrapper = mountCollection()
+    await filterButton(wrapper, 'Auras').trigger('click')
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'entity', 'action'))
   })
 
   it('hides action cards when the actions filter is toggled off', async () => {
     const wrapper = mountCollection()
     await filterButton(wrapper, 'Actions').trigger('click')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'asset'))
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'entity', 'aura'))
   })
 
   it('shows no cards when every filter is toggled off', async () => {
     const wrapper = mountCollection()
-    for (const label of ['Rules', 'Assets', 'Actions']) {
+    for (const label of ['Rules', 'Entities', 'Auras', 'Actions']) {
       await filterButton(wrapper, label).trigger('click')
     }
     expect(shownCardNames(wrapper)).toEqual([])
@@ -100,8 +108,8 @@ describe('CollectionView filters', () => {
 
   it('shows a category again when toggled back on', async () => {
     const wrapper = mountCollection()
-    await filterButton(wrapper, 'Assets').trigger('click')
-    await filterButton(wrapper, 'Assets').trigger('click')
-    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'asset', 'action'))
+    await filterButton(wrapper, 'Auras').trigger('click')
+    await filterButton(wrapper, 'Auras').trigger('click')
+    expect(shownCardNames(wrapper)).toEqual(collectionNames('rules', 'entity', 'aura', 'action'))
   })
 })

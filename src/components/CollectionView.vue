@@ -27,12 +27,14 @@ const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
 
 const cardFilters: { category: CardCategory; label: string }[] = [
   { category: 'rules', label: 'Rules' },
-  { category: 'asset', label: 'Assets' },
+  { category: 'entity', label: 'Entities' },
+  { category: 'aura', label: 'Auras' },
   { category: 'action', label: 'Actions' },
 ]
 const shownCategories = ref<Record<CardCategory, boolean>>({
   rules: true,
-  asset: true,
+  entity: true,
+  aura: true,
   action: true,
 })
 
@@ -154,7 +156,7 @@ const collectionCardsEntries = computed(() => {
 })
 
 const categoryQuantities = computed(() => {
-  const quantities: Record<CardCategory, number> = { rules: 0, asset: 0, action: 0 }
+  const quantities: Record<CardCategory, number> = { rules: 0, entity: 0, aura: 0, action: 0 }
   for (const [id, amount] of entries(collection.value.cards)) {
     quantities[cardCategory(cards[id])] += amount ?? 0
   }

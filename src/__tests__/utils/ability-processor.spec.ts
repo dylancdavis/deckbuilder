@@ -7,7 +7,13 @@ import {
   resolveChoice,
 } from '../../utils/ability-processor'
 import type { Ability, EventTrigger } from '../../utils/ability'
-import { doubleChoice, isAsset, type CardInstance, type PlayableCard } from '../../utils/cards'
+import {
+  doubleChoice,
+  isAsset,
+  isEntity,
+  type CardInstance,
+  type PlayableCard,
+} from '../../utils/cards'
 import type {
   CardPlayEvent,
   CardDrawEvent,
@@ -838,6 +844,28 @@ describe('isAsset', () => {
     const card = createCard({ instanceId: 'card-1', abilities: [ability] })
 
     expect(isAsset(card)).toBe(true)
+  })
+})
+
+describe('isEntity', () => {
+  it('returns true when card has only attack', () => {
+    const card = createCard({ instanceId: 'card-1', abilities: [], attack: 1 })
+    expect(isEntity(card)).toBe(true)
+  })
+
+  it('returns true when card has only defense', () => {
+    const card = createCard({ instanceId: 'card-1', abilities: [], defense: 1 })
+    expect(isEntity(card)).toBe(true)
+  })
+
+  it('returns true when a stat is zero', () => {
+    const card = createCard({ instanceId: 'card-1', abilities: [], attack: 0 })
+    expect(isEntity(card)).toBe(true)
+  })
+
+  it('returns false when card has neither attack nor defense', () => {
+    const card = createCard({ instanceId: 'card-1', abilities: [] })
+    expect(isEntity(card)).toBe(false)
   })
 })
 
