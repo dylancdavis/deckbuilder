@@ -130,7 +130,9 @@ const selectedDeckCardsEntries = computed(() => {
 
 const collectionCardsEntries = computed(() => {
   const collectionCards = entries(collection.value.cards)
-  return collectionCards.map(([id, amount]) => [cards[id], amount] as [Card, number])
+  return collectionCards
+    .map(([id, amount]) => [cards[id], amount] as [Card, number])
+    .sort(([a], [b]) => Number(b.type === 'rules') - Number(a.type === 'rules'))
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
