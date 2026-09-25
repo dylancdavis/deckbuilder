@@ -19,6 +19,15 @@ describe('collection persistence', () => {
     expect(store.collection.decks.startingDeck.name).toBe('Starter Deck')
   })
 
+  it('does not carry deck edits into a fresh default collection', () => {
+    const first = freshStore()
+    first.addCardToDeck('startingDeck', 'score')
+    localStorage.clear()
+
+    const second = freshStore()
+    expect(second.collection.decks.startingDeck.cards).toEqual({})
+  })
+
   it('restores decks saved by a previous session', async () => {
     const first = freshStore()
     const key = first.addDeck('Saved Deck')

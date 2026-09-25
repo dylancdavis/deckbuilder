@@ -49,8 +49,9 @@ const initialCollectionCards: Counter<CardID> = {
   'basic-striker': 4,
 }
 
+/** A fresh copy of the starting collection, so edits never reach the shared constants. */
 function defaultCollection(): Collection {
-  return {
+  return structuredClone({
     cards: initialCollectionCards,
     decks: {
       startingDeck: startingDeck,
@@ -59,7 +60,7 @@ function defaultCollection(): Collection {
       choiceTestDeck: choiceTestDeck,
       attackTestDeck: attackTestDeck,
     },
-  }
+  })
 }
 
 function initialCollection(): Collection {
