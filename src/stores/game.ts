@@ -1,16 +1,9 @@
 import { ref, computed, watch, type Ref } from 'vue'
 import { defineStore } from 'pinia'
-import {
-  startingDeck,
-  discardTestDeck,
-  moveTestDeck,
-  choiceTestDeck,
-  attackTestDeck,
-} from '../constants.ts'
-import type { Counter } from '@/utils/counter.ts'
+import { presetSaves, type PresetSave } from '../constants.ts'
 import type { PlayableCardID, CardID, RulesCardID } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
-import { add, sub } from '@/utils/counter.ts'
+import { add, set, sub } from '@/utils/counter.ts'
 import type { GameState } from '@/utils/game.ts'
 import { handleCommand } from '@/utils/ability-processor.ts'
 import type { Collection } from '@/utils/collection.ts'
@@ -21,59 +14,17 @@ import {
   serializeCollection,
 } from '@/utils/persistence.ts'
 
-const initialCollectionCards: Counter<CardID> = {
-  score: 4,
-  'collect-basic': 4,
-  'dual-score': 4,
-  'save-reward': 4,
-  'zero-reward': 4,
-  'point-reset': 4,
-  'point-multiply': 4,
-  'score-surge': 4,
-  'score-synergy': 4,
-  'point-loan': 4,
-  'last-resort': 4,
-  'starter-rules': 1,
-  // Test cards
-  'test-rules': 1,
-  'discard-test-rules': 1,
-  'hand-board-discard': 4,
-  'move-test-rules': 1,
-  'hand-to-board': 4,
-  'double-choice': 4,
-  'choice-draw': 4,
-  'draw-watcher': 4,
-  'draw-bonus': 4,
-  'choice-add-choice': 4,
-  'choice-test-rules': 1,
-  'basic-entity': 4,
-  'target-dummy': 4,
-  'attack-test-rules': 1,
-  striker: 4,
-  'thorn-dummy': 4,
-  'basic-striker': 4,
-}
-
-/** A fresh copy of the starting collection, so edits never reach the shared constants. */
-function defaultCollection(): Collection {
-  return structuredClone({
-    cards: initialCollectionCards,
-    decks: {
-      startingDeck: startingDeck,
-      discardTestDeck: discardTestDeck,
-      moveTestDeck: moveTestDeck,
-      choiceTestDeck: choiceTestDeck,
-      attackTestDeck: attackTestDeck,
-    },
-  })
+/** A fresh copy of a preset save, so edits never reach the shared constants. */
+function presetCollection(preset: PresetSave): Collection {
+  return structuredClone(presetSaves[preset])
 }
 
 function initialCollection(): Collection {
   try {
-    return loadCollection(localStorage) ?? defaultCollection()
+    return loadCollection(localStorage) ?? presetCollection('default')
   } catch (error) {
     console.error('Discarding invalid saved collection', error)
-    return defaultCollection()
+    return presetCollection('default')
   }
 }
 
@@ -190,6 +141,19 @@ export const useGameStore = defineStore('game', () => {
     return newDeckKey
   }
 
+  function setCardQuantity(cardId: CardID, quantity: number) {
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      throw new Error(`Invalid card quantity for ${cardId}: ${quantity}`)
+    }
+    const collection = gameState.value.game.collection
+    collection.cards = set(collection.cards, cardId, quantity)
+  }
+
+  function loadPresetSave(preset: PresetSave) {
+    gameState.value.game.collection = presetCollection(preset)
+    gameState.value.ui.collection.selectedDeck = null
+  }
+
   function exportSave() {
     return serializeCollection(gameState.value.game.collection)
   }
@@ -274,6 +238,8 @@ export const useGameStore = defineStore('game', () => {
     setDeckRulesCard,
     clearDeckRulesCard,
     resolveAttack,
+    setCardQuantity,
+    loadPresetSave,
     exportSave,
     importSave,
     openEventLog,

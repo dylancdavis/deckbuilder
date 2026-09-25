@@ -89,4 +89,29 @@ describe('SettingsView', () => {
     await input.trigger('change')
     await vi.waitFor(() => expect(useGameStore().collection.decks[key]?.name).toBe('File Deck'))
   })
+
+  it('loads the test save', async () => {
+    const wrapper = mountSettings()
+
+    await button(wrapper, 'Load test save').trigger('click')
+    expect(useGameStore().collection.decks.attackTestDeck).toBeDefined()
+  })
+
+  it('resets to the default save', async () => {
+    const store = useGameStore()
+    store.loadPresetSave('test')
+    const wrapper = mountSettings()
+
+    await button(wrapper, 'Reset to default save').trigger('click')
+    expect(store.collection.decks.attackTestDeck).toBeUndefined()
+  })
+
+  it('sets a card quantity', async () => {
+    const wrapper = mountSettings()
+
+    const input = wrapper.find('[data-card-quantity="score"] input')
+    ;(input.element as HTMLInputElement).value = '2'
+    await input.trigger('change')
+    expect(useGameStore().collection.cards.score).toBe(2)
+  })
 })

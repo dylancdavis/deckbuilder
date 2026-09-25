@@ -88,3 +88,40 @@
   background-color: #ffeeee;
   border: 1px solid #cc0000;
 }
+
+.settings-section h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.card-quantities {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.25em 1.5em;
+}
+
+.card-quantity {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.25em 0;
+  border-bottom: 1px solid #d5d5d5;
+}
+
+.card-quantity-name {
+  flex: 1;
+}
+
+.card-quantity-type {
+  font-size: 12px;
+  color: #777;
+}
+
+.card-quantity input {
+  width: 4em;
+  padding: 0.2em 0.4em;
+  font: inherit;
+  border: 1px solid #999;
+  border-radius: 4px;
+  user-select: text;
+}

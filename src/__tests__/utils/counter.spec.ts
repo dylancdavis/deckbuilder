@@ -6,6 +6,7 @@ import {
   total,
   missingCounts,
   mergeCounters,
+  set,
   type Counter,
 } from '../../utils/counter.js'
 
@@ -103,6 +104,22 @@ describe('Counter', () => {
 
     it('merges two counters with same key', () => {
       expect(mergeCounters({ a: 1 }, { a: 2 })).toEqual({ a: 3 })
+    })
+  })
+
+  describe('set', () => {
+    it('sets the count of a key', () => {
+      expect(set({ a: 1 }, 'a', 3)).toEqual({ a: 3 })
+    })
+
+    it('adds a missing key', () => {
+      const counter: Counter<'a' | 'b'> = { a: 1 }
+      expect(set(counter, 'b', 2)).toEqual({ a: 1, b: 2 })
+    })
+
+    it('removes a key set to 0', () => {
+      const counter: Counter<'a' | 'b'> = { a: 1, b: 2 }
+      expect(set(counter, 'a', 0)).toEqual({ b: 2 })
     })
   })
 })

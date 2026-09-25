@@ -39,6 +39,14 @@ export function sub<T extends string>(counter: Counter<T>, key: T, n = 1): Count
 }
 
 /**
+ * Sets the count of `key` in `counter` to `n`. A count of 0 removes the key.
+ */
+export function set<T extends string>(counter: Counter<T>, key: T, n: number): Counter<T> {
+  const { [key]: _, ...rest } = counter
+  return (n === 0 ? rest : { ...rest, [key]: n }) as Counter<T>
+}
+
+/**
  * Returns the total of all count values in `counter`.
  */
 export function total<T extends string>(counter: Counter<T>) {

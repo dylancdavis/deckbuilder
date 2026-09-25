@@ -14,6 +14,7 @@ describe('attack test deck smoke test', () => {
 
   function startAttackRun() {
     const store = useGameStore()
+    store.loadPresetSave('test')
     store.selectDeck('attackTestDeck')
     store.startRun()
 

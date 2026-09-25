@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import App from '../../App.vue'
+import { useGameStore } from '../../stores/game'
+import type { PresetSave } from '../../constants'
 
 // Mock shuffle to preserve order. placeItems shims the original because it
 // calls shuffle internally — the module-internal binding isn't reachable
@@ -21,9 +23,10 @@ vi.mock('../../utils/utils', async (importOriginal) => {
   }
 })
 
-function renderApp() {
+function renderApp(preset: PresetSave = 'default') {
   const pinia = createPinia()
   setActivePinia(pinia)
+  useGameStore().loadPresetSave(preset)
   return render(App, { global: { plugins: [pinia] } })
 }
 
@@ -313,7 +316,7 @@ describe('starter deck run', () => {
 
   describe('discard commands', () => {
     async function startDiscardTestRun() {
-      renderApp()
+      renderApp('test')
       await fireEvent.click(screen.getByText('Discard Test Deck'))
       await fireEvent.click(screen.getByText('Run This Deck'))
     }
@@ -340,7 +343,7 @@ describe('starter deck run', () => {
 
   describe('move commands', () => {
     async function startMoveTestRun() {
-      renderApp()
+      renderApp('test')
       await fireEvent.click(screen.getByText('Move Test Deck'))
       await fireEvent.click(screen.getByText('Run This Deck'))
     }
@@ -367,7 +370,7 @@ describe('starter deck run', () => {
   // Choice flow tests
   describe('choice-add-choice card', () => {
     async function startChoiceTestRun() {
-      renderApp()
+      renderApp('test')
       await fireEvent.click(screen.getByText('Choice Test Deck'))
       await fireEvent.click(screen.getByText('Run This Deck'))
     }

@@ -16,20 +16,48 @@ describe('collection persistence', () => {
 
   it('starts from the default collection when nothing is saved', () => {
     const store = freshStore()
-    expect(store.collection.decks.startingDeck.name).toBe('Starter Deck')
+    expect(store.collection).toEqual({
+      cards: { 'starter-rules': 1 },
+      decks: {
+        startingDeck: { name: 'Starter Deck', rulesCardId: 'starter-rules', cards: {} },
+      },
+    })
   })
 
-  it('does not carry deck edits into a fresh default collection', () => {
-    const first = freshStore()
-    first.addCardToDeck('startingDeck', 'score')
-    localStorage.clear()
+  it('loads the test save', () => {
+    const store = freshStore()
+    store.selectDeck('startingDeck')
+    store.loadPresetSave('test')
+    expect(store.collection.decks.attackTestDeck.name).toBe('Attack Test Deck')
+    expect(store.collection.cards.score).toBe(4)
+    expect(store.selectedDeckKey).toBeNull()
+  })
 
-    const second = freshStore()
-    expect(second.collection.decks.startingDeck.cards).toEqual({})
+  it('does not carry deck edits into a preset save', () => {
+    const store = freshStore()
+    store.loadPresetSave('test')
+    store.addCardToDeck('startingDeck', 'score')
+    store.loadPresetSave('test')
+    expect(store.collection.decks.startingDeck.cards).toEqual({})
+  })
+
+  it('sets the quantity of a card in the collection', () => {
+    const store = freshStore()
+    store.setCardQuantity('score', 3)
+    expect(store.collection.cards.score).toBe(3)
+    store.setCardQuantity('score', 0)
+    expect(store.collection.cards).not.toHaveProperty('score')
+  })
+
+  it('rejects a negative or fractional card quantity', () => {
+    const store = freshStore()
+    expect(() => store.setCardQuantity('score', -1)).toThrow()
+    expect(() => store.setCardQuantity('score', 1.5)).toThrow()
   })
 
   it('restores decks saved by a previous session', async () => {
     const first = freshStore()
+    first.setCardQuantity('score', 1)
     const key = first.addDeck('Saved Deck')
     first.addCardToDeck(key, 'score')
     first.setDeckRulesCard(key, 'starter-rules')
