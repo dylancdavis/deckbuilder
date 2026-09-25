@@ -36,11 +36,6 @@
   overflow-y: auto;
 }
 
-.cards-panel .panel-header {
-  padding: 0.5em;
-  font-size: 40px;
-}
-
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, var(--collection-card-width));

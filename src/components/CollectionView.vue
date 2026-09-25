@@ -239,7 +239,6 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
     </div>
 
     <div class="cards-panel">
-      <div class="panel-header">Cards</div>
       <div class="card-grid">
         <div v-if="collectionCardsEntries.length === 0">
           No Cards in Collection. Run the starter deck!
