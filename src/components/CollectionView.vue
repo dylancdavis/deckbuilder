@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useGameStore } from '../stores/game'
 import CardItem from './CardItem.vue'
 import CardCount from './CardCount.vue'
@@ -12,7 +12,7 @@ import {
   type PlayableCardID,
   type RulesCardID,
 } from '@/utils/cards'
-import { entries, values, firstMissingNum } from '@/utils/utils'
+import { entries, keys, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
 import { deckRulesCard, getDeckValidationErrors, type Deck } from '@/utils/deck'
 import { useFlyAnimation } from '@/composables/useFlyAnimation'
@@ -22,6 +22,18 @@ const gameStore = useGameStore()
 const collection = computed(() => gameStore.collection)
 const selectedDeck = computed(() => gameStore.selectedDeck as Deck)
 const selectedDeckKey = computed(() => gameStore.selectedDeckKey)
+
+type CardType = Card['type']
+
+const cardFilters: { type: CardType; label: string }[] = [
+  { type: 'rules', label: 'Rules' },
+  { type: 'playable', label: 'Playables' },
+]
+const shownCardTypes = ref<Record<CardType, boolean>>({ rules: true, playable: true })
+
+function onToggleCardFilter(type: CardType) {
+  shownCardTypes.value[type] = !shownCardTypes.value[type]
+}
 
 const { flyElement } = useFlyAnimation()
 const cardRefs = useTemplateRef<InstanceType<typeof CardItem>[]>('cardRefs')
@@ -132,8 +144,19 @@ const collectionCardsEntries = computed(() => {
   const collectionCards = entries(collection.value.cards)
   return collectionCards
     .map(([id, amount]) => [cards[id], amount] as [Card, number])
+    .filter(([card]) => shownCardTypes.value[card.type])
     .sort(([a], [b]) => Number(b.type === 'rules') - Number(a.type === 'rules'))
 })
+
+const cardTypeQuantities = computed(() => {
+  const quantities: Record<CardType, number> = { rules: 0, playable: 0 }
+  for (const [id, amount] of entries(collection.value.cards)) {
+    quantities[cards[id].type] += amount ?? 0
+  }
+  return quantities
+})
+
+const isCollectionEmpty = computed(() => keys(collection.value.cards).length === 0)
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
 const selectedDeckRulesCard = computed(() =>
@@ -242,10 +265,19 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
     </div>
 
     <div class="cards-panel">
+      <div class="collection-filters">
+        <button
+          v-for="filter in cardFilters"
+          :key="filter.type"
+          class="collection-filter"
+          :class="{ active: shownCardTypes[filter.type] }"
+          @click="onToggleCardFilter(filter.type)"
+        >
+          {{ filter.label }} (x{{ cardTypeQuantities[filter.type] }})
+        </button>
+      </div>
       <div class="card-grid">
-        <div v-if="collectionCardsEntries.length === 0">
-          No Cards in Collection. Run the starter deck!
-        </div>
+        <div v-if="isCollectionEmpty">No Cards in Collection. Run the starter deck!</div>
         <div
           v-for="([card, amountInCollection], index) in collectionCardsEntries"
           :key="card.name"
