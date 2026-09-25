@@ -12,6 +12,10 @@ describe('App', () => {
     setActivePinia(pinia)
   })
 
+  function store() {
+    return useGameStore()
+  }
+
   function mountApp() {
     return mount(App, { global: { plugins: [pinia] } })
   }
@@ -28,7 +32,14 @@ describe('App', () => {
 
   it('hides the run nav button when there is no run', () => {
     const wrapper = mountApp()
-    expect(wrapper.findAll('.nav button').map((b) => b.text())).toEqual(['Collection'])
+    expect(wrapper.findAll('.nav button').map((b) => b.text())).toEqual(['Collection', 'Settings'])
+  })
+
+  it('opens the settings view from the nav', async () => {
+    const wrapper = mountApp()
+    await navButton(wrapper, 'Settings').trigger('click')
+    expect(store().view).toEqual(['settings'])
+    expect(wrapper.find('.settings-view').exists()).toBe(true)
   })
 
   it('switches between the collection and run views during a run', async () => {

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useGameStore } from './stores/game'
 import CollectionView from './components/CollectionView.vue'
 import RunView from './components/RunView.vue'
+import SettingsView from './components/SettingsView.vue'
 import CardChoiceModal from './components/CardChoiceModal.vue'
 import EventLogModal from './components/EventLogModal.vue'
 import type { CardID } from './utils/cards'
@@ -21,6 +22,8 @@ function getView(viewName: string[]) {
       return CollectionView
     case 'run':
       return RunView
+    case 'settings':
+      return SettingsView
     default:
       return CollectionView
   }
@@ -39,18 +42,28 @@ async function handleSelect(cardId: CardID) {
   <div class="main-content">
     <div class="main-panel">
       <div class="nav">
-        <button
-          :class="{ active: view[0] === 'collection' }"
-          @click="gameStore.setView(['collection'])"
-        >
-          Collection
-        </button>
-        <template v-if="gameStore.run">
-          <div class="nav-divider"></div>
-          <button :class="{ active: view[0] === 'run' }" @click="gameStore.setView(['run'])">
-            Current Run
+        <div class="nav-group">
+          <button
+            :class="{ active: view[0] === 'collection' }"
+            @click="gameStore.setView(['collection'])"
+          >
+            Collection
           </button>
-        </template>
+          <template v-if="gameStore.run">
+            <div class="nav-divider"></div>
+            <button :class="{ active: view[0] === 'run' }" @click="gameStore.setView(['run'])">
+              Current Run
+            </button>
+          </template>
+        </div>
+        <div class="nav-group">
+          <button
+            :class="{ active: view[0] === 'settings' }"
+            @click="gameStore.setView(['settings'])"
+          >
+            Settings
+          </button>
+        </div>
       </div>
       <component :is="getView(view)" />
     </div>

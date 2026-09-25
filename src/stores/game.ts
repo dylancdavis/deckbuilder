@@ -14,7 +14,12 @@ import { add, sub } from '@/utils/counter.ts'
 import type { GameState } from '@/utils/game.ts'
 import { handleCommand } from '@/utils/ability-processor.ts'
 import type { Collection } from '@/utils/collection.ts'
-import { loadCollection, saveCollection } from '@/utils/persistence.ts'
+import {
+  loadCollection,
+  parseCollection,
+  saveCollection,
+  serializeCollection,
+} from '@/utils/persistence.ts'
 
 const initialCollectionCards: Counter<CardID> = {
   score: 4,
@@ -185,6 +190,16 @@ export const useGameStore = defineStore('game', () => {
     return newDeckKey
   }
 
+  function exportSave() {
+    return serializeCollection(gameState.value.game.collection)
+  }
+
+  /** Replaces the collection with a serialized one. Throws if the save is invalid. */
+  function importSave(json: string) {
+    gameState.value.game.collection = parseCollection(json)
+    gameState.value.ui.collection.selectedDeck = null
+  }
+
   function openEventLog() {
     if (!gameState.value.game.run) return
     gameState.value.viewData.modalView = 'event-log'
@@ -259,6 +274,8 @@ export const useGameStore = defineStore('game', () => {
     setDeckRulesCard,
     clearDeckRulesCard,
     resolveAttack,
+    exportSave,
+    importSave,
     openEventLog,
     closeEventLog,
   }

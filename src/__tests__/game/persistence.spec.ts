@@ -62,4 +62,23 @@ describe('collection persistence', () => {
     expect(error).toHaveBeenCalled()
     error.mockRestore()
   })
+
+  it('imports a save, replacing the collection', () => {
+    const source = freshStore()
+    const key = source.addDeck('Imported Deck')
+    const save = source.exportSave()
+
+    const target = freshStore()
+    target.selectDeck('startingDeck')
+    target.importSave(save)
+    expect(target.collection.decks[key].name).toBe('Imported Deck')
+    expect(target.selectedDeckKey).toBeNull()
+  })
+
+  it('rejects an invalid save without changing the collection', () => {
+    const store = freshStore()
+    const before = store.exportSave()
+    expect(() => store.importSave('{"cards":{"no-such-card":1},"decks":{}}')).toThrow()
+    expect(store.exportSave()).toBe(before)
+  })
 })

@@ -4,6 +4,7 @@ import {
   loadCollection,
   parseCollection,
   saveCollection,
+  serializeCollection,
 } from '../../utils/persistence.js'
 import type { Collection } from '../../utils/collection.js'
 
@@ -17,7 +18,11 @@ const collection: Collection = {
 
 describe('parseCollection', () => {
   it('parses a serialized collection', () => {
-    expect(parseCollection(JSON.stringify(collection))).toEqual(collection)
+    expect(parseCollection(serializeCollection(collection))).toEqual(collection)
+  })
+
+  it('throws on malformed JSON', () => {
+    expect(() => parseCollection('not a save')).toThrow()
   })
 
   it('throws on an unknown collection card id', () => {

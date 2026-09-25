@@ -52,6 +52,11 @@ svg {
   color: white;
   font-size: 18px;
   display: flex;
+  justify-content: space-between;
+}
+
+.main-panel .nav .nav-group {
+  display: flex;
   gap: 0.5em;
 }
 

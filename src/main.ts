@@ -8,6 +8,7 @@ import './assets/css/index.css'
 import './assets/css/cards.css'
 import './assets/css/collection.css'
 import './assets/css/run.css'
+import './assets/css/settings.css'
 
 const app = createApp(App)
 

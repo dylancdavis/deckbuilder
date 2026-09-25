@@ -38,6 +38,10 @@ export function loadCollection(storage: Storage): Collection | null {
   return json === null ? null : parseCollection(json)
 }
 
+export function serializeCollection(collection: Collection) {
+  return JSON.stringify(collection, null, 2)
+}
+
 export function saveCollection(storage: Storage, collection: Collection) {
-  storage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(collection))
+  storage.setItem(COLLECTION_STORAGE_KEY, serializeCollection(collection))
 }
