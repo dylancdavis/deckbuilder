@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { moveCardByIndex, moveCards, populateDrawPile, type Run } from '../../utils/run.js'
+import { makeRun, moveCardByIndex, moveCards, populateDrawPile, type Run } from '../../utils/run.js'
 import { pileToIdCounter } from '../../utils/deck.ts'
 import {
   playableCards,
+  starterRules,
   coreGameFlowAbilities,
   type CardInstance,
   type RulesCard,
@@ -191,6 +192,17 @@ describe('populateDrawPile', () => {
     const result = populateDrawPile(emptyHandRun)
     const idCounter = pileToIdCounter(result.cards.drawPile)
     expect(idCounter).toEqual(exampleCounter)
+  })
+})
+
+describe('makeRun', () => {
+  it("resolves the deck's rules card", () => {
+    const run = makeRun({ name: 'Test', cards: exampleCounter, rulesCardId: 'starter-rules' })
+    expect(run.deck.rulesCard).toBe(starterRules)
+  })
+
+  it('throws when the deck has no rules card', () => {
+    expect(() => makeRun({ name: 'Test', cards: exampleCounter, rulesCardId: null })).toThrow()
   })
 })
 

@@ -578,18 +578,15 @@ function handlePlayCard(gameState: GameState, command: PlayCardCommand): Command
   }
 
   // Check playAmount limit
-  const rulesCard = run.deck.rulesCard
-  if (rulesCard) {
-    const playAmount = rulesCard.turnStructure.playAmount
-    if (typeof playAmount === 'number') {
-      const cardsPlayedThisTurn = run.events.filter(
-        (e) => e.type === 'card-play' && e.round === round && e.turn === turn,
-      ).length
-      if (cardsPlayedThisTurn >= playAmount) {
-        throw new Error(
-          `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`,
-        )
-      }
+  const playAmount = run.deck.rulesCard.turnStructure.playAmount
+  if (typeof playAmount === 'number') {
+    const cardsPlayedThisTurn = run.events.filter(
+      (e) => e.type === 'card-play' && e.round === round && e.turn === turn,
+    ).length
+    if (cardsPlayedThisTurn >= playAmount) {
+      throw new Error(
+        `Cannot play card: playAmount limit of ${playAmount} reached (${cardsPlayedThisTurn} cards played this turn)`,
+      )
     }
   }
 

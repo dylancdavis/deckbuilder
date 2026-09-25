@@ -14,7 +14,7 @@ import {
 } from '@/utils/cards'
 import { entries, values, firstMissingNum } from '@/utils/utils'
 import { total } from '@/utils/counter'
-import { getDeckValidationErrors, type Deck } from '@/utils/deck'
+import { deckRulesCard, getDeckValidationErrors, type Deck } from '@/utils/deck'
 import { useFlyAnimation } from '@/composables/useFlyAnimation'
 import { TILT_PRESETS } from '@/composables/useTilt'
 
@@ -68,7 +68,7 @@ function onStartRun() {
 }
 
 function handleCardClick(id: CardID, index: number) {
-  if (cardType(id) === 'rules' && selectedDeck.value?.rulesCard) {
+  if (cardType(id) === 'rules' && selectedDeck.value?.rulesCardId) {
     return
   }
 
@@ -134,7 +134,10 @@ const collectionCardsEntries = computed(() => {
 })
 
 const currentDeckSize = computed(() => deckSize(selectedDeck.value))
-const requiredDeckSize = computed(() => selectedDeck.value.rulesCard?.deckLimits.size)
+const selectedDeckRulesCard = computed(() =>
+  selectedDeck.value ? deckRulesCard(selectedDeck.value) : null,
+)
+const requiredDeckSize = computed(() => selectedDeckRulesCard.value?.deckLimits.size)
 const deckValidationErrors = computed(() => {
   if (!selectedDeck.value) return []
   return getDeckValidationErrors(selectedDeck.value, collection.value)
@@ -184,14 +187,12 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
         <div class="card-list-container">
           <!-- Rules Card Display -->
           <div class="card-list-block">
-            <div v-if="!selectedDeck?.rulesCard" class="card-list-header">
-              No Rules Card Selected
-            </div>
+            <div v-if="!selectedDeckRulesCard" class="card-list-header">No Rules Card Selected</div>
             <div v-else>
               <div class="card-list-header">Rules Card:</div>
               <ul>
                 <li class="deck-card-count-item">
-                  <span>{{ selectedDeck.rulesCard.name }}</span>
+                  <span>{{ selectedDeckRulesCard.name }}</span>
                   <button @click="onClearSelectedDeckRulesCard">X</button>
                 </li>
               </ul>
@@ -248,8 +249,8 @@ function deckSizeText(currentSize: number, requiredSize: [number, number]) {
           :key="card.name"
           class="card-collection-item"
           :class="{
-            clickable: selectedDeck && !(card.type === 'rules' && selectedDeck.rulesCard),
-            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCard,
+            clickable: selectedDeck && !(card.type === 'rules' && selectedDeck.rulesCardId),
+            disabled: selectedDeck && card.type === 'rules' && selectedDeck.rulesCardId,
           }"
           @click="handleCardClick(card.id, index)"
         >

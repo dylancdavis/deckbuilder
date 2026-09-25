@@ -9,31 +9,40 @@ import {
   type PlayableCard,
   type PlayableCardID,
   type RulesCard,
+  type RulesCardID,
 } from './cards.ts'
 import { entries, keys } from './utils.ts'
 import type { Collection } from './collection.ts'
 
 export type Deck = {
   name: string
-  rulesCard: RulesCard | null
+  rulesCardId: RulesCardID | null
   cards: Counter<PlayableCardID>
+}
+
+/**
+ * Returns the rules card a deck references, or null if it has none.
+ */
+export function deckRulesCard(deck: Deck): RulesCard | null {
+  return deck.rulesCardId ? cards[deck.rulesCardId] : null
 }
 
 /**
  * Returns true if a deck has a rules card.
  */
 export function hasRulesCard(deck: Deck) {
-  return deck.rulesCard != null
+  return deck.rulesCardId != null
 }
 
 /**
  * Returns true if a deck has a size within the range specified by its rules card.
  */
 export function deckInSizeRange(deck: Deck) {
-  if (!deck.rulesCard) return true
+  const rulesCard = deckRulesCard(deck)
+  if (!rulesCard) return true
 
   const deckSize = total(deck.cards)
-  const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
+  const [minSize, maxSize] = rulesCard.deckLimits?.size || [0, Infinity]
 
   return minSize <= deckSize && deckSize <= maxSize
 }
@@ -71,9 +80,10 @@ export function getDeckValidationErrors(deck: Deck, collection: Collection): str
   }
 
   // Check deck size against rules card limits
-  if (deck.rulesCard && !deckInSizeRange(deck)) {
+  const rulesCard = deckRulesCard(deck)
+  if (rulesCard && !deckInSizeRange(deck)) {
     const deckSize = total(deck.cards)
-    const [minSize, maxSize] = deck.rulesCard.deckLimits?.size || [0, Infinity]
+    const [minSize, maxSize] = rulesCard.deckLimits?.size || [0, Infinity]
 
     if (deckSize < minSize) {
       errors.push(`Too few cards in deck (${deckSize}/${minSize})`)

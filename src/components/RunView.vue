@@ -36,8 +36,6 @@ const cardsPlayedThisTurn = computed(() => {
 })
 
 const canPlayCard = computed(() => {
-  if (!run.value.deck.rulesCard) return false
-
   const playAmount = run.value.deck.rulesCard.turnStructure.playAmount
   // If playAmount is 'any', can always play
   if (playAmount === 'any') return true
@@ -47,8 +45,6 @@ const canPlayCard = computed(() => {
 })
 
 const nextTurnButtonText = computed(() => {
-  if (!run.value.deck.rulesCard) return { main: 'Next Turn', subtitle: null }
-
   const hasCardsInHand = run.value.cards.hand.length > 0
 
   const main = isEndOfRun.value ? 'End Run' : 'Next Turn'
@@ -222,7 +218,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
   <div v-if="run" class="run-view" @click="selectedAttackerId = null">
     <!-- Rules Draw Panel -->
     <div class="panel rules-draw">
-      <CardItem v-if="run.deck.rulesCard" :card="run.deck.rulesCard" :tilt="TILT_PRESETS.minimal" />
+      <CardItem :card="run.deck.rulesCard" :tilt="TILT_PRESETS.minimal" />
 
       <!-- Draw Pile -->
       <div v-if="drawPileData.pileSize === 0" class="empty-pile">draw</div>
@@ -313,12 +309,12 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
             data-testid="cards-played-display"
           >
             <span>Cards Played</span>
-            <span v-if="run.deck.rulesCard?.turnStructure.playAmount === 'any'">
+            <span v-if="run.deck.rulesCard.turnStructure.playAmount === 'any'">
               <FlashValue :value="cardsPlayedThisTurn" />
             </span>
             <span v-else>
               <FlashValue :value="cardsPlayedThisTurn" /> /
-              <FlashValue :value="run.deck.rulesCard?.turnStructure.playAmount || 0" />
+              <FlashValue :value="run.deck.rulesCard.turnStructure.playAmount" />
             </span>
           </div>
           <div class="resources-grid">

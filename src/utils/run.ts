@@ -3,10 +3,10 @@
  */
 
 import { moveItem, moveItems } from './utils.ts'
-import { toArray } from './counter.ts'
-import { playableCards, type CardInstance } from './cards.ts'
+import { toArray, type Counter } from './counter.ts'
+import { playableCards, type CardInstance, type PlayableCardID, type RulesCard } from './cards.ts'
 import type { GameState } from './game.ts'
-import type { Deck } from './deck.ts'
+import { deckRulesCard, type Deck } from './deck.ts'
 import type { Resource } from './resource.ts'
 import type { Event } from './event.ts'
 import { handleCommand } from './ability-processor.ts'
@@ -15,8 +15,15 @@ export type Location = 'drawPile' | 'hand' | 'board' | 'discardPile'
 
 export type RunCards = Record<Location, CardInstance[]>
 
+/** A deck as played in a run, with its rules card resolved. */
+export type RunDeck = {
+  name: string
+  rulesCard: RulesCard
+  cards: Counter<PlayableCardID>
+}
+
 export type Run = {
-  deck: Deck
+  deck: RunDeck
   cards: RunCards
   resources: Record<Resource, number>
   stats: { turns: number; rounds: number }
@@ -95,8 +102,13 @@ export function populateDrawPile(run: Run): Run {
  * Creates a new run from a deck with populated draw pile.
  */
 export function makeRun(deck: Deck): Run {
+  const rulesCard = deckRulesCard(deck)
+  if (!rulesCard) {
+    throw new Error(`Cannot make run: deck ${deck.name} has no rules card`)
+  }
+
   const baseRun: Run = {
-    deck: deck,
+    deck: { name: deck.name, rulesCard, cards: deck.cards },
     cards: { drawPile: [], hand: [], board: [], discardPile: [] },
     resources: { points: 0 },
     stats: { turns: 0, rounds: 0 },

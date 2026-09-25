@@ -8,8 +8,7 @@ import {
   attackTestDeck,
 } from '../constants.ts'
 import type { Counter } from '@/utils/counter.ts'
-import type { PlayableCardID, RulesCard, CardID, RulesCardID } from '@/utils/cards.ts'
-import { cards } from '@/utils/cards.ts'
+import type { PlayableCardID, CardID, RulesCardID } from '@/utils/cards.ts'
 import { initializeRun } from '@/utils/run.ts'
 import { add, sub } from '@/utils/counter.ts'
 import type { GameState } from '@/utils/game.ts'
@@ -144,24 +143,21 @@ export const useGameStore = defineStore('game', () => {
     const deck = gameState.value.game.collection.decks[deckKey]
     if (!deck) return
 
-    // Set rules card (just reference from cards collection)
-    deck.rulesCard = cards[rulesCardId] as RulesCard
+    deck.rulesCardId = rulesCardId
   }
 
   function clearDeckRulesCard(deckKey: string) {
     const deck = gameState.value.game.collection.decks[deckKey]
     if (!deck) return
 
-    // Clear rules card - need to handle this based on deck structure requirements
-    // For now, setting to starter rules as fallback
-    deck.rulesCard = null
+    deck.rulesCardId = null
   }
 
   function addDeck(name: string) {
     const newDeckKey = crypto.randomUUID()
     gameState.value.game.collection.decks[newDeckKey] = {
       name: name,
-      rulesCard: null,
+      rulesCardId: null,
       cards: {},
     }
     return newDeckKey
@@ -202,7 +198,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function nextTurn() {
-    if (!gameState.value.game.run?.deck.rulesCard) return
+    if (!gameState.value.game.run) return
 
     gameState.value = handleCommand(
       gameState.value,

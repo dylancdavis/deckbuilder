@@ -551,7 +551,7 @@ export function findMatchingAbilities(run: Run, event: Event): AbilityMatch[] {
   const cardMatches: AbilityMatch[] = []
   const afterCards: AbilityMatch[] = []
 
-  const rulesCard = run.deck.rulesCard!
+  const rulesCard = run.deck.rulesCard
   for (const ability of rulesCard.abilities) {
     if (ability.type !== 'reactive') continue
     if (matchesTrigger(event, rulesCard, 'board', ability.trigger, run)) {
@@ -586,7 +586,7 @@ function findMatchingInterrupt(
   commandContext: CommandContext,
   applied: string[],
 ): { card: CardInstance | RulesCard; ability: InterruptAbility } | null {
-  const rulesCard = run.deck.rulesCard!
+  const rulesCard = run.deck.rulesCard
   for (const ability of rulesCard.abilities) {
     if (ability.type !== 'interrupt' || applied.includes(interruptKey(rulesCard, ability))) continue
     if (matchesCommandTrigger(command, rulesCard, 'board', ability.trigger, commandContext, run))
