@@ -1,0 +1,443 @@
+/* Mockups of colorless indicators distinguishing actions from assets (auras and entities).
+   Each variant class switches one treatment on. */
+
+.mockup-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.mockup-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Layouts: bigger structural changes to the card's face, one per cell via data-layout */
+
+/* Band: the art runs edge to edge across the card, out past the face's padding */
+.mockup-layouts [data-layout='band'] .card-image {
+  width: auto;
+  margin-inline: calc(var(--card-width) * -12 / 250);
+  border-radius: 0;
+  border-inline: none;
+  border-block: calc(var(--card-width) * 3 / 250) solid var(--card-border-color);
+}
+
+/* Full art: the art fills the whole face, with the name and description floating over it.
+   The art stays in flow, so its icon centres in the space between the two panels, but its
+   background moves to a ::before spread across the face. background: inherit copies the art's
+   layers onto it, and the art's own zero-size layers draw nothing. */
+.mockup-layouts [data-layout^='full-art'] .card-background {
+  position: relative;
+  isolation: isolate;
+}
+
+.mockup-layouts [data-layout^='full-art'] .card-image {
+  border: none;
+  background-size: 0 0;
+}
+
+/* Negative z-index puts it under the panels; the isolated face keeps it above the face's own
+   background. The face's 12-unit radius keeps its corners off the frame. */
+.mockup-layouts [data-layout^='full-art'] .card-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: inherit;
+  background-size: auto;
+  border-radius: calc(var(--card-width) * 12 / 250);
+}
+
+/* Frosted glass, like Mica: a translucent tint over a blurred, saturated view of the art.
+   A raised edge and drop shadow replace the inset shadows, so both panels float rather than
+   sink. */
+.mockup-layouts [data-layout^='full-art'] :is(.card-name, .card-description) {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(calc(var(--card-width) * 8 / 250)) saturate(1.6);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 calc(var(--card-width) * 1 / 250) 0 rgba(255, 255, 255, 0.7),
+    0 calc(var(--card-width) * 2 / 250) calc(var(--card-width) * 8 / 250) rgba(0, 0, 0, 0.3);
+}
+
+.mockup-layouts [data-layout^='full-art'] .card-description {
+  height: auto;
+  min-height: 40%;
+}
+
+/* Full art flush: the panels attach to the face's edges instead of floating. The face and
+   content drop their padding, the name keeps only its bottom border and the description only
+   its top one. Outer corners take the face's 12-unit radius; the inner edge keeps the panels'
+   own 8-unit curve. Their shadows fall inward, onto the art. */
+.mockup-layouts [data-layout='full-art-flush'] :is(.card-background, .card-content) {
+  padding: 0;
+}
+
+.mockup-layouts [data-layout='full-art-flush'] .card-name {
+  --outer: calc(var(--card-width) * 12 / 250);
+  --inner: calc(var(--card-width) * 8 / 250);
+  border-width: 0 0 calc(var(--card-width) * 3 / 250);
+  border-radius: var(--outer) var(--outer) var(--inner) var(--inner);
+  box-shadow:
+    inset 0 calc(var(--card-width) * 1 / 250) 0 rgba(255, 255, 255, 0.7),
+    0 calc(var(--card-width) * 2 / 250) calc(var(--card-width) * 8 / 250) rgba(0, 0, 0, 0.3);
+}
+
+.mockup-layouts [data-layout='full-art-flush'] .card-description {
+  --outer: calc(var(--card-width) * 12 / 250);
+  --inner: calc(var(--card-width) * 8 / 250);
+  min-height: 30%;
+  border-width: calc(var(--card-width) * 1 / 250) 0 0;
+  border-radius: var(--inner) var(--inner) var(--outer) var(--outer);
+  box-shadow:
+    inset 0 calc(var(--card-width) * 1 / 250) 0 rgba(255, 255, 255, 0.7),
+    0 calc(var(--card-width) * -2 / 250) calc(var(--card-width) * 8 / 250) rgba(0, 0, 0, 0.3);
+}
+
+/* Corner: the art fills everything beneath the name, and the description sits in a cut-out
+   in its bottom-right corner. Both share one grid cell; the art is clipped around the
+   description, leaving a gap of face between them. The cut-out is sized in card units so the
+   clip and the art's icon can line up with it. */
+.mockup-layouts [data-layout='corner'] .card-content {
+  --cutout-width: calc(var(--card-width) * 140 / 250);
+  --cutout-height: calc(var(--card-width) * 96 / 250);
+  --cutout-gap: calc(var(--card-width) * 8 / 250);
+  display: grid;
+  grid-template: 1fr / 1fr;
+}
+
+.mockup-layouts [data-layout='corner'] :is(.card-image, .card-description) {
+  grid-area: 1 / 1;
+}
+
+/* The bottom padding lifts the centred icon into the open space above the cut-out. The clip
+   traces the art clockwise from its top-left, rounding the two corners where its edges turn
+   into the notch and the notch's inner corner. The inner radius is the description's 8 plus
+   the gap, so it stays concentric with the description's corner. Its own outer corners are
+   left to its border-radius. */
+.mockup-layouts [data-layout='corner'] .card-image {
+  --notch-left: calc(100% - var(--cutout-width) - var(--cutout-gap));
+  --notch-top: calc(100% - var(--cutout-height) - var(--cutout-gap));
+  --edge-radius: calc(var(--card-width) * 8 / 250);
+  --notch-radius: calc(var(--card-width) * 8 / 250 + var(--cutout-gap));
+  height: auto;
+  padding-bottom: calc(var(--cutout-height) + var(--cutout-gap));
+  clip-path: shape(
+    from 0 0,
+    hline to 100%,
+    vline to calc(var(--notch-top) - var(--edge-radius)),
+    arc to calc(100% - var(--edge-radius)) var(--notch-top) of var(--edge-radius) cw,
+    hline to calc(var(--notch-left) + var(--notch-radius)),
+    arc to var(--notch-left) calc(var(--notch-top) + var(--notch-radius)) of var(--notch-radius) ccw,
+    vline to calc(100% - var(--edge-radius)),
+    arc to calc(var(--notch-left) - var(--edge-radius)) 100% of var(--edge-radius) cw,
+    hline to 0,
+    close
+  );
+}
+
+.mockup-layouts [data-layout='corner'] .card-description {
+  width: var(--cutout-width);
+  height: var(--cutout-height);
+  justify-self: end;
+  align-self: end;
+}
+
+/* Borders: changes to the card's outer frame. The frame is the dark .card-container showing
+   around the lighter .card-background face, so cutting the face reveals frame beneath it. */
+
+/* Indents: frame-coloured cuts into the face at each cardinal point, drawn as trapezoids
+   that slope at 45° from the edge. With no flat they close into triangles. Top and bottom hang
+   off the face; left and right hang off the art's bottom edge, so they follow wherever the
+   description meets the art. */
+[data-decor='indents'] {
+  --indent-depth: var(--mock-indent-depth, 9);
+  --indent-flat: 0;
+}
+
+[data-decor='indents-trapezoid'] {
+  --indent-depth: var(--mock-trapezoid-depth, 6);
+  --indent-flat: var(--mock-trapezoid-flat, 30);
+}
+
+[data-decor^='indents'] .card-background {
+  position: relative;
+}
+
+[data-decor^='indents'] :is(.card-background, .card-image) {
+  --indent: calc(var(--card-width) * var(--indent-depth) / 250);
+  --indent-span: calc(var(--card-width) * (var(--indent-depth) * 2 + var(--indent-flat)) / 250);
+}
+
+[data-decor^='indents'] .card-background::before,
+[data-decor^='indents'] .card-background::after,
+[data-decor^='indents'] .card-image::before,
+[data-decor^='indents'] .card-image::after {
+  content: '';
+  position: absolute;
+  background: var(--mock-decor-color, var(--card-border-color));
+  pointer-events: none;
+}
+
+[data-decor^='indents'] .card-background::before,
+[data-decor^='indents'] .card-background::after {
+  left: 50%;
+  width: var(--indent-span);
+  height: var(--indent);
+  transform: translateX(-50%);
+}
+
+[data-decor^='indents'] .card-background::before {
+  top: 0;
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--indent)) 100%, var(--indent) 100%);
+}
+
+[data-decor^='indents'] .card-background::after {
+  bottom: 0;
+  clip-path: polygon(var(--indent) 0, calc(100% - var(--indent)) 0, 100% 100%, 0 100%);
+}
+
+[data-decor^='indents'] .card-image {
+  position: relative;
+}
+
+[data-decor^='indents'] .card-image::before,
+[data-decor^='indents'] .card-image::after {
+  /* Offsets start inside the art's 1-unit border, so each adds it back: 5 is that border plus
+     half the 8-unit gap below, and 13 is it plus the face padding (8) and content inset (4)
+     out to the frame */
+  bottom: calc(var(--card-width) * -5 / 250 - var(--indent-span) / 2);
+  width: var(--indent);
+  height: var(--indent-span);
+}
+
+[data-decor^='indents'] .card-image::before {
+  left: calc(var(--card-width) * -13 / 250);
+  clip-path: polygon(0 0, 100% var(--indent), 100% calc(100% - var(--indent)), 0 100%);
+}
+
+[data-decor^='indents'] .card-image::after {
+  right: calc(var(--card-width) * -13 / 250);
+  clip-path: polygon(0 var(--indent), 100% 0, 100% 100%, 0 calc(100% - var(--indent)));
+}
+
+/* Frames: each cell picks a border decor with data-decor. Every size below is in the card's
+   250-wide units, driven by the story's controls through --mock-* variables. */
+/* Rows of four, so the decors fit on screen at once */
+.mockup-frames {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-items: center;
+}
+
+.mockup-frames * {
+  --collection-card-width: calc(var(--mock-card-width, 200) * 1px);
+}
+
+.mockup-frames :is(.card-container, .card-stat) {
+  --card-border-color: var(--mock-border-color, rgb(20, 20, 20));
+}
+
+.mockup-frames .card-container {
+  border-width: calc(var(--card-width) * var(--mock-border-width, 4) / 250);
+}
+
+.mockup-frames .card-background {
+  --decor: var(--mock-decor-color, var(--card-border-color));
+  --face: linear-gradient(var(--mock-face-top, #ccc), var(--mock-face-bottom, #919191));
+  background: var(--face);
+}
+
+/* Double: the border split into two lines, thickened so both read. The gap shows the
+   container's background. */
+.mockup-frames [data-decor='double'] .card-container {
+  border-style: double;
+  border-width: calc(var(--card-width) * var(--mock-double-width, 7) / 250);
+  background-color: var(--mock-double-gap, #bdbdbd);
+}
+
+/* Partial doubles: the border split into the double's two lines along the edges only, or
+   around the corners only, the inner line stepping out of the plain border and the gap tapering
+   to a point. The story draws the split parts as SVG paths over the card, in pixels. */
+.mockup-partial-double {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  fill-rule: evenodd;
+}
+
+.mockup-partial-double .double-line {
+  fill: var(--mock-border-color, #141414);
+}
+
+.mockup-partial-double .double-gap {
+  fill: var(--mock-double-gap, #bdbdbd);
+}
+
+/* Ribbon wrap: decor-coloured strips cutting across the card's corners. Each corner is its own
+   gradient layer of the face's background, so the name bar, art and description paint over
+   them. */
+.mockup-frames [data-decor^='ribbon'] .card-background {
+  --ribbon-inset: calc(var(--card-width) * var(--mock-ribbon-inset, 20) / 250);
+  --ribbon-width: calc(var(--card-width) * var(--mock-ribbon-width, 22) / 250);
+  --ribbon-stops:
+    #0000 var(--ribbon-inset), var(--decor) 0 calc(var(--ribbon-inset) + var(--ribbon-width)),
+    #0000 0;
+  --ribbon-top-left: linear-gradient(135deg, var(--ribbon-stops));
+  --ribbon-top-right: linear-gradient(-135deg, var(--ribbon-stops));
+  --ribbon-bottom-left: linear-gradient(45deg, var(--ribbon-stops));
+  --ribbon-bottom-right: linear-gradient(-45deg, var(--ribbon-stops));
+  background: var(--ribbon-top-left), var(--ribbon-bottom-right), var(--face);
+}
+
+/* Striped: several thin strips layered on all four corners. CSS can't repeat a band a set
+   number of times, so the story builds the stops from its stripe controls. */
+.mockup-frames [data-decor='ribbon-striped'] .card-background {
+  --ribbon-stops: var(--mock-stripe-stops);
+  background:
+    var(--ribbon-top-left), var(--ribbon-top-right), var(--ribbon-bottom-left),
+    var(--ribbon-bottom-right), var(--face);
+}
+
+/* Bottom: full-width strips on the two bottom corners only */
+.mockup-frames [data-decor='ribbon-bottom'] .card-background {
+  background: var(--ribbon-bottom-left), var(--ribbon-bottom-right), var(--face);
+}
+
+/* Perforated: a dashed line inside the face, like a tear-off coupon. It's an SVG rounded rect
+   laid over the card, so the dashes follow the corners and their lengths can be set. The SVG's
+   box is the stroke's centreline: frame + offset + half the line in from the card's edge, with
+   the stroke's outer half spilling over it. */
+.mockup-frames .mockup-card {
+  --u: calc(var(--mock-card-width, 200) * 1px / 250);
+  position: relative;
+}
+
+.mockup-perforation {
+  --line: calc(var(--u) * var(--mock-perforation-thickness, 2));
+  --offset: calc(var(--u) * var(--mock-perforation-offset, 4));
+  --inset: calc(var(--u) * var(--mock-border-width, 4) + var(--offset) + var(--line) / 2);
+  position: absolute;
+  top: var(--inset);
+  left: var(--inset);
+  width: calc(100% - var(--inset) * 2);
+  height: calc(100% - var(--inset) * 2);
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* The corner radius stays concentric with the face's 12-unit corners */
+.mockup-perforation rect {
+  fill: none;
+  stroke: var(--mock-decor-color, #141414);
+  stroke-width: var(--line);
+  stroke-dasharray: calc(var(--u) * var(--mock-perforation-dash, 8))
+    calc(var(--u) * var(--mock-perforation-gap, 6));
+  rx: max(0px, calc(var(--u) * 12 - var(--offset) - var(--line) / 2));
+}
+
+/* Type line: a small-caps label inside the description box, along its bottom by default.
+   Frames places it with data-type-line: top, top-left, bottom or bottom-right. */
+:is(.mockup-type-line, [data-type-line]) .card-description {
+  grid-template-rows: 1fr auto;
+  gap: calc(var(--card-width) * 4 / 250);
+}
+
+:is(.mockup-type-line, [data-type-line]) .card-description::after {
+  font-size: calc(var(--card-width) * 11 / 250);
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  color: #666;
+  align-self: end;
+}
+
+:is(.mockup-type-line, [data-type-line]) [data-category='action'] .card-description::after {
+  content: 'ACTION';
+}
+
+:is(.mockup-type-line, [data-type-line]) [data-category='aura'] .card-description::after {
+  content: 'ASSET · AURA';
+}
+
+:is(.mockup-type-line, [data-type-line]) [data-category='entity'] .card-description::after {
+  content: 'ASSET · ENTITY';
+}
+
+/* Top: the label takes the first row, pushing the description text into the second */
+:is([data-type-line='top'], [data-type-line='top-left']) .card-description {
+  grid-template-rows: auto 1fr;
+}
+
+:is([data-type-line='top'], [data-type-line='top-left']) .card-description::after {
+  grid-row: 1;
+  align-self: start;
+}
+
+[data-type-line='top-left'] .card-description::after {
+  justify-self: start;
+}
+
+/* The trailing letter-spacing would leave a gap before the right edge, so pull it back */
+[data-type-line='bottom-right'] .card-description::after {
+  justify-self: end;
+  margin-right: -0.12em;
+}
+
+/* Turn counter: a coloured diamond on the bottom edge showing how many turns an aura, or an
+   entity that also acts like one, has left. The diamond is rotated, so the number sits in a
+   separate, unrotated layer over it. The story's controls set the --mock-* values. */
+.mockup-aura-turn-counter .card-container {
+  --badge-size: calc(var(--card-width) * var(--mock-badge-size, 38) / 250);
+  --badge-bottom: calc(var(--card-width) * var(--mock-badge-offset, -12) / 250);
+}
+
+.mockup-aura-turn-counter .card-container::before,
+.mockup-aura-turn-counter .card-container::after {
+  position: absolute;
+  left: 50%;
+  bottom: var(--badge-bottom);
+  width: var(--badge-size);
+  height: var(--badge-size);
+  /* The reset's border-box sizing skips pseudo-elements; without it the diamond's border
+     grows its box past the number's, and the number sits a border-width low */
+  box-sizing: border-box;
+  /* Lift both layers over the description, which is positioned and comes later in the tree */
+  z-index: 1;
+}
+
+.mockup-aura-turn-counter .card-container::before {
+  content: '';
+  transform: translateX(-50%) rotate(45deg);
+  border: calc(var(--card-width) * var(--mock-badge-border, 4) / 250) solid var(--card-border-color);
+  border-radius: calc(var(--card-width) * var(--mock-badge-radius, 4) / 250);
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--mock-badge-light, #2fa89c),
+    var(--mock-badge-dark, #0b5d56)
+  );
+  box-shadow: 0 calc(var(--card-width) * 2 / 250) calc(var(--card-width) * 4 / 250)
+    rgba(0, 0, 0, 0.4);
+}
+
+.mockup-aura-turn-counter .card-container::after {
+  counter-reset: turns var(--mock-turns, 3);
+  content: counter(turns);
+  transform: translateX(-50%)
+    translateY(calc(var(--card-width) * var(--mock-number-nudge, 0) / 250));
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  font-size: calc(var(--card-width) * var(--mock-number-size, 22) / 250);
+  color: var(--mock-number-color, #fff);
+  text-shadow: 0 1px calc(var(--mock-number-shadow-blur, 3) * 1px)
+    rgba(0, 0, 0, var(--mock-number-shadow, 0.3));
+}
