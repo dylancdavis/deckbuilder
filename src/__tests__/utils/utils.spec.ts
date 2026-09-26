@@ -1,5 +1,28 @@
 import { describe, it, expect } from 'vitest'
-import { firstMissingNum, selectKeysBy, moveItem, moveItems } from '../../utils/utils.js'
+import {
+  entries,
+  firstMissingNum,
+  fromEntries,
+  selectKeysBy,
+  moveItem,
+  moveItems,
+} from '../../utils/utils.js'
+
+describe('fromEntries', () => {
+  it('builds an object from key-value pairs', () => {
+    expect(
+      fromEntries([
+        ['a', 1],
+        ['b', 2],
+      ] as const),
+    ).toEqual({ a: 1, b: 2 })
+  })
+
+  it('round-trips with entries', () => {
+    const obj = { x: 'one', y: 'two' }
+    expect(fromEntries(entries(obj))).toEqual(obj)
+  })
+})
 
 describe('firstMissingNum', () => {
   it('returns 1 when given empty list', () => {

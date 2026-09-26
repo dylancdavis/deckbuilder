@@ -24,6 +24,15 @@ export const entries = <T extends object>(obj: T): [keyof T, T[keyof T]][] => {
 }
 
 /**
+ * Returns Object.fromEntries with correct type information.
+ */
+export const fromEntries = <K extends PropertyKey, V>(
+  pairs: Iterable<readonly [K, V]>,
+): Record<K, V> => {
+  return Object.fromEntries(pairs) as Record<K, V>
+}
+
+/**
  * Given an array of integers, return the smallest positive integer not in the array.
  */
 export function firstMissingNum(numbers: number[]) {
