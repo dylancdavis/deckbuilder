@@ -1,0 +1,128 @@
+/* Mockups of the card back: the current hexagon pattern with its colours and size opened up,
+   and a striped alternative. The story sets every --mock-* variable on the cell; sizes are in
+   the card's 250-wide units. */
+
+.card-back-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.card-back-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: #555;
+}
+
+.card-back-mockup {
+  --card-width: calc(var(--mock-card-width) * 1px);
+  --card-height: calc(var(--card-width) * 7 / 5);
+  --u: calc(var(--card-width) / 250);
+  position: relative;
+}
+
+.card-back-mockup .card-back {
+  --card-width: inherit;
+  --card-height: inherit;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Hexagons: the same conic tessellation as .card-back, with its size, fill and seam exposed.
+   The seam is the sliver of each 120deg sector left clear, so the background shows through. */
+.card-back-mockup[data-pattern='hexagons'] .card-back {
+  --s: calc(var(--mock-hex-size) * var(--u));
+  --c:
+    #0000,
+    var(--mock-hex-color) calc(var(--mock-hex-seam) * 1deg)
+      calc(120deg - var(--mock-hex-seam) * 1deg),
+    #0000 120deg;
+  background:
+    var(--g1),
+    var(--g1) var(--s) calc(1.73 * var(--s)),
+    var(--g2),
+    var(--g2) var(--s) calc(1.73 * var(--s)),
+    var(--g3) var(--s) 0,
+    var(--g3) 0 calc(1.73 * var(--s)) var(--mock-seam-color);
+  background-size: calc(2 * var(--s)) calc(3.46 * var(--s));
+}
+
+/* Rotated hexagons: the same tessellation turned 90deg clockwise. Each point (x, y) of the tile
+   moves to (100% - y, x), each conic turns 90deg further, each layer's offset (dx, dy) becomes
+   (-dy, dx) wrapped into the tile, and the tile itself swaps width and height. */
+.card-back-mockup[data-pattern='hexagons'][data-rotated] .card-back {
+  --g1: conic-gradient(from 150deg at calc(175% / 6) 56.25%, var(--c));
+  --g2: conic-gradient(from 270deg at calc(175% / 6) 43.75%, var(--c));
+  --g3: conic-gradient(from 30deg at calc(1025% / 12) 50%, var(--c));
+  background:
+    var(--g1),
+    var(--g1) calc(1.73 * var(--s)) var(--s),
+    var(--g2),
+    var(--g2) calc(1.73 * var(--s)) var(--s),
+    var(--g3) 0 var(--s),
+    var(--g3) calc(1.73 * var(--s)) 0 var(--mock-seam-color);
+  background-size: calc(3.46 * var(--s)) calc(2 * var(--s));
+}
+
+/* Stripes: two colours repeating at an angle */
+.card-back-mockup[data-pattern='stripes'] .card-back {
+  background: repeating-linear-gradient(
+    calc(var(--mock-stripe-angle) * 1deg),
+    var(--mock-stripe-color) 0 calc(var(--mock-stripe-width) * var(--u)),
+    var(--mock-gap-color) 0 calc((var(--mock-stripe-width) + var(--mock-stripe-gap)) * var(--u))
+  );
+}
+
+/* Tint: a top-to-bottom gradient multiplied over the pattern. White on both ends leaves it be. */
+.card-back-mockup .card-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--mock-tint-top), var(--mock-tint-bottom));
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Glow and frame: a radial light from the centre, inside an inset border with its own corner
+   radius. The card's is 16, so a little under reads as following it. A zero strength or width
+   turns either off. */
+.card-back-mockup .card-back::after {
+  --frame-inset: calc(var(--mock-frame-inset) * var(--u));
+  content: '';
+  position: absolute;
+  inset: var(--frame-inset);
+  border: calc(var(--mock-frame-width) * var(--u)) solid var(--mock-frame-color);
+  border-radius: calc(var(--mock-frame-radius) * var(--u));
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--mock-glow-color) calc(var(--mock-glow-strength) * 100%), #0000),
+    #0000 calc(var(--mock-glow-radius) * 1%)
+  );
+  pointer-events: none;
+}
+
+/* Emblem: one of the game's icons in the middle, each layer filled from its own colour */
+.card-back-emblem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: calc(var(--mock-emblem-size) * var(--u));
+  height: auto;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.card-back-emblem .emblem-dark {
+  fill: var(--mock-emblem-dark);
+}
+
+.card-back-emblem .emblem-light {
+  fill: var(--mock-emblem-light);
+}
