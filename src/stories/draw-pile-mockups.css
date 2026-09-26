@@ -1,0 +1,65 @@
+/* Mockups of the draw pile: the run view's stack beside variants of its spread and shadow. The
+   story sets every --pile-* variable on the pile; each card sets its depth in --i, 0 on top. */
+
+.draw-pile-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 48px;
+  padding: 32px;
+  background-color: white;
+  border-radius: 14px;
+}
+
+.draw-pile-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  font-size: 14px;
+  color: #555;
+}
+
+.draw-pile-mockup {
+  position: relative;
+  /* Leave room for the cards spread out behind the top one */
+  margin-left: calc(var(--pile-depth) * max(0px, -1 * var(--pile-dx)));
+  margin-right: calc(var(--pile-depth) * max(0px, var(--pile-dx)));
+  margin-bottom: calc(var(--pile-depth) * max(0px, var(--pile-dy)));
+  margin-top: calc(var(--pile-depth) * max(0px, -1 * var(--pile-dy)));
+}
+
+.draw-pile-mockup .card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: calc(10 - var(--i));
+  translate: calc(var(--i) * var(--pile-dx)) calc(var(--i) * var(--pile-dy));
+  box-shadow: var(--pile-shadow-x) var(--pile-shadow-y) var(--pile-shadow-blur)
+    rgb(0 0 0 / var(--pile-shadow-opacity));
+  filter: brightness(calc(1 - var(--i) * var(--pile-darken)));
+}
+
+/* The top card comes first and holds the pile's size */
+.draw-pile-mockup .card-back:first-child {
+  position: relative;
+}
+
+.draw-pile-mockup .card-back:hover {
+  z-index: 20;
+}
+
+/* The counter parks behind the stack and slides out from under it on hover, as in the run view */
+.draw-pile-mockup .card-count {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  transition: 0.15s transform ease;
+}
+
+.draw-pile-mockup:hover .card-count {
+  transform: translate(-50%, -0.75em);
+}
