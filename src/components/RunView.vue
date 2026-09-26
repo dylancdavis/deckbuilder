@@ -274,7 +274,7 @@ const discardPileData = computed(() => discardPile(run.value.cards.discardPile))
                 <CardItem :card="card" :tilt="TILT_PRESETS.hand" />
               </div>
               <div class="flip-card-back">
-                <div class="card-container card-back" />
+                <CardBack />
               </div>
             </div>
           </div>

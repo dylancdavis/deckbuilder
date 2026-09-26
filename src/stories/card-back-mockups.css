@@ -1,6 +1,6 @@
-/* Mockups of the card back: the current hexagon pattern with its colours and size opened up,
-   and a striped alternative. The story sets every --mock-* variable on the cell; sizes are in
-   the card's 250-wide units. */
+/* Mockups of the card back: the old hexagon pattern with its colours and size opened up, and
+   the stripes the card back now uses. The story sets every --mock-* variable on the cell; sizes
+   are in the card's 250-wide units. */
 
 .card-back-row {
   display: flex;
@@ -34,9 +34,17 @@
   isolation: isolate;
 }
 
-/* Hexagons: the same conic tessellation as .card-back, with its size, fill and seam exposed.
+/* The mockups draw their own emblem over the card */
+.card-back-mockup .card-back-icon {
+  display: none;
+}
+
+/* Hexagons: the old card back's conic tessellation, with its size, fill and seam exposed.
    The seam is the sliver of each 120deg sector left clear, so the background shows through. */
 .card-back-mockup[data-pattern='hexagons'] .card-back {
+  --g1: conic-gradient(from 60deg at 56.25% calc(425% / 6), var(--c));
+  --g2: conic-gradient(from 180deg at 43.75% calc(425% / 6), var(--c));
+  --g3: conic-gradient(from -60deg at 50% calc(175% / 12), var(--c));
   --s: calc(var(--mock-hex-size) * var(--u));
   --c:
     #0000,

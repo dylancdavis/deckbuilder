@@ -64,7 +64,7 @@ const overlayControls = {
   emblemSize: { var: 'emblem-size', default: 0, min: 0, max: 200, step: 1 },
 } as const
 
-// The hexagon defaults match .card-back: 8px hexagons on a 200px card, #ededed on #dfdfdf
+// The hexagon defaults match the old card back: 8px hexagons on a 200px card, #ededed on #dfdfdf
 const hexControls = {
   hexSize: { var: 'hex-size', default: 10, min: 3, max: 60, step: 0.5 },
   hexColor: { var: 'hex-color', default: '#ededed' },

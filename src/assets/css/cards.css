@@ -55,21 +55,46 @@
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.7);
 }
 
+/* Wide diagonal stripes inside an inset frame, with the game's icon in the middle. Sizes are in
+   the card's 250-wide units. */
 .card-back {
-  --s: 8px; /* control the size */
-  --c: #0000, #ededed 0.5deg 119.5deg, #0000 120deg;
-  --g1: conic-gradient(from 60deg at 56.25% calc(425% / 6), var(--c));
-  --g2: conic-gradient(from 180deg at 43.75% calc(425% / 6), var(--c));
-  --g3: conic-gradient(from -60deg at 50% calc(175% / 12), var(--c));
+  --u: calc(var(--card-width) / 250);
+  --card-back-stripe: #8a8a8a;
+  --card-back-gap: #747474;
+  --card-back-dark: #404040;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--card-back-stripe) 0 calc(12 * var(--u)),
+    var(--card-back-gap) 0 calc(24 * var(--u))
+  );
+}
 
-  background:
-    var(--g1),
-    var(--g1) var(--s) calc(1.73 * var(--s)),
-    var(--g2),
-    var(--g2) var(--s) calc(1.73 * var(--s)),
-    var(--g3) var(--s) 0,
-    var(--g3) 0 calc(1.73 * var(--s)) #dfdfdf;
-  background-size: calc(2 * var(--s)) calc(3.46 * var(--s));
+.card-back::after {
+  content: '';
+  position: absolute;
+  inset: calc(12 * var(--u));
+  border: calc(6 * var(--u)) solid var(--card-back-dark);
+  border-radius: calc(12 * var(--u));
+  pointer-events: none;
+}
+
+.card-back-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: calc(92 * var(--u));
+  height: auto;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.card-back-icon .icon-dark {
+  fill: var(--card-back-dark);
+}
+
+.card-back-icon .icon-light {
+  fill: var(--card-back-stripe);
 }
 
 .card-back:last-child {
