@@ -52,14 +52,15 @@
   gap: 2em;
 }
 
+/* The pile spreads from the top right down to the bottom left, each card darker than the last */
 .draw-pile {
   position: relative;
-  transform: translateX(10px);
-  --card-stack-offset: 0.375em;
+  transform: translateX(8px);
+  --card-stack-offset: 0.25em;
 }
 
 .draw-pile .card-back {
-  box-shadow: -2px 0px 2px #00000080;
+  box-shadow: -1px 1px 2px #00000040;
 }
 
 .draw-pile .card-back:nth-child(1) {
@@ -74,12 +75,16 @@
 
 .draw-pile .card-back:nth-child(2) {
   right: calc(var(--card-stack-offset) * 1);
+  top: calc(var(--card-stack-offset) * 1);
   z-index: 2;
+  filter: brightness(0.88);
 }
 
 .draw-pile .card-back:nth-child(3) {
   right: calc(var(--card-stack-offset) * 2);
+  top: calc(var(--card-stack-offset) * 2);
   z-index: 1;
+  filter: brightness(0.76);
 }
 
 .draw-pile .card-back:hover {
